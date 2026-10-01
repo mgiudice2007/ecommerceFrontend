@@ -5,6 +5,9 @@ import { useCatalogo } from '../../hooks/useCatalogo'
 import { paraInputFechaHora } from '../../utils/formato'
 import './Panel.css'
 
+const MAXIMO_FOTOS = 5 // mismos limites que el backend
+const MAXIMO_MB = 5
+
 const FORM_VACIO = {
   numeroVuelo: '',
   descripcion: '',
@@ -28,6 +31,8 @@ function FormVuelo() {
   const [cargando, setCargando] = useState(esEdicion)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
+  // Fotos elegidas al publicar: { archivo, vistaPrevia } (solo en alta; al editar se usan las pestañas)
+  const [fotos, setFotos] = useState([])
 
   useEffect(() => {
     if (!esEdicion) return
@@ -52,6 +57,49 @@ function FormVuelo() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const agregarFotos = (e) => {
+    const elegidas = [...e.target.files]
+    e.target.value = '' // permite volver a elegir el mismo archivo
+    setError('')
+
+    const grandes = elegidas.filter((archivo) => archivo.size > MAXIMO_MB * 1024 * 1024)
+    if (grandes.length > 0) {
+      setError(`Estas fotos pesan más de ${MAXIMO_MB} MB: ${grandes.map((a) => a.name).join(', ')}`)
+    }
+
+    const validas = elegidas.filter((archivo) => archivo.size <= MAXIMO_MB * 1024 * 1024)
+    const lugar = MAXIMO_FOTOS - fotos.length
+    if (validas.length > lugar) {
+      setError(`Se pueden subir hasta ${MAXIMO_FOTOS} fotos por vuelo`)
+    }
+
+    // URL.createObjectURL arma una direccion temporal para mostrar la foto antes de subirla
+    const nuevas = validas.slice(0, lugar).map((archivo) => ({ archivo, vistaPrevia: URL.createObjectURL(archivo) }))
+    setFotos([...fotos, ...nuevas])
+  }
+
+  const quitarFoto = (indice) => {
+    URL.revokeObjectURL(fotos[indice].vistaPrevia)
+    setFotos(fotos.filter((_, i) => i !== indice))
+  }
+
+  // Sube las fotos una por una al vuelo recien creado (POST /api/fotos, multipart).
+  // Devuelve los nombres de las que fallaron, para avisar sin perder el vuelo creado.
+  const subirFotos = async (vueloId) => {
+    const fallidas = []
+    for (const { archivo } of fotos) {
+      const datos = new FormData()
+      datos.append('vueloId', vueloId)
+      datos.append('file', archivo)
+      try {
+        await api('/api/fotos', { method: 'POST', body: datos })
+      } catch {
+        fallidas.push(archivo.name)
+      }
+    }
+    return fallidas
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -72,8 +120,10 @@ function FormVuelo() {
         ? await api(`/api/vuelos/${id}`, { method: 'PUT', body })
         : await api('/api/vuelos', { method: 'POST', body })
 
+      const fotosConError = esEdicion ? [] : await subirFotos(vuelo.id)
+
       // Un vuelo nuevo nace sin asientos: lo mandamos a cargarle las clases
-      navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: !esEdicion } })
+      navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: !esEdicion, fotosConError } })
     } catch (err) {
       setError(err.message)
       setGuardando(false)
@@ -95,7 +145,7 @@ function FormVuelo() {
         <p className="texto-suave">
           {esEdicion
             ? 'Los cambios se ven enseguida en la búsqueda. Las compras ya hechas no cambian.'
-            : 'Después de guardarlo vas a poder cargar las clases, asientos, descuentos y fotos.'}
+            : 'Cargá los datos y las fotos. Después vas a poder agregar las clases con asientos y los descuentos.'}
         </p>
 
         {error && <div className="mensaje mensaje-error">{error}</div>}
@@ -205,9 +255,48 @@ function FormVuelo() {
             />
           </div>
 
+          {esEdicion ? (
+            <p className="panel-ayuda">
+              Las fotos, clases y descuentos se manejan desde{' '}
+              <Link to={`/panel/vuelos/${id}`}>la gestión del vuelo</Link>.
+            </p>
+          ) : (
+            <div className="campo">
+              <label htmlFor="fotos">
+                Fotos ({fotos.length}/{MAXIMO_FOTOS})
+              </label>
+              {fotos.length < MAXIMO_FOTOS && (
+                <input id="fotos" type="file" accept="image/*" multiple onChange={agregarFotos} />
+              )}
+              <span className="panel-ayuda">
+                Podés elegir varias a la vez, hasta {MAXIMO_MB} MB cada una. La primera es la portada.
+              </span>
+
+              {fotos.length > 0 && (
+                <div className="form-fotos">
+                  {fotos.map((foto, indice) => (
+                    <figure key={foto.vistaPrevia}>
+                      <img src={foto.vistaPrevia} alt={foto.archivo.name} />
+                      {indice === 0 && <span className="etiqueta">Portada</span>}
+                      <button type="button" onClick={() => quitarFoto(indice)} aria-label={`Quitar ${foto.archivo.name}`}>
+                        ✕
+                      </button>
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="panel-botones">
             <button className="boton boton-primario" disabled={guardando}>
-              {guardando ? 'Guardando…' : esEdicion ? 'Guardar cambios' : 'Publicar vuelo'}
+              {guardando
+                ? fotos.length > 0 && !esEdicion
+                  ? 'Publicando y subiendo fotos…'
+                  : 'Guardando…'
+                : esEdicion
+                  ? 'Guardar cambios'
+                  : 'Publicar vuelo'}
             </button>
             <Link to="/panel" className="boton boton-secundario">
               Cancelar

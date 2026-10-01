@@ -19,6 +19,7 @@ import CrearAdmin from './pages/vendedor/CrearAdmin'
 import FormVuelo from './pages/vendedor/FormVuelo'
 import GestionVuelo from './pages/vendedor/GestionVuelo'
 import PanelVuelos from './pages/vendedor/PanelVuelos'
+import Usuarios from './pages/vendedor/Usuarios'
 
 function App() {
   return (
@@ -115,6 +116,14 @@ function App() {
             />
 
             {/* Solo administradores */}
+            <Route
+              path="/panel/usuarios"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <Usuarios />
+                </RutaProtegida>
+              }
+            />
             <Route
               path="/panel/administradores"
               element={

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { duracion, fechaCorta, hora, precio } from '../utils/formato'
 import { precioDesde, textoDescuento } from '../utils/vuelos'
+import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
 
 // Una fila del listado de resultados. Recibe el vuelo completo por props.
@@ -10,6 +11,10 @@ function TarjetaVuelo({ vuelo }) {
 
   return (
     <article className="tarjeta tarjeta-vuelo">
+      <Link to={`/vuelos/${vuelo.id}`} className="tarjeta-vuelo-foto" tabIndex={-1} aria-hidden="true">
+        <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+      </Link>
+
       <div className="tarjeta-vuelo-info">
         <div className="tarjeta-vuelo-encabezado">
           <span className="tarjeta-vuelo-avion" aria-hidden="true">✈</span>

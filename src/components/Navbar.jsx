@@ -44,7 +44,12 @@ function Navbar() {
               {cantidadCarrito > 0 && <span className="navbar-contador">{cantidadCarrito}</span>}
             </NavLink>
           )}
-          {(esVendedor || esAdmin) && <NavLink to="/panel">Panel de vuelos</NavLink>}
+          {(esVendedor || esAdmin) && (
+            <NavLink to="/panel" end>
+              Panel de vuelos
+            </NavLink>
+          )}
+          {esAdmin && <NavLink to="/panel/usuarios">Usuarios</NavLink>}
 
           {estaLogueado ? (
             <div className="navbar-usuario" onClick={(e) => e.stopPropagation()}>

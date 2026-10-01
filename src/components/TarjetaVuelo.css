@@ -1,8 +1,23 @@
 .tarjeta-vuelo {
   display: grid;
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 180px 1fr 220px;
   gap: 24px;
-  padding: 20px 24px;
+  padding: 16px 24px 16px 16px;
+}
+
+.tarjeta-vuelo-foto {
+  overflow: hidden;
+  min-height: 160px;
+  border-radius: var(--radio);
+}
+
+.tarjeta-vuelo-foto .foto-vuelo-vacia span {
+  font-size: 32px;
+}
+
+.tarjeta-vuelo-info {
+  min-width: 0;
+  padding-top: 4px;
 }
 
 .tarjeta-vuelo-encabezado {
@@ -157,11 +172,22 @@
   width: 100%;
 }
 
+@media (max-width: 960px) {
+  .tarjeta-vuelo {
+    grid-template-columns: 140px 1fr 200px;
+  }
+}
+
 @media (max-width: 760px) {
   .tarjeta-vuelo {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 18px;
+  }
+
+  .tarjeta-vuelo-foto {
+    min-height: 0;
+    height: 150px;
   }
 
   .tarjeta-vuelo-precio {

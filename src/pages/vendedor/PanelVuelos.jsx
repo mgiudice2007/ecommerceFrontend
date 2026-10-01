@@ -64,8 +64,8 @@ function PanelVuelos() {
         </div>
         <div className="panel-encabezado-acciones">
           {esAdmin && (
-            <Link to="/panel/administradores" className="boton boton-secundario">
-              Crear administrador
+            <Link to="/panel/usuarios" className="boton boton-secundario">
+              Usuarios y permisos
             </Link>
           )}
           <Link to="/panel/vuelos/nuevo" className="boton boton-primario">

@@ -38,8 +38,8 @@ Los crea el backend la primera vez que arranca con la base vacía:
 
 - **Cualquier visitante:** ver el inicio, buscar vuelos (origen, destino, tipo, clase y precio) y ver el detalle de cada vuelo.
 - **Comprador:** agregar pasajes al carrito, pagar (pago simulado), ver sus compras, cancelarlas (los asientos vuelven al vuelo) y completar su perfil.
-- **Vendedor:** publicar, editar y eliminar sus vuelos; cargar clases con asientos y precio; crear, pausar y borrar descuentos; subir y borrar fotos.
-- **Administrador:** lo mismo que el vendedor pero sobre los vuelos de todos, y además crear otros administradores.
+- **Vendedor:** publicar vuelos con sus fotos, editarlos y eliminarlos; cargar clases con asientos y precio; crear, pausar y borrar descuentos; subir y borrar fotos.
+- **Administrador:** lo mismo que el vendedor pero sobre los vuelos de todos; ver todas las cuentas y cambiarles el rol (asignación de permisos); crear otros administradores.
 
 ## Estructura
 

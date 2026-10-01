@@ -70,6 +70,12 @@ function GestionVuelo() {
           ¡Vuelo publicado! Ahora cargale al menos una clase con asientos para que se pueda comprar.
         </div>
       )}
+      {location.state?.fotosConError?.length > 0 && (
+        <div className="mensaje mensaje-error">
+          No se pudieron subir estas fotos: {location.state.fotosConError.join(', ')}. Probá de nuevo desde la
+          pestaña Fotos.
+        </div>
+      )}
 
       <header className="tarjeta gestion-encabezado">
         <div>

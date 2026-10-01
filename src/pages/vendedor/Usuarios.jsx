@@ -1,0 +1,197 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { api } from '../../api/api'
+import { useAuth } from '../../context/AuthContext'
+import { fechaLarga } from '../../utils/formato'
+import './Panel.css'
+import './Usuarios.css'
+
+const ROLES = [
+  { valor: 'COMPRADOR', nombre: 'Comprador', plural: 'Compradores' },
+  { valor: 'VENDEDOR', nombre: 'Vendedor', plural: 'Vendedores' },
+  { valor: 'ADMIN', nombre: 'Administrador', plural: 'Administradores' },
+]
+
+// Administracion de cuentas y asignacion de permisos (solo ADMIN).
+// GET /api/usuarios trae todas las cuentas; PUT /api/usuarios/:id/rol cambia el rol.
+function Usuarios() {
+  const { usuario: yo } = useAuth()
+
+  const [usuarios, setUsuarios] = useState(null)
+  const [cambios, setCambios] = useState({}) // { idUsuario: rolElegido } de las filas sin guardar
+  const [busqueda, setBusqueda] = useState('')
+  const [filtroRol, setFiltroRol] = useState('')
+  const [error, setError] = useState('')
+  const [exito, setExito] = useState('')
+  const [guardando, setGuardando] = useState(null)
+
+  useEffect(() => {
+    api('/api/usuarios')
+      .then(setUsuarios)
+      .catch((err) => setError(err.message))
+  }, [])
+
+  const elegirRol = (usuario, rol) => {
+    setExito('')
+    // Si vuelve a elegir el rol que ya tenia, deja de ser un cambio pendiente
+    const nuevos = { ...cambios }
+    if (rol === usuario.rol) delete nuevos[usuario.id]
+    else nuevos[usuario.id] = rol
+    setCambios(nuevos)
+  }
+
+  const guardar = async (usuario) => {
+    const rol = cambios[usuario.id]
+    const nombreRol = ROLES.find((r) => r.valor === rol).nombre
+    if (!window.confirm(`¿Cambiar a ${usuario.username} a ${nombreRol}?`)) return
+
+    setError('')
+    setExito('')
+    setGuardando(usuario.id)
+    try {
+      const actualizado = await api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
+      setUsuarios(usuarios.map((u) => (u.id === actualizado.id ? actualizado : u)))
+      const { [usuario.id]: _guardado, ...resto } = cambios
+      setCambios(resto)
+      setExito(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setGuardando(null)
+    }
+  }
+
+  const texto = busqueda.trim().toLowerCase()
+  const visibles = (usuarios ?? []).filter(
+    (u) =>
+      (!filtroRol || u.rol === filtroRol) &&
+      (!texto || `${u.username} ${u.nombre} ${u.apellido} ${u.mail}`.toLowerCase().includes(texto)),
+  )
+
+  const cantidadPorRol = (rol) => (usuarios ?? []).filter((u) => u.rol === rol).length
+
+  return (
+    <div className="contenedor pagina">
+      <Link to="/panel" className="panel-volver">
+        ← Volver al panel
+      </Link>
+
+      <header className="panel-encabezado">
+        <div>
+          <span className="etiqueta">Administrador</span>
+          <h1>Usuarios y permisos</h1>
+        </div>
+        <Link to="/panel/administradores" className="boton boton-secundario">
+          + Crear administrador
+        </Link>
+      </header>
+
+      {usuarios && (
+        <div className="panel-numeros">
+          {ROLES.map((r) => (
+            <div key={r.valor} className="tarjeta">
+              <small>{r.plural}</small>
+              <strong>{cantidadPorRol(r.valor)}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && <div className="mensaje mensaje-error">{error}</div>}
+      {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+
+      <section className="tarjeta">
+        <div className="usuarios-filtros">
+          <div className="campo">
+            <label htmlFor="busqueda">Buscar</label>
+            <input
+              id="busqueda"
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Usuario, nombre o mail"
+            />
+          </div>
+          <div className="campo">
+            <label htmlFor="filtroRol">Rol</label>
+            <select id="filtroRol" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
+              <option value="">Todos</option>
+              {ROLES.map((r) => (
+                <option key={r.valor} value={r.valor}>
+                  {r.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {!usuarios && !error && <p className="texto-suave">Cargando usuarios…</p>}
+        {usuarios && visibles.length === 0 && <div className="gestion-vacio">Ningún usuario coincide con la búsqueda.</div>}
+
+        {visibles.length > 0 && (
+          <div className="usuarios-tabla-contenedor">
+            <table className="usuarios-tabla">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Nombre</th>
+                  <th>Registrado</th>
+                  <th>Rol</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {visibles.map((u) => {
+                  const soyYo = u.username === yo.username
+                  const rolElegido = cambios[u.id] ?? u.rol
+
+                  return (
+                    <tr key={u.id} className={cambios[u.id] ? 'con-cambios' : ''}>
+                      <td>
+                        <strong>{u.username}</strong>
+                        <small>{u.mail}</small>
+                      </td>
+                      <td>
+                        {u.nombre} {u.apellido}
+                      </td>
+                      <td>{u.fechaRegistro ? fechaLarga(u.fechaRegistro) : '—'}</td>
+                      <td>
+                        <select
+                          value={rolElegido}
+                          onChange={(e) => elegirRol(u, e.target.value)}
+                          disabled={soyYo}
+                          aria-label={`Rol de ${u.username}`}
+                          title={soyYo ? 'No podés cambiar tu propio rol' : undefined}
+                        >
+                          {ROLES.map((r) => (
+                            <option key={r.valor} value={r.valor}>
+                              {r.nombre}
+                            </option>
+                          ))}
+                        </select>
+                        {soyYo && <small>Sos vos</small>}
+                      </td>
+                      <td className="acciones">
+                        {cambios[u.id] && (
+                          <button
+                            className="boton boton-primario"
+                            onClick={() => guardar(u)}
+                            disabled={guardando === u.id}
+                          >
+                            {guardando === u.id ? 'Guardando…' : 'Guardar'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  )
+}
+
+export default Usuarios
