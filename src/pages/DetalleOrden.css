@@ -1,0 +1,142 @@
+.orden {
+  max-width: 800px;
+}
+
+.orden-exito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.orden-exito-icono {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--verde-suave);
+  color: var(--verde);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.orden-exito h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(28px, 4vw, 38px);
+}
+
+.orden-exito p {
+  max-width: 480px;
+  margin: 0;
+}
+
+.orden-encabezado {
+  margin-bottom: 20px;
+}
+
+.orden-encabezado h1 {
+  margin-top: 8px;
+  font-size: 30px;
+}
+
+.etiqueta-exito {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.etiqueta-cancelada {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}
+
+.orden-boleto-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--borde);
+}
+
+.orden-boleto-encabezado div {
+  display: flex;
+  flex-direction: column;
+}
+
+.orden-boleto-encabezado small {
+  color: var(--texto-suave);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.orden-boleto-encabezado .etiqueta {
+  margin-left: auto;
+}
+
+.orden-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orden-items li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.orden-items li div {
+  display: flex;
+  flex-direction: column;
+}
+
+.orden-items small {
+  color: var(--texto-suave);
+}
+
+.orden-items li > span {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.orden-totales {
+  padding-top: 16px;
+}
+
+.orden-ahorro {
+  display: flex;
+  justify-content: space-between;
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.orden-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 8px;
+}
+
+.orden-total span {
+  font-weight: 700;
+}
+
+.orden-total strong {
+  color: var(--azul);
+  font-size: 30px;
+}
+
+.orden-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}

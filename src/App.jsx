@@ -3,6 +3,9 @@ import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import RutaProtegida from './components/RutaProtegida'
 import { AuthProvider } from './context/AuthContext'
+import Carrito from './pages/Carrito'
+import Checkout from './pages/Checkout'
+import DetalleOrden from './pages/DetalleOrden'
 import DetalleVuelo from './pages/DetalleVuelo'
 import Inicio from './pages/Inicio'
 import Login from './pages/Login'
@@ -30,7 +33,15 @@ function App() {
               path="/carrito"
               element={
                 <RutaProtegida roles={['COMPRADOR']}>
-                  <Proximamente titulo="Mi carrito" />
+                  <Carrito />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <Checkout />
                 </RutaProtegida>
               }
             />
@@ -39,6 +50,14 @@ function App() {
               element={
                 <RutaProtegida roles={['COMPRADOR']}>
                   <Proximamente titulo="Mis compras" />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/mis-compras/:id"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <DetalleOrden />
                 </RutaProtegida>
               }
             />

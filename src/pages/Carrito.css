@@ -1,0 +1,100 @@
+/* Estilos del carrito y del checkout (comparten el resumen de la derecha) */
+.carrito-titulo {
+  margin-bottom: 24px;
+  font-size: clamp(28px, 4vw, 36px);
+}
+
+.carrito-titulo span {
+  color: var(--azul);
+  font-size: 0.6em;
+}
+
+.carrito-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.carrito-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.carrito-vacio {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.carrito-vacio p {
+  margin: 8px 0 20px;
+}
+
+.carrito-resumen {
+  position: sticky;
+  top: 96px;
+}
+
+.carrito-resumen h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.carrito-resumen-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.carrito-resumen-fila span:first-child {
+  color: var(--texto-suave);
+}
+
+.carrito-resumen-ahorro {
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.carrito-resumen-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--borde);
+}
+
+.carrito-resumen-total span {
+  font-weight: 700;
+}
+
+.carrito-resumen-total strong {
+  color: var(--azul);
+  font-size: 32px;
+}
+
+.carrito-aclaracion {
+  margin: 8px 0 16px;
+  font-size: 13px;
+}
+
+.carrito-seguir {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 960px) {
+  .carrito-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .carrito-resumen {
+    position: static;
+  }
+}
