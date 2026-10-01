@@ -1,0 +1,144 @@
+/* Estilos compartidos por Login y Registro */
+.auth {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.auth-formulario {
+  padding: 40px;
+}
+
+.auth-formulario h1 {
+  margin: 14px 0 6px;
+  font-size: 30px;
+}
+
+.auth-formulario > p {
+  margin: 0 0 24px;
+}
+
+.auth-pie {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--borde);
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  border-radius: var(--radio-grande);
+  color: rgba(255, 255, 255, 0.85);
+  background:
+    radial-gradient(circle at 85% 15%, rgba(43, 143, 214, 0.45), transparent 45%),
+    linear-gradient(160deg, var(--azul) 0%, var(--azul-noche) 100%);
+}
+
+.auth-panel h2 {
+  color: #fff;
+  font-size: 28px;
+}
+
+.auth-panel p {
+  margin: 0;
+}
+
+.auth-panel ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-panel li::before {
+  content: '✓';
+  margin-right: 10px;
+  color: var(--durazno);
+  font-weight: 800;
+}
+
+.auth-panel-etiqueta {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--durazno);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Selector de rol en el registro */
+.auth-roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 0;
+  border: none;
+}
+
+.auth-roles legend {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-rol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.auth-rol input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auth-rol small {
+  color: var(--texto-suave);
+}
+
+.auth-rol.seleccionado {
+  border-color: var(--azul);
+  background: var(--celeste-suave);
+}
+
+.auth-rol:has(input:focus-visible) {
+  outline: 2px solid var(--celeste);
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-panel {
+    padding: 28px;
+  }
+
+  .auth-formulario {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-roles {
+    grid-template-columns: 1fr;
+  }
+}

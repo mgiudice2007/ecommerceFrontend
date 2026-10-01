@@ -15,7 +15,9 @@ const mensajeDeError = (data, status) => {
   if (data?.fields) {
     return Object.values(data.fields).join('. ')
   }
-  if (data?.error) {
+  // Los 401/403 que corta Spring Security antes de llegar al controller
+  // vienen con el texto en ingles ("Unauthorized", "Forbidden")
+  if (data?.error && !['Unauthorized', 'Forbidden'].includes(data.error)) {
     return data.error
   }
   if (status === 401) return 'Tenés que iniciar sesión'

@@ -1,0 +1,50 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--azul-noche);
+}
+
+.logo:hover {
+  text-decoration: none;
+}
+
+.logo-icono {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--azul);
+  color: #fff;
+}
+
+.logo-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logo-texto strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--azul);
+}
+
+.logo-texto small {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.logo-claro .logo-icono {
+  background: #fff;
+  color: var(--azul);
+}
+
+.logo-claro .logo-texto strong,
+.logo-claro .logo-texto small {
+  color: #fff;
+}

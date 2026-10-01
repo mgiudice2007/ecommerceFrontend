@@ -1,12 +1,215 @@
+/* Colores y medidas de BCA Airlines (sacados del diseño de Figma).
+   Se usan en todo el sitio con var(--nombre). */
+:root {
+  --azul-noche: #0a2540;
+  --azul: #0b4f7c;
+  --azul-hover: #093f63;
+  --celeste: #2b8fd6;
+  --celeste-suave: #e6f1fb;
+  --durazno: #f9d9a8;
+
+  --fondo: #f4f6fb;
+  --superficie: #ffffff;
+  --superficie-2: #eef2f8;
+  --borde: #dfe5ee;
+
+  --texto: #12263a;
+  --texto-suave: #5b6b7c;
+
+  --verde: #1f8a5b;
+  --verde-suave: #e3f5ec;
+  --rojo: #c0392b;
+  --rojo-suave: #fbe9e7;
+
+  --radio: 12px;
+  --radio-grande: 18px;
+  --sombra: 0 6px 24px rgba(10, 37, 64, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  background: #f4f6fb;
-  color: #12263a;
+  background: var(--fondo);
+  color: var(--texto);
+  line-height: 1.5;
 }
 
-.base {
-  max-width: 960px;
+a {
+  color: var(--azul);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 16px;
+  padding: 0 16px;
+}
+
+.pagina {
+  padding: 40px 0 64px;
+  min-height: calc(100vh - 280px);
+}
+
+/* ---------- Botones ---------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.boton-primario {
+  background: var(--azul);
+  color: #fff;
+}
+
+.boton-primario:hover:not(:disabled) {
+  background: var(--azul-hover);
+  text-decoration: none;
+}
+
+.boton-secundario {
+  background: var(--superficie);
+  color: var(--azul);
+  border-color: var(--borde);
+}
+
+.boton-secundario:hover:not(:disabled) {
+  border-color: var(--azul);
+  text-decoration: none;
+}
+
+.boton-peligro {
+  background: var(--superficie);
+  color: var(--rojo);
+  border-color: var(--borde);
+}
+
+.boton-peligro:hover:not(:disabled) {
+  background: var(--rojo-suave);
+}
+
+.boton-ancho {
+  width: 100%;
+}
+
+/* ---------- Formularios ---------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.campo label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie-2);
+  font: inherit;
+  color: var(--texto);
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: 2px solid var(--celeste);
+  outline-offset: 1px;
+  background: var(--superficie);
+}
+
+.fila-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ---------- Tarjetas y mensajes ---------- */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra);
+  padding: 24px;
+}
+
+.mensaje {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.mensaje-error {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}
+
+.mensaje-exito {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--celeste-suave);
+  color: var(--azul);
+}
+
+.texto-suave {
+  color: var(--texto-suave);
+}
+
+@media (max-width: 640px) {
+  .fila-campos {
+    grid-template-columns: 1fr;
+  }
+
+  .pagina {
+    padding: 24px 0 48px;
+  }
 }
