@@ -10,7 +10,7 @@ export const precio = (valor) => formatoPrecio.format(Number(valor ?? 0))
 
 // El backend manda fechas como "2026-12-15T10:00:00"
 export const hora = (fecha) =>
-  new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
 
 export const fechaCorta = (fecha) =>
   new Date(fecha).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })

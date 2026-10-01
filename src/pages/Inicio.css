@@ -1,0 +1,137 @@
+.inicio-hero {
+  padding: 72px 0 120px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(43, 143, 214, 0.5), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(249, 217, 168, 0.18), transparent 40%),
+    linear-gradient(165deg, var(--azul) 0%, var(--azul-noche) 100%);
+}
+
+.inicio-hero-chip {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.inicio-hero h1 {
+  max-width: 720px;
+  margin: 20px 0 16px;
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 800;
+}
+
+.inicio-hero h1 span {
+  color: #7cc4f5;
+}
+
+.inicio-hero p {
+  max-width: 560px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 17px;
+}
+
+.inicio-buscador {
+  margin-top: -72px;
+  position: relative;
+}
+
+.inicio-seccion {
+  padding-top: 64px;
+}
+
+.inicio-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.inicio-titulo h2 {
+  margin-top: 4px;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.inicio-sobretitulo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--celeste);
+}
+
+.inicio-destinos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.inicio-vendedores {
+  padding: 48px;
+  border-radius: 24px;
+  color: rgba(255, 255, 255, 0.85);
+  background:
+    radial-gradient(circle at 90% 50%, rgba(43, 143, 214, 0.45), transparent 50%),
+    linear-gradient(135deg, var(--azul) 0%, var(--azul-noche) 100%);
+}
+
+.inicio-vendedores h2 {
+  max-width: 620px;
+  margin: 16px 0 12px;
+  color: #fff;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.inicio-vendedores p {
+  max-width: 560px;
+  margin: 0 0 24px;
+}
+
+.inicio-vendedores-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--durazno);
+  color: var(--azul-noche);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.inicio-vendedores-boton {
+  background: var(--durazno);
+  color: var(--azul-noche);
+}
+
+.inicio-vendedores-boton:hover {
+  background: #f5c98a;
+  text-decoration: none;
+}
+
+@media (max-width: 960px) {
+  .inicio-destinos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .inicio-hero {
+    padding: 48px 0 100px;
+  }
+
+  .inicio-titulo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inicio-destinos {
+    grid-template-columns: 1fr;
+  }
+
+  .inicio-vendedores {
+    padding: 28px;
+  }
+}

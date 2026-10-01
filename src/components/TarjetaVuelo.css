@@ -1,0 +1,178 @@
+.tarjeta-vuelo {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 24px;
+  padding: 20px 24px;
+}
+
+.tarjeta-vuelo-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tarjeta-vuelo-encabezado > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.tarjeta-vuelo-encabezado small {
+  color: var(--texto-suave);
+}
+
+.tarjeta-vuelo-avion {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--celeste-suave);
+  color: var(--azul);
+  font-size: 18px;
+}
+
+.etiqueta-descuento {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.tarjeta-vuelo-horarios {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  margin: 20px 0 16px;
+}
+
+.tarjeta-vuelo-horarios > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-vuelo-horarios .derecha {
+  text-align: right;
+}
+
+.tarjeta-vuelo-horarios strong {
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.tarjeta-vuelo-horarios span {
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.tarjeta-vuelo-horarios small {
+  color: var(--texto-suave);
+}
+
+.tarjeta-vuelo-linea {
+  align-items: center;
+  text-align: center;
+}
+
+.tarjeta-vuelo-linea span {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  margin: 6px 0;
+  background: var(--borde);
+}
+
+.tarjeta-vuelo-linea span::before,
+.tarjeta-vuelo-linea span::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--azul);
+}
+
+.tarjeta-vuelo-linea span::before {
+  left: 0;
+}
+
+.tarjeta-vuelo-linea span::after {
+  right: 0;
+}
+
+.tarjeta-vuelo-clases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tarjeta-vuelo-clases li {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--superficie-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tarjeta-vuelo-clases li.agotada {
+  color: var(--texto-suave);
+  text-decoration: line-through;
+}
+
+.tarjeta-vuelo-precio {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
+  padding-left: 24px;
+  border-left: 1px dashed var(--borde);
+  text-align: right;
+}
+
+.tarjeta-vuelo-precio small {
+  color: var(--texto-suave);
+}
+
+.tarjeta-vuelo-precio s {
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.tarjeta-vuelo-precio strong {
+  font-size: 26px;
+  color: var(--azul);
+}
+
+.tarjeta-vuelo-precio .sin-stock {
+  font-size: 18px;
+  color: var(--texto-suave);
+}
+
+.tarjeta-vuelo-precio .boton {
+  margin-top: 12px;
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .tarjeta-vuelo {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .tarjeta-vuelo-precio {
+    align-items: stretch;
+    padding: 16px 0 0;
+    border-left: none;
+    border-top: 1px dashed var(--borde);
+    text-align: left;
+  }
+
+  .tarjeta-vuelo-horarios strong {
+    font-size: 22px;
+  }
+}

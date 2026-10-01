@@ -1,0 +1,71 @@
+.vuelos-titulo {
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+.vuelos-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 28px;
+}
+
+.vuelos-filtros {
+  position: sticky;
+  top: 96px;
+  padding: 20px;
+}
+
+.vuelos-filtros h2 {
+  margin-bottom: 16px;
+  font-size: 17px;
+}
+
+.vuelos-filtros .boton + .boton {
+  margin-top: 8px;
+}
+
+.vuelos-aclaracion {
+  margin: -4px 0 16px;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.vuelos-cantidad {
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+.vuelos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vuelos-vacio {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.vuelos-vacio p {
+  margin: 8px 0 0;
+}
+
+.vuelos-paginas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 860px) {
+  .vuelos-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .vuelos-filtros {
+    position: static;
+  }
+}

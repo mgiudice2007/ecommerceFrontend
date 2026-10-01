@@ -1,0 +1,78 @@
+.tarjeta-destino {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  color: var(--texto);
+  font-weight: 400;
+  transition: transform 0.15s;
+}
+
+.tarjeta-destino:hover {
+  transform: translateY(-3px);
+  text-decoration: none;
+}
+
+.tarjeta-destino-foto {
+  position: relative;
+  height: 170px;
+}
+
+.tarjeta-destino-foto .etiqueta {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.tarjeta-destino-cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+.tarjeta-destino-cuerpo h3 {
+  font-size: 18px;
+}
+
+.tarjeta-destino-cuerpo p {
+  margin: 4px 0 16px;
+  font-size: 14px;
+}
+
+.tarjeta-destino-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.tarjeta-destino-pie div {
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-destino-pie small {
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.tarjeta-destino-pie strong {
+  color: var(--azul);
+  font-size: 20px;
+}
+
+.tarjeta-destino-flecha {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--celeste-suave);
+  color: var(--azul);
+  font-weight: 700;
+}

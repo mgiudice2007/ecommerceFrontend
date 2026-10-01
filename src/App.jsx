@@ -3,9 +3,11 @@ import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import RutaProtegida from './components/RutaProtegida'
 import { AuthProvider } from './context/AuthContext'
+import Inicio from './pages/Inicio'
 import Login from './pages/Login'
 import Proximamente from './pages/Proximamente'
 import Registro from './pages/Registro'
+import Vuelos from './pages/Vuelos'
 
 function App() {
   return (
@@ -16,8 +18,9 @@ function App() {
         <main>
           <Routes>
             {/* Publicas */}
-            <Route path="/" element={<Proximamente titulo="Inicio" />} />
-            <Route path="/vuelos" element={<Proximamente titulo="Buscar vuelos" />} />
+            <Route path="/" element={<Inicio />} />
+            <Route path="/vuelos" element={<Vuelos />} />
+            <Route path="/vuelos/:id" element={<Proximamente titulo="Detalle del vuelo" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
 
