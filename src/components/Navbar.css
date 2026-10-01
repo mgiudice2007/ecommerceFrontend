@@ -31,6 +31,25 @@
   color: var(--azul);
 }
 
+.navbar-carrito {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar-contador {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--rojo);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .navbar-usuario {
   display: flex;
   align-items: center;

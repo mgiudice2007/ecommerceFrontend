@@ -3,6 +3,7 @@ import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import RutaProtegida from './components/RutaProtegida'
 import { AuthProvider } from './context/AuthContext'
+import DetalleVuelo from './pages/DetalleVuelo'
 import Inicio from './pages/Inicio'
 import Login from './pages/Login'
 import Proximamente from './pages/Proximamente'
@@ -20,7 +21,7 @@ function App() {
             {/* Publicas */}
             <Route path="/" element={<Inicio />} />
             <Route path="/vuelos" element={<Vuelos />} />
-            <Route path="/vuelos/:id" element={<Proximamente titulo="Detalle del vuelo" />} />
+            <Route path="/vuelos/:id" element={<DetalleVuelo />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
 

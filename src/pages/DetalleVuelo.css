@@ -1,0 +1,193 @@
+.detalle-migas {
+  margin-bottom: 16px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.detalle-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.detalle-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.detalle-encabezado .etiqueta + .etiqueta {
+  margin-left: 6px;
+}
+
+.detalle-encabezado h1 {
+  margin: 12px 0 4px;
+  font-size: clamp(26px, 3.5vw, 34px);
+}
+
+.detalle-encabezado p {
+  margin: 0;
+}
+
+.etiqueta-descuento {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.detalle-itinerario {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+}
+
+.detalle-itinerario > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.detalle-itinerario .derecha {
+  text-align: right;
+}
+
+.detalle-itinerario small {
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.detalle-itinerario strong {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.detalle-itinerario span {
+  font-weight: 600;
+}
+
+.detalle-duracion {
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--superficie);
+  text-align: center;
+}
+
+.detalle-descripcion {
+  margin: 20px 0 0;
+}
+
+.detalle-subtitulo {
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+
+.detalle-clases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.detalle-compra {
+  position: sticky;
+  top: 96px;
+}
+
+.detalle-compra h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.detalle-resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.detalle-resumen span {
+  color: var(--texto-suave);
+}
+
+.detalle-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 16px 0;
+}
+
+.detalle-total span {
+  font-weight: 700;
+}
+
+.detalle-total strong {
+  color: var(--azul);
+  font-size: 30px;
+}
+
+.detalle-ir-carrito {
+  margin-top: 8px;
+}
+
+/* Botones - 1 + (tambien se usan en el carrito) */
+.contador {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.contador button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--superficie-2);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--azul);
+  cursor: pointer;
+}
+
+.contador button:disabled {
+  color: var(--texto-suave);
+  cursor: not-allowed;
+}
+
+.contador span {
+  min-width: 40px;
+  color: var(--texto);
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .detalle-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detalle-compra {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .detalle-itinerario {
+    grid-template-columns: 1fr;
+  }
+
+  .detalle-itinerario .derecha {
+    text-align: left;
+  }
+
+  .detalle-duracion {
+    justify-self: start;
+  }
+}

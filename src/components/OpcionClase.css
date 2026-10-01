@@ -1,0 +1,91 @@
+.opcion-clase {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.opcion-clase:hover:not(:disabled) {
+  border-color: var(--celeste);
+}
+
+.opcion-clase.seleccionada {
+  border-color: var(--azul);
+  background: var(--celeste-suave);
+}
+
+.opcion-clase:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.opcion-clase-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.opcion-clase-encabezado strong {
+  font-size: 18px;
+}
+
+.opcion-clase p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.opcion-clase ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.opcion-clase li.no-incluye {
+  color: var(--texto-suave);
+}
+
+.opcion-clase-precio {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+}
+
+.opcion-clase-precio small {
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.opcion-clase-precio small.pocos {
+  color: var(--rojo);
+  font-weight: 700;
+}
+
+.opcion-clase-precio s {
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.opcion-clase-precio strong {
+  color: var(--azul);
+  font-size: 24px;
+}
+
+.opcion-clase-precio .agotada {
+  color: var(--texto-suave);
+  font-size: 18px;
+}

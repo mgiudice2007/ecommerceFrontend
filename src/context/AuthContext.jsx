@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { api, borrarToken, guardarToken, obtenerToken } from '../api/api'
 
 // El contexto permite que cualquier componente (la Navbar, una pagina, etc.)
@@ -24,6 +24,22 @@ const leerToken = (token) => {
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(() => leerToken(obtenerToken()))
+  const [cantidadCarrito, setCantidadCarrito] = useState(0)
+
+  // Recibe el carrito que devuelve el backend (CarritoResponse) y cuenta los pasajes.
+  // Las paginas la llaman despues de agregar, cambiar o borrar items.
+  const actualizarCarrito = (carrito) => {
+    setCantidadCarrito(carrito.items.reduce((total, item) => total + item.cantidad, 0))
+  }
+
+  // Cuando entra un comprador, traemos su carrito para mostrar la cantidad en la Navbar
+  useEffect(() => {
+    if (usuario?.rol === 'COMPRADOR') {
+      api('/api/carrito')
+        .then(actualizarCarrito)
+        .catch(() => setCantidadCarrito(0))
+    }
+  }, [usuario])
 
   const login = async (username, password) => {
     const { token } = await api('/api/auth/login', {
@@ -44,6 +60,7 @@ export function AuthProvider({ children }) {
     }
     borrarToken()
     setUsuario(null)
+    setCantidadCarrito(0)
   }
 
   const valor = {
@@ -54,6 +71,8 @@ export function AuthProvider({ children }) {
     esAdmin: usuario?.rol === 'ADMIN',
     login,
     logout,
+    cantidadCarrito,
+    actualizarCarrito,
   }
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

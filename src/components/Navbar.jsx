@@ -5,7 +5,7 @@ import Logo from './Logo'
 import './Navbar.css'
 
 function Navbar() {
-  const { usuario, estaLogueado, esComprador, esVendedor, esAdmin, logout } = useAuth()
+  const { usuario, estaLogueado, esComprador, esVendedor, esAdmin, logout, cantidadCarrito } = useAuth()
   const [menuAbierto, setMenuAbierto] = useState(false)
   const navigate = useNavigate()
 
@@ -38,7 +38,12 @@ function Navbar() {
 
           {/* Cada rol ve solo los links que le sirven */}
           {esComprador && <NavLink to="/mis-compras">Mis compras</NavLink>}
-          {esComprador && <NavLink to="/carrito">Carrito</NavLink>}
+          {esComprador && (
+            <NavLink to="/carrito" className="navbar-carrito">
+              Carrito
+              {cantidadCarrito > 0 && <span className="navbar-contador">{cantidadCarrito}</span>}
+            </NavLink>
+          )}
           {(esVendedor || esAdmin) && <NavLink to="/panel">Panel de vuelos</NavLink>}
 
           {estaLogueado ? (
