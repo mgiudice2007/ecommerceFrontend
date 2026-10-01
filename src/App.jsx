@@ -9,6 +9,8 @@ import DetalleOrden from './pages/DetalleOrden'
 import DetalleVuelo from './pages/DetalleVuelo'
 import Inicio from './pages/Inicio'
 import Login from './pages/Login'
+import MisCompras from './pages/MisCompras'
+import Perfil from './pages/Perfil'
 import Proximamente from './pages/Proximamente'
 import Registro from './pages/Registro'
 import Vuelos from './pages/Vuelos'
@@ -49,7 +51,7 @@ function App() {
               path="/mis-compras"
               element={
                 <RutaProtegida roles={['COMPRADOR']}>
-                  <Proximamente titulo="Mis compras" />
+                  <MisCompras />
                 </RutaProtegida>
               }
             />
@@ -67,7 +69,7 @@ function App() {
               path="/perfil"
               element={
                 <RutaProtegida>
-                  <Proximamente titulo="Mi perfil" />
+                  <Perfil />
                 </RutaProtegida>
               }
             />

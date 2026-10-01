@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, precio } from '../utils/formato'
+import { cancelarOrden } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 // Detalle de una compra (GET /api/ordenes/:id).
@@ -13,6 +14,7 @@ function DetalleOrden() {
 
   const [orden, setOrden] = useState(null)
   const [error, setError] = useState('')
+  const [cancelando, setCancelando] = useState(false)
 
   useEffect(() => {
     api(`/api/ordenes/${id}`)
@@ -35,9 +37,21 @@ function DetalleOrden() {
 
   const cancelada = orden.estado === 'CANCELADA'
 
+  const cancelar = async () => {
+    setCancelando(true)
+    try {
+      const actualizada = await cancelarOrden(orden)
+      if (actualizada) setOrden(actualizada)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCancelando(false)
+    }
+  }
+
   return (
     <div className="contenedor pagina orden">
-      {recienComprada ? (
+      {recienComprada && !cancelada ? (
         <header className="orden-exito">
           <span className="orden-exito-icono" aria-hidden="true">✓</span>
           <span className="etiqueta etiqueta-exito">Compra aprobada</span>
@@ -49,6 +63,12 @@ function DetalleOrden() {
           <Link to="/mis-compras">← Mis compras</Link>
           <h1>Compra #{orden.id}</h1>
         </header>
+      )}
+
+      {cancelada && (
+        <div className="mensaje mensaje-error">
+          Esta compra está cancelada: los asientos se devolvieron al vuelo.
+        </div>
       )}
 
       <section className="tarjeta orden-boleto">
@@ -106,6 +126,11 @@ function DetalleOrden() {
         <Link to="/" className="boton boton-secundario">
           Volver al inicio
         </Link>
+        {!cancelada && (
+          <button className="boton boton-peligro" onClick={cancelar} disabled={cancelando}>
+            {cancelando ? 'Cancelando…' : 'Cancelar compra'}
+          </button>
+        )}
       </div>
     </div>
   )

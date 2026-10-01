@@ -1,0 +1,89 @@
+.compras-titulo {
+  margin-bottom: 24px;
+  font-size: clamp(28px, 4vw, 36px);
+}
+
+.compras-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 860px;
+}
+
+.compras-vacio {
+  max-width: 860px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.compras-vacio p {
+  margin: 8px 0 20px;
+}
+
+.compra-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.compra-encabezado div {
+  display: flex;
+  flex-direction: column;
+}
+
+.compra-encabezado strong {
+  font-size: 18px;
+}
+
+.compra-encabezado small,
+.compra-vuelos small {
+  color: var(--texto-suave);
+}
+
+.compra-vuelos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+  list-style: none;
+  font-weight: 600;
+}
+
+.compra-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.compra-pie > strong {
+  color: var(--azul);
+  font-size: 24px;
+}
+
+.compra-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.compra-cancelada .compra-pie > strong {
+  color: var(--texto-suave);
+  text-decoration: line-through;
+}
+
+/* Las etiquetas de estado tambien se usan aca */
+.etiqueta-exito {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.etiqueta-cancelada {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}
