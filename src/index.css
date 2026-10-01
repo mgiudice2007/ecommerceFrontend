@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: #f4f6fb;
+  color: #12263a;
+}
+
+.base {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
