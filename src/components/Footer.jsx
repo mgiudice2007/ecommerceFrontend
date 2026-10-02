@@ -26,7 +26,7 @@ function Footer() {
       </div>
 
       <div className="contenedor footer-legal">
-        © 2026 BCA Airlines · Trabajo práctico — UADE
+        © 2026 BCA Airlines · Todos los derechos reservados
       </div>
     </footer>
   )

@@ -12,10 +12,18 @@ function Inicio() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
-  // Al abrir la pagina traemos los primeros 4 vuelos para mostrarlos como destacados
+  // Al abrir la pagina traemos vuelos y nos quedamos con 4 de destinos distintos,
+  // para que los destacados no muestren la misma ciudad repetida
   useEffect(() => {
-    api('/api/vuelos?page=0&size=4')
-      .then((pagina) => setDestacados(pagina.content))
+    api('/api/vuelos?page=0&size=30')
+      .then((pagina) => {
+        const unoPorDestino = []
+        for (const vuelo of pagina.content) {
+          const yaEsta = unoPorDestino.some((v) => v.destinoIata === vuelo.destinoIata)
+          if (!yaEsta) unoPorDestino.push(vuelo)
+        }
+        setDestacados(unoPorDestino.slice(0, 4))
+      })
       .catch((err) => setError(err.message))
       .finally(() => setCargando(false))
   }, [])

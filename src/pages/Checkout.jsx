@@ -97,10 +97,10 @@ function Checkout() {
           </div>
 
           <div className="checkout-aviso">
-            <strong>Pago simulado</strong>
+            <strong>🔒 Compra protegida</strong>
             <p>
-              Este sitio es un trabajo práctico: no se cobra nada ni se piden datos de tarjeta. Al confirmar se
-              registra la compra y se reservan los asientos.
+              No te pedimos datos de tarjeta en este paso. Al confirmar se registra tu compra y tus asientos
+              quedan reservados al instante.
             </p>
           </div>
         </section>
