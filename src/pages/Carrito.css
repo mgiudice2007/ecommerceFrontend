@@ -1,14 +1,4 @@
 /* Estilos del carrito y del checkout (comparten el resumen de la derecha) */
-.carrito-titulo {
-  margin-bottom: 24px;
-  font-size: clamp(28px, 4vw, 36px);
-}
-
-.carrito-titulo span {
-  color: var(--azul);
-  font-size: 0.6em;
-}
-
 .carrito-layout {
   display: grid;
   grid-template-columns: 1fr 360px;

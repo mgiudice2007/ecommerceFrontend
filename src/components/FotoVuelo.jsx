@@ -19,7 +19,7 @@ function FotoVuelo({ vueloId, destinoIata, destinoCiudad }) {
 
   return (
     <div className="foto-vuelo foto-vuelo-vacia" aria-hidden="true">
-      <span>{destinoIata}</span>
+      <span>{destinoIata || '✈'}</span>
     </div>
   )
 }

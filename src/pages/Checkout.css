@@ -1,15 +1,16 @@
+/* Los pasos van dentro de la franja azul del encabezado */
 .checkout-pasos {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 24px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--texto-suave);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .checkout-pasos .hecho {
-  color: var(--verde);
+  color: #7be0b5;
 }
 
 .checkout-pasos .hecho::before {
@@ -17,7 +18,7 @@
 }
 
 .checkout-pasos .actual {
-  color: var(--azul);
+  color: #fff;
 }
 
 .checkout-titulo {

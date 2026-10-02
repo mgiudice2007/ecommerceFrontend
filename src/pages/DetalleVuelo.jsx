@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../api/api'
+import { api, urlFoto } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import OpcionClase from '../components/OpcionClase'
 import { useAuth } from '../context/AuthContext'
@@ -89,138 +89,152 @@ function DetalleVuelo() {
     }
   }
 
+  // La primera foto del vuelo es el fondo de la portada (si no tiene, queda el azul)
+  const fondoPortada = fotos.length > 0 ? { backgroundImage: `url(${urlFoto(fotos[0].id)})` } : undefined
+
   return (
-    <div className="contenedor pagina">
-      <nav className="detalle-migas">
-        <Link to="/vuelos">Vuelos</Link> / {vuelo.origenCiudad} → {vuelo.destinoCiudad}
-      </nav>
-
-      <div className="detalle-layout">
-        <div className="detalle-principal">
-          <GaleriaFotos fotos={fotos} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
-
-          <section className="tarjeta">
-            <div className="detalle-encabezado">
-              <div>
-                <span className="etiqueta">{vuelo.categoriaNombre}</span>
-                {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}
-                <h1>
-                  {vuelo.origenCiudad} → {vuelo.destinoCiudad}
-                </h1>
-                <p className="texto-suave">Vuelo {vuelo.numeroVuelo} · Directo</p>
-              </div>
-            </div>
-
-            <div className="detalle-itinerario">
-              <div>
-                <small>Salida · {fechaLarga(vuelo.fechaSalida)}</small>
-                <strong>{hora(vuelo.fechaSalida)}</strong>
-                <span>
-                  {vuelo.origenIata} · {vuelo.origenCiudad}
-                </span>
-              </div>
-              <div className="detalle-duracion">
-                <span>{duracion(vuelo.duracionMinutos)}</span>
-                <small>Directo</small>
-              </div>
-              <div className="derecha">
-                <small>Llegada · {fechaLarga(vuelo.fechaLlegada)}</small>
-                <strong>{hora(vuelo.fechaLlegada)}</strong>
-                <span>
-                  {vuelo.destinoIata} · {vuelo.destinoCiudad}
-                </span>
-              </div>
-            </div>
-
-            {vuelo.descripcion && <p className="detalle-descripcion">{vuelo.descripcion}</p>}
-          </section>
-
-          <section>
-            <h2 className="detalle-subtitulo">Seleccioná tu clase</h2>
-            {vuelo.disponibilidades.length === 0 ? (
-              <p className="texto-suave">El vendedor todavía no cargó asientos para este vuelo.</p>
-            ) : (
-              <div className="detalle-clases">
-                {vuelo.disponibilidades.map((d) => (
-                  <OpcionClase
-                    key={d.id}
-                    disponibilidad={d}
-                    clase={clases.find((c) => c.id === d.claseId)}
-                    seleccionada={elegida?.id === d.id}
-                    onElegir={elegirClase}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
+    <>
+      <section className="detalle-portada" style={fondoPortada}>
+        <div className="contenedor">
+          <nav className="detalle-migas">
+            <Link to="/vuelos">Vuelos</Link> / {vuelo.origenCiudad} → {vuelo.destinoCiudad}
+          </nav>
+          <div className="detalle-portada-etiquetas">
+            <span>{vuelo.categoriaNombre}</span>
+            {descuento && <span className="oferta">{descuento}</span>}
+          </div>
+          <h1>
+            {vuelo.origenCiudad} → {vuelo.destinoCiudad}
+          </h1>
+          <p>
+            Vuelo {vuelo.numeroVuelo} · Directo · {duracion(vuelo.duracionMinutos)} · {fechaLarga(vuelo.fechaSalida)}
+          </p>
         </div>
+      </section>
 
-        <aside className="tarjeta detalle-compra">
-          <h2>Tu selección</h2>
-
-          {!sePuedeComprar ? (
-            <div className="mensaje mensaje-error">
-              {yaSalio
-                ? 'Este vuelo ya salió.'
-                : vuelo.estado !== 'ACTIVO'
-                  ? 'Este vuelo ya no está a la venta.'
-                  : 'No quedan asientos en este vuelo.'}
-            </div>
-          ) : !elegida ? (
-            <p className="texto-suave">Elegí una clase para continuar.</p>
-          ) : (
-            <>
-              <div className="detalle-resumen">
-                <span>Clase</span>
-                <strong>{elegida.claseNombre}</strong>
-              </div>
-              <div className="detalle-resumen">
-                <span>Precio por pasajero</span>
-                <strong>{precio(elegida.precioConDescuento)}</strong>
-              </div>
-
-              <div className="detalle-resumen">
-                <span>Pasajes</span>
-                <div className="contador">
-                  <button onClick={() => cambiarCantidad(cantidad - 1)} disabled={cantidad <= 1} aria-label="Restar">
-                    −
-                  </button>
-                  <span>{cantidad}</span>
-                  <button
-                    onClick={() => cambiarCantidad(cantidad + 1)}
-                    disabled={cantidad >= elegida.asientosDisponibles}
-                    aria-label="Sumar"
-                  >
-                    +
-                  </button>
+      <div className="contenedor detalle-cuerpo">
+        <div className="detalle-layout">
+          <div className="detalle-principal">
+            <section className="tarjeta">
+              <h2 className="detalle-subtitulo">Itinerario</h2>
+              <div className="detalle-itinerario">
+                <div>
+                  <small>Salida · {fechaLarga(vuelo.fechaSalida)}</small>
+                  <strong>{hora(vuelo.fechaSalida)}</strong>
+                  <span>
+                    {vuelo.origenIata} · {vuelo.origenCiudad}
+                  </span>
+                </div>
+                <div className="detalle-duracion">
+                  <span>{duracion(vuelo.duracionMinutos)}</span>
+                  <small>Directo</small>
+                </div>
+                <div className="derecha">
+                  <small>Llegada · {fechaLarga(vuelo.fechaLlegada)}</small>
+                  <strong>{hora(vuelo.fechaLlegada)}</strong>
+                  <span>
+                    {vuelo.destinoIata} · {vuelo.destinoCiudad}
+                  </span>
                 </div>
               </div>
 
-              <div className="detalle-total">
-                <span>Total</span>
-                <strong>{precio(elegida.precioConDescuento * cantidad)}</strong>
-              </div>
+              {vuelo.descripcion && <p className="detalle-descripcion">{vuelo.descripcion}</p>}
+            </section>
 
-              {mensaje && <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>}
-
-              {estaLogueado && !esComprador ? (
-                <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
+            <section>
+              <h2 className="detalle-subtitulo">Seleccioná tu clase</h2>
+              {vuelo.disponibilidades.length === 0 ? (
+                <p className="texto-suave">El vendedor todavía no cargó asientos para este vuelo.</p>
               ) : (
-                <button className="boton boton-primario boton-ancho" onClick={agregarAlCarrito} disabled={agregando}>
-                  {agregando ? 'Agregando…' : estaLogueado ? 'Agregar al carrito' : 'Iniciá sesión para comprar'}
-                </button>
+                <div className="detalle-clases">
+                  {vuelo.disponibilidades.map((d) => (
+                    <OpcionClase
+                      key={d.id}
+                      disponibilidad={d}
+                      clase={clases.find((c) => c.id === d.claseId)}
+                      seleccionada={elegida?.id === d.id}
+                      onElegir={elegirClase}
+                    />
+                  ))}
+                </div>
               )}
+            </section>
 
-              {mensaje?.tipo === 'exito' && (
-                <Link to="/carrito" className="boton boton-secundario boton-ancho detalle-ir-carrito">
-                  Ir al carrito →
-                </Link>
-              )}
-            </>
-          )}
-        </aside>
+            {fotos.length > 1 && (
+              <section>
+                <h2 className="detalle-subtitulo">Conocé {vuelo.destinoCiudad}</h2>
+                <GaleriaFotos fotos={fotos} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+              </section>
+            )}
+          </div>
+
+          <aside className="tarjeta detalle-compra">
+            <h2>Tu selección</h2>
+
+            {!sePuedeComprar ? (
+              <div className="mensaje mensaje-error">
+                {yaSalio
+                  ? 'Este vuelo ya salió.'
+                  : vuelo.estado !== 'ACTIVO'
+                    ? 'Este vuelo ya no está a la venta.'
+                    : 'No quedan asientos en este vuelo.'}
+              </div>
+            ) : !elegida ? (
+              <p className="texto-suave">Elegí una clase para continuar.</p>
+            ) : (
+              <>
+                <div className="detalle-resumen">
+                  <span>Clase</span>
+                  <strong>{elegida.claseNombre}</strong>
+                </div>
+                <div className="detalle-resumen">
+                  <span>Precio por pasajero</span>
+                  <strong>{precio(elegida.precioConDescuento)}</strong>
+                </div>
+
+                <div className="detalle-resumen">
+                  <span>Pasajes</span>
+                  <div className="contador">
+                    <button onClick={() => cambiarCantidad(cantidad - 1)} disabled={cantidad <= 1} aria-label="Restar">
+                      −
+                    </button>
+                    <span>{cantidad}</span>
+                    <button
+                      onClick={() => cambiarCantidad(cantidad + 1)}
+                      disabled={cantidad >= elegida.asientosDisponibles}
+                      aria-label="Sumar"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div className="detalle-total">
+                  <span>Total</span>
+                  <strong>{precio(elegida.precioConDescuento * cantidad)}</strong>
+                </div>
+
+                {mensaje && <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>}
+
+                {estaLogueado && !esComprador ? (
+                  <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
+                ) : (
+                  <button className="boton boton-primario boton-ancho" onClick={agregarAlCarrito} disabled={agregando}>
+                    {agregando ? 'Agregando…' : estaLogueado ? 'Agregar al carrito' : 'Iniciá sesión para comprar'}
+                  </button>
+                )}
+
+                {mensaje?.tipo === 'exito' && (
+                  <Link to="/carrito" className="boton boton-secundario boton-ancho detalle-ir-carrito">
+                    Ir al carrito →
+                  </Link>
+                )}
+              </>
+            )}
+          </aside>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

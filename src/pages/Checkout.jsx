@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
+import EncabezadoPagina from '../components/EncabezadoPagina'
 import { useAuth } from '../context/AuthContext'
 import { precio } from '../utils/formato'
 import './Carrito.css'
@@ -67,79 +68,83 @@ function Checkout() {
   }
 
   return (
-    <div className="contenedor pagina">
-      <nav className="checkout-pasos" aria-label="Pasos de la compra">
-        <span className="hecho">1. Carrito</span>
-        <span className="actual">2. Pago</span>
-        <span>3. Confirmación</span>
-      </nav>
+    <>
+      <EncabezadoPagina titulo="Finalizá tu compra">
+        <nav className="checkout-pasos" aria-label="Pasos de la compra">
+          <span className="hecho">1. Carrito</span>
+          <span className="actual">2. Pago</span>
+          <span>3. Confirmación</span>
+        </nav>
+      </EncabezadoPagina>
 
-      <div className="carrito-layout">
-        <section className="tarjeta">
-          <h1 className="checkout-titulo">Seleccioná cómo pagar</h1>
+      <div className="contenedor sobre-encabezado">
+        <div className="carrito-layout">
+          <section className="tarjeta">
+            <h1 className="checkout-titulo">Seleccioná cómo pagar</h1>
 
-          <div className="checkout-medios" role="radiogroup" aria-label="Medio de pago">
-            {MEDIOS_DE_PAGO.map((m) => (
-              <label key={m.valor} className={`checkout-medio ${medio === m.valor ? 'seleccionado' : ''}`}>
-                <input
-                  type="radio"
-                  name="medio"
-                  value={m.valor}
-                  checked={medio === m.valor}
-                  onChange={(e) => setMedio(e.target.value)}
-                />
-                <span>
-                  <strong>{m.titulo}</strong>
-                  <small>{m.detalle}</small>
-                </span>
-              </label>
-            ))}
-          </div>
-
-          <div className="checkout-aviso">
-            <strong>🔒 Compra protegida</strong>
-            <p>
-              No te pedimos datos de tarjeta en este paso. Al confirmar se registra tu compra y tus asientos
-              quedan reservados al instante.
-            </p>
-          </div>
-        </section>
-
-        <aside className="tarjeta carrito-resumen">
-          <h2>Detalle de la compra</h2>
-          {carrito.items.map((item) => (
-            <div key={item.id} className="carrito-resumen-fila">
-              <span>
-                {item.origen} → {item.destino}
-                <br />
-                <small>
-                  {item.claseNombre} × {item.cantidad}
-                </small>
-              </span>
-              <span>{precio(item.subtotal)}</span>
+            <div className="checkout-medios" role="radiogroup" aria-label="Medio de pago">
+              {MEDIOS_DE_PAGO.map((m) => (
+                <label key={m.valor} className={`checkout-medio ${medio === m.valor ? 'seleccionado' : ''}`}>
+                  <input
+                    type="radio"
+                    name="medio"
+                    value={m.valor}
+                    checked={medio === m.valor}
+                    onChange={(e) => setMedio(e.target.value)}
+                  />
+                  <span>
+                    <strong>{m.titulo}</strong>
+                    <small>{m.detalle}</small>
+                  </span>
+                </label>
+              ))}
             </div>
-          ))}
 
-          <div className="carrito-resumen-total">
-            <span>Total</span>
-            <strong>{precio(carrito.total)}</strong>
-          </div>
+            <div className="checkout-aviso">
+              <strong>🔒 Compra protegida</strong>
+              <p>
+                No te pedimos datos de tarjeta en este paso. Al confirmar se registra tu compra y tus asientos
+                quedan reservados al instante.
+              </p>
+            </div>
+          </section>
 
-          {error && <div className="mensaje mensaje-error checkout-error">{error}</div>}
+          <aside className="tarjeta carrito-resumen">
+            <h2>Detalle de la compra</h2>
+            {carrito.items.map((item) => (
+              <div key={item.id} className="carrito-resumen-fila">
+                <span>
+                  {item.origen} → {item.destino}
+                  <br />
+                  <small>
+                    {item.claseNombre} × {item.cantidad}
+                  </small>
+                </span>
+                <span>{precio(item.subtotal)}</span>
+              </div>
+            ))}
 
-          <button
-            className="boton boton-primario boton-ancho checkout-confirmar"
-            onClick={confirmarCompra}
-            disabled={confirmando}
-          >
-            {confirmando ? 'Confirmando…' : `Confirmar compra · ${precio(carrito.total)}`}
-          </button>
-          <Link to="/carrito" className="carrito-seguir">
-            ← Volver al carrito
-          </Link>
-        </aside>
+            <div className="carrito-resumen-total">
+              <span>Total</span>
+              <strong>{precio(carrito.total)}</strong>
+            </div>
+
+            {error && <div className="mensaje mensaje-error checkout-error">{error}</div>}
+
+            <button
+              className="boton boton-primario boton-ancho checkout-confirmar"
+              onClick={confirmarCompra}
+              disabled={confirmando}
+            >
+              {confirmando ? 'Confirmando…' : `Confirmar compra · ${precio(carrito.total)}`}
+            </button>
+            <Link to="/carrito" className="carrito-seguir">
+              ← Volver al carrito
+            </Link>
+          </aside>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

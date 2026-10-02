@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, precio } from '../utils/formato'
+import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
 
 // Un item del carrito. Recibe el item (ItemCarritoResponse) y dos funciones
@@ -22,6 +23,10 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
 
   return (
     <article className="tarjeta item-carrito">
+      <Link to={`/vuelos/${item.vueloId}`} className="item-carrito-foto" tabIndex={-1} aria-hidden="true">
+        <FotoVuelo vueloId={item.vueloId} destinoIata={vuelo?.destinoIata ?? ''} destinoCiudad={item.destino} />
+      </Link>
+
       <div className="item-carrito-info">
         <span className="etiqueta">Vuelo {item.numeroVuelo}</span>
         <h3>

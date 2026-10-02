@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/api'
+import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
 import { useAuth } from '../context/AuthContext'
 import { precio } from '../utils/formato'
@@ -50,62 +51,69 @@ function Carrito() {
   const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
 
   return (
-    <div className="contenedor pagina">
-      <h1 className="carrito-titulo">
-        Mi carrito <span>({cantidadPasajes} {cantidadPasajes === 1 ? 'pasaje' : 'pasajes'})</span>
-      </h1>
+    <>
+      <EncabezadoPagina
+        titulo="Mi carrito"
+        subtitulo={
+          cantidadPasajes === 0
+            ? 'Todavía no agregaste pasajes.'
+            : `${cantidadPasajes} ${cantidadPasajes === 1 ? 'pasaje listo' : 'pasajes listos'} para comprar.`
+        }
+      />
 
-      {error && <div className="mensaje mensaje-error">{error}</div>}
+      <div className="contenedor sobre-encabezado">
+        {error && <div className="mensaje mensaje-error">{error}</div>}
 
-      {carrito.items.length === 0 ? (
-        <div className="tarjeta carrito-vacio">
-          <h2>Tu carrito está vacío</h2>
-          <p className="texto-suave">Buscá un vuelo, elegí la clase y agregalo para comprarlo.</p>
-          <Link to="/vuelos" className="boton boton-primario">
-            Buscar vuelos
-          </Link>
-        </div>
-      ) : (
-        <div className="carrito-layout">
-          <div className="carrito-items">
-            {carrito.items.map((item) => (
-              <ItemCarrito
-                key={item.id}
-                item={item}
-                onCambiarCantidad={cambiarCantidad}
-                onEliminar={eliminar}
-                ocupado={ocupado}
-              />
-            ))}
+        {carrito.items.length === 0 ? (
+          <div className="tarjeta carrito-vacio">
+            <h2>Tu carrito está vacío</h2>
+            <p className="texto-suave">Buscá un vuelo, elegí la clase y agregalo para comprarlo.</p>
+            <Link to="/vuelos" className="boton boton-primario">
+              Buscar vuelos
+            </Link>
           </div>
-
-          <aside className="tarjeta carrito-resumen">
-            <h2>Resumen de compra</h2>
-            {carrito.items.map((item) => (
-              <div key={item.id} className="carrito-resumen-fila">
-                <span>
-                  {item.origen} → {item.destino} × {item.cantidad}
-                </span>
-                <span>{precio(item.subtotal)}</span>
-              </div>
-            ))}
-            <div className="carrito-resumen-total">
-              <span>Total a pagar</span>
-              <strong>{precio(carrito.total)}</strong>
+        ) : (
+          <div className="carrito-layout">
+            <div className="carrito-items">
+              {carrito.items.map((item) => (
+                <ItemCarrito
+                  key={item.id}
+                  item={item}
+                  onCambiarCantidad={cambiarCantidad}
+                  onEliminar={eliminar}
+                  ocupado={ocupado}
+                />
+              ))}
             </div>
-            <p className="texto-suave carrito-aclaracion">
-              Los precios ya incluyen los descuentos vigentes. Se confirman al momento de pagar.
-            </p>
-            <Link to="/checkout" className="boton boton-primario boton-ancho">
-              Continuar al pago →
-            </Link>
-            <Link to="/vuelos" className="carrito-seguir">
-              Seguir buscando vuelos
-            </Link>
-          </aside>
-        </div>
-      )}
-    </div>
+
+            <aside className="tarjeta carrito-resumen">
+              <h2>Resumen de compra</h2>
+              {carrito.items.map((item) => (
+                <div key={item.id} className="carrito-resumen-fila">
+                  <span>
+                    {item.origen} → {item.destino} × {item.cantidad}
+                  </span>
+                  <span>{precio(item.subtotal)}</span>
+                </div>
+              ))}
+              <div className="carrito-resumen-total">
+                <span>Total a pagar</span>
+                <strong>{precio(carrito.total)}</strong>
+              </div>
+              <p className="texto-suave carrito-aclaracion">
+                Los precios ya incluyen los descuentos vigentes. Se confirman al momento de pagar.
+              </p>
+              <Link to="/checkout" className="boton boton-primario boton-ancho">
+                Continuar al pago →
+              </Link>
+              <Link to="/vuelos" className="carrito-seguir">
+                Seguir buscando vuelos
+              </Link>
+            </aside>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 

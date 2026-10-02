@@ -35,9 +35,10 @@
   padding: 40px;
   border-radius: var(--radio-grande);
   color: rgba(255, 255, 255, 0.85);
+  /* Foto del ala del avion con una capa azul encima para que se lea el texto */
   background:
-    radial-gradient(circle at 85% 15%, rgba(43, 143, 214, 0.45), transparent 45%),
-    linear-gradient(160deg, var(--azul) 0%, var(--azul-noche) 100%);
+    linear-gradient(160deg, rgba(0, 87, 184, 0.82) 0%, rgba(4, 30, 66, 0.94) 100%),
+    url('../assets/portada.jpg') center / cover;
 }
 
 .auth-panel h2 {

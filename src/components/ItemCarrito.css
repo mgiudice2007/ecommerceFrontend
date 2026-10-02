@@ -1,8 +1,23 @@
 .item-carrito {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 130px 1fr auto;
   gap: 20px;
   align-items: center;
+  padding: 16px 20px 16px 16px;
+}
+
+.item-carrito-foto {
+  height: 110px;
+  overflow: hidden;
+  border-radius: var(--radio);
+}
+
+.item-carrito-foto .foto-vuelo-vacia span {
+  font-size: 24px;
+}
+
+.item-carrito-info {
+  min-width: 0;
 }
 
 .item-carrito-info h3 {
@@ -53,6 +68,10 @@
 @media (max-width: 560px) {
   .item-carrito {
     grid-template-columns: 1fr;
+  }
+
+  .item-carrito-foto {
+    height: 140px;
   }
 
   .item-carrito-acciones {

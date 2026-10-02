@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../api/api'
 import Buscador from '../components/Buscador'
+import EncabezadoPagina from '../components/EncabezadoPagina'
 import TarjetaVuelo from '../components/TarjetaVuelo'
 import './Vuelos.css'
 
@@ -63,14 +64,12 @@ function Vuelos() {
 
   return (
     <>
-      <section className="vuelos-encabezado">
-        <div className="contenedor">
-          <h1>Buscá tu vuelo</h1>
-          <p>Vuelos directos a Argentina, América y Europa, con el precio final a la vista.</p>
-        </div>
-      </section>
+      <EncabezadoPagina
+        titulo="Buscá tu vuelo"
+        subtitulo="Vuelos directos a Argentina, América y Europa, con el precio final a la vista."
+      />
 
-      <div className="contenedor vuelos-pagina">
+      <div className="contenedor sobre-encabezado vuelos-pagina">
         {/* La key hace que el buscador se reinicie con los filtros nuevos si cambia la URL */}
         <Buscador key={searchParams.toString()} inicial={filtrosIniciales} />
 

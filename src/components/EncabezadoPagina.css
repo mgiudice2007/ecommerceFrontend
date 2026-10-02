@@ -1,0 +1,30 @@
+.encabezado-pagina {
+  padding: 40px 0 92px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(31, 162, 224, 0.45), transparent 50%),
+    var(--azul-noche);
+}
+
+.encabezado-pagina h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+}
+
+.encabezado-pagina p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.encabezado-pagina a {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #7fd0f7;
+  font-size: 14px;
+}
+
+/* El contenido de la pagina se monta encima de la franja */
+.sobre-encabezado {
+  margin-top: -60px;
+  min-height: calc(100vh - 420px);
+}

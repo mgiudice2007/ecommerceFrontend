@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/api'
+import EncabezadoPagina from '../components/EncabezadoPagina'
 import { fechaLarga } from '../utils/formato'
 import './Perfil.css'
 
@@ -75,100 +76,102 @@ function Perfil() {
   const faltanDatos = usuario.rol === 'COMPRADOR' && (!usuario.dni || !usuario.fechaNacimiento)
 
   return (
-    <div className="contenedor pagina perfil">
-      <h1 className="perfil-titulo">Mi perfil</h1>
+    <>
+      <EncabezadoPagina titulo="Mi perfil" subtitulo="Tus datos de cuenta y del pasajero titular." />
 
-      <div className="perfil-layout">
-        <aside className="tarjeta perfil-cuenta">
-          <span className="perfil-avatar" aria-hidden="true">
-            {usuario.nombre?.[0] ?? usuario.username[0]}
-          </span>
-          <h2>
-            {usuario.nombre} {usuario.apellido}
-          </h2>
-          <span className="etiqueta">{NOMBRES_DE_ROL[usuario.rol]}</span>
+      <div className="contenedor sobre-encabezado perfil">
+        <div className="perfil-layout">
+          <aside className="tarjeta perfil-cuenta">
+            <span className="perfil-avatar" aria-hidden="true">
+              {usuario.nombre?.[0] ?? usuario.username[0]}
+            </span>
+            <h2>
+              {usuario.nombre} {usuario.apellido}
+            </h2>
+            <span className="etiqueta">{NOMBRES_DE_ROL[usuario.rol]}</span>
 
-          <dl>
-            <dt>Usuario</dt>
-            <dd>{usuario.username}</dd>
-            <dt>Correo electrónico</dt>
-            <dd>{usuario.mail}</dd>
-            <dt>Miembro desde</dt>
-            <dd>{fechaLarga(usuario.fechaRegistro)}</dd>
-          </dl>
-        </aside>
+            <dl>
+              <dt>Usuario</dt>
+              <dd>{usuario.username}</dd>
+              <dt>Correo electrónico</dt>
+              <dd>{usuario.mail}</dd>
+              <dt>Miembro desde</dt>
+              <dd>{fechaLarga(usuario.fechaRegistro)}</dd>
+            </dl>
+          </aside>
 
-        <section className="tarjeta">
-          <h2 className="perfil-subtitulo">Datos personales</h2>
-          <p className="texto-suave perfil-aclaracion">
-            {usuario.rol === 'COMPRADOR'
-              ? 'Son los datos del pasajero titular. Completalos antes de volar.'
-              : 'Tus datos de contacto como vendedor.'}
-          </p>
+          <section className="tarjeta">
+            <h2 className="perfil-subtitulo">Datos personales</h2>
+            <p className="texto-suave perfil-aclaracion">
+              {usuario.rol === 'COMPRADOR'
+                ? 'Son los datos del pasajero titular. Completalos antes de volar.'
+                : 'Tus datos de contacto como vendedor.'}
+            </p>
 
-          {faltanDatos && (
-            <div className="mensaje perfil-aviso">Te falta completar tu DNI y fecha de nacimiento.</div>
-          )}
-          {error && <div className="mensaje mensaje-error">{error}</div>}
-          {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+            {faltanDatos && (
+              <div className="mensaje perfil-aviso">Te falta completar tu DNI y fecha de nacimiento.</div>
+            )}
+            {error && <div className="mensaje mensaje-error">{error}</div>}
+            {exito && <div className="mensaje mensaje-exito">{exito}</div>}
 
-          <form onSubmit={handleSubmit}>
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="nombre">Nombre</label>
-                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+            <form onSubmit={handleSubmit}>
+              <div className="fila-campos">
+                <div className="campo">
+                  <label htmlFor="nombre">Nombre</label>
+                  <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+                </div>
+                <div className="campo">
+                  <label htmlFor="apellido">Apellido</label>
+                  <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
+                </div>
               </div>
-              <div className="campo">
-                <label htmlFor="apellido">Apellido</label>
-                <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
-              </div>
-            </div>
 
-            <div className="fila-campos">
+              <div className="fila-campos">
+                <div className="campo">
+                  <label htmlFor="dni">DNI</label>
+                  <input
+                    id="dni"
+                    name="dni"
+                    value={formData.dni}
+                    onChange={handleChange}
+                    inputMode="numeric"
+                    pattern="\d{7,9}"
+                    title="De 7 a 9 números, sin puntos"
+                    placeholder="Sin puntos"
+                  />
+                </div>
+                <div className="campo">
+                  <label htmlFor="fechaNacimiento">Fecha de nacimiento</label>
+                  <input
+                    id="fechaNacimiento"
+                    name="fechaNacimiento"
+                    type="date"
+                    value={formData.fechaNacimiento}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
               <div className="campo">
-                <label htmlFor="dni">DNI</label>
+                <label htmlFor="telefono">Teléfono</label>
                 <input
-                  id="dni"
-                  name="dni"
-                  value={formData.dni}
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  value={formData.telefono}
                   onChange={handleChange}
-                  inputMode="numeric"
-                  pattern="\d{7,9}"
-                  title="De 7 a 9 números, sin puntos"
-                  placeholder="Sin puntos"
+                  placeholder="11 2233 4455"
                 />
               </div>
-              <div className="campo">
-                <label htmlFor="fechaNacimiento">Fecha de nacimiento</label>
-                <input
-                  id="fechaNacimiento"
-                  name="fechaNacimiento"
-                  type="date"
-                  value={formData.fechaNacimiento}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
 
-            <div className="campo">
-              <label htmlFor="telefono">Teléfono</label>
-              <input
-                id="telefono"
-                name="telefono"
-                type="tel"
-                value={formData.telefono}
-                onChange={handleChange}
-                placeholder="11 2233 4455"
-              />
-            </div>
-
-            <button className="boton boton-primario" disabled={guardando}>
-              {guardando ? 'Guardando…' : 'Guardar cambios'}
-            </button>
-          </form>
-        </section>
+              <button className="boton boton-primario" disabled={guardando}>
+                {guardando ? 'Guardando…' : 'Guardar cambios'}
+              </button>
+            </form>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
