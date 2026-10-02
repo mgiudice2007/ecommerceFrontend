@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
+import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { useAuth } from '../../context/AuthContext'
 import { fechaLarga } from '../../utils/formato'
 import './Panel.css'
@@ -71,126 +72,127 @@ function Usuarios() {
   const cantidadPorRol = (rol) => (usuarios ?? []).filter((u) => u.rol === rol).length
 
   return (
-    <div className="contenedor pagina">
-      <Link to="/panel" className="panel-volver">
-        ← Volver al panel
-      </Link>
+    <>
+      <EncabezadoPagina
+        etiqueta="Administrador"
+        titulo="Usuarios y permisos"
+        subtitulo="Revisá las cuentas registradas y asigná el rol de cada una."
+        acciones={
+          <Link to="/panel/administradores" className="boton boton-claro">
+            + Crear administrador
+          </Link>
+        }
+      >
+        <Link to="/panel">← Volver al panel</Link>
+      </EncabezadoPagina>
 
-      <header className="panel-encabezado">
-        <div>
-          <span className="etiqueta">Administrador</span>
-          <h1>Usuarios y permisos</h1>
-        </div>
-        <Link to="/panel/administradores" className="boton boton-secundario">
-          + Crear administrador
-        </Link>
-      </header>
-
-      {usuarios && (
-        <div className="panel-numeros">
-          {ROLES.map((r) => (
-            <div key={r.valor} className="tarjeta">
-              <small>{r.plural}</small>
-              <strong>{cantidadPorRol(r.valor)}</strong>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {error && <div className="mensaje mensaje-error">{error}</div>}
-      {exito && <div className="mensaje mensaje-exito">{exito}</div>}
-
-      <section className="tarjeta">
-        <div className="usuarios-filtros">
-          <div className="campo">
-            <label htmlFor="busqueda">Buscar</label>
-            <input
-              id="busqueda"
-              type="search"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Usuario, nombre o mail"
-            />
-          </div>
-          <div className="campo">
-            <label htmlFor="filtroRol">Rol</label>
-            <select id="filtroRol" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
-              <option value="">Todos</option>
-              {ROLES.map((r) => (
-                <option key={r.valor} value={r.valor}>
-                  {r.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {!usuarios && !error && <p className="texto-suave">Cargando usuarios…</p>}
-        {usuarios && visibles.length === 0 && <div className="gestion-vacio">Ningún usuario coincide con la búsqueda.</div>}
-
-        {visibles.length > 0 && (
-          <div className="usuarios-tabla-contenedor">
-            <table className="usuarios-tabla">
-              <thead>
-                <tr>
-                  <th>Usuario</th>
-                  <th>Nombre</th>
-                  <th>Registrado</th>
-                  <th>Rol</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {visibles.map((u) => {
-                  const soyYo = u.username === yo.username
-                  const rolElegido = cambios[u.id] ?? u.rol
-
-                  return (
-                    <tr key={u.id} className={cambios[u.id] ? 'con-cambios' : ''}>
-                      <td>
-                        <strong>{u.username}</strong>
-                        <small>{u.mail}</small>
-                      </td>
-                      <td>
-                        {u.nombre} {u.apellido}
-                      </td>
-                      <td>{u.fechaRegistro ? fechaLarga(u.fechaRegistro) : '—'}</td>
-                      <td>
-                        <select
-                          value={rolElegido}
-                          onChange={(e) => elegirRol(u, e.target.value)}
-                          disabled={soyYo}
-                          aria-label={`Rol de ${u.username}`}
-                          title={soyYo ? 'No podés cambiar tu propio rol' : undefined}
-                        >
-                          {ROLES.map((r) => (
-                            <option key={r.valor} value={r.valor}>
-                              {r.nombre}
-                            </option>
-                          ))}
-                        </select>
-                        {soyYo && <small>Sos vos</small>}
-                      </td>
-                      <td className="acciones">
-                        {cambios[u.id] && (
-                          <button
-                            className="boton boton-primario"
-                            onClick={() => guardar(u)}
-                            disabled={guardando === u.id}
-                          >
-                            {guardando === u.id ? 'Guardando…' : 'Guardar'}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+      <div className="contenedor sobre-encabezado">
+        {usuarios && (
+          <div className="panel-numeros">
+            {ROLES.map((r) => (
+              <div key={r.valor} className="tarjeta">
+                <small>{r.plural}</small>
+                <strong>{cantidadPorRol(r.valor)}</strong>
+              </div>
+            ))}
           </div>
         )}
-      </section>
-    </div>
+
+        {error && <div className="mensaje mensaje-error">{error}</div>}
+        {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+
+        <section className="tarjeta">
+          <div className="usuarios-filtros">
+            <div className="campo">
+              <label htmlFor="busqueda">Buscar</label>
+              <input
+                id="busqueda"
+                type="search"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Usuario, nombre o mail"
+              />
+            </div>
+            <div className="campo">
+              <label htmlFor="filtroRol">Rol</label>
+              <select id="filtroRol" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
+                <option value="">Todos</option>
+                {ROLES.map((r) => (
+                  <option key={r.valor} value={r.valor}>
+                    {r.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {!usuarios && !error && <p className="texto-suave">Cargando usuarios…</p>}
+          {usuarios && visibles.length === 0 && <div className="gestion-vacio">Ningún usuario coincide con la búsqueda.</div>}
+
+          {visibles.length > 0 && (
+            <div className="usuarios-tabla-contenedor">
+              <table className="usuarios-tabla">
+                <thead>
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Registrado</th>
+                    <th>Rol</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibles.map((u) => {
+                    const soyYo = u.username === yo.username
+                    const rolElegido = cambios[u.id] ?? u.rol
+
+                    return (
+                      <tr key={u.id} className={cambios[u.id] ? 'con-cambios' : ''}>
+                        <td>
+                          <strong>{u.username}</strong>
+                          <small>{u.mail}</small>
+                        </td>
+                        <td>
+                          {u.nombre} {u.apellido}
+                        </td>
+                        <td>{u.fechaRegistro ? fechaLarga(u.fechaRegistro) : '—'}</td>
+                        <td>
+                          <select
+                            value={rolElegido}
+                            onChange={(e) => elegirRol(u, e.target.value)}
+                            disabled={soyYo}
+                            aria-label={`Rol de ${u.username}`}
+                            title={soyYo ? 'No podés cambiar tu propio rol' : undefined}
+                          >
+                            {ROLES.map((r) => (
+                              <option key={r.valor} value={r.valor}>
+                                {r.nombre}
+                              </option>
+                            ))}
+                          </select>
+                          {soyYo && <small>Sos vos</small>}
+                        </td>
+                        <td className="acciones">
+                          {cambios[u.id] && (
+                            <button
+                              className="boton boton-primario"
+                              onClick={() => guardar(u)}
+                              disabled={guardando === u.id}
+                            >
+                              {guardando === u.id ? 'Guardando…' : 'Guardar'}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
+    </>
   )
 }
 

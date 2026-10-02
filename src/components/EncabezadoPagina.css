@@ -1,9 +1,34 @@
 .encabezado-pagina {
+  position: relative;
   padding: 40px 0 92px;
   color: #fff;
   background:
     radial-gradient(circle at 90% 0%, rgba(31, 162, 224, 0.45), transparent 50%),
     var(--azul-noche);
+  isolation: isolate;
+}
+
+/* Con foto: la imagen de fondo con una capa azul encima para que se lea el texto */
+.encabezado-pagina.con-imagen {
+  padding-top: 56px;
+  background-size: cover;
+  background-position: center;
+}
+
+.encabezado-pagina.con-imagen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgba(4, 30, 66, 0.95) 0%, rgba(4, 30, 66, 0.55) 60%, rgba(4, 30, 66, 0.35) 100%);
+}
+
+.encabezado-pagina-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .encabezado-pagina h1 {
@@ -16,15 +41,35 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.encabezado-pagina a {
+.encabezado-pagina-etiqueta {
   display: inline-block;
   margin-bottom: 10px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #7fd0f7;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.encabezado-pagina > .contenedor > a {
+  display: inline-block;
+  margin-bottom: 14px;
   color: #7fd0f7;
   font-size: 14px;
 }
 
+.encabezado-pagina-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 /* El contenido de la pagina se monta encima de la franja */
 .sobre-encabezado {
+  position: relative;
   margin-top: -60px;
   min-height: calc(100vh - 420px);
 }

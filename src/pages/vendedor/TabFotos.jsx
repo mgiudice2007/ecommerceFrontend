@@ -5,7 +5,7 @@ const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
 const MAXIMO_MB = 5
 
 // Pestaña "Fotos": subir (multipart/form-data) y borrar fotos del vuelo.
-function TabFotos({ vuelo }) {
+function TabFotos({ vuelo, onCambio }) {
   const [fotos, setFotos] = useState([])
   const [archivo, setArchivo] = useState(null)
   const [error, setError] = useState('')
@@ -54,6 +54,7 @@ function TabFotos({ vuelo }) {
       setArchivo(null)
       inputArchivo.current.value = ''
       cargar()
+      onCambio()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -69,6 +70,7 @@ function TabFotos({ vuelo }) {
       const respuesta = await api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
       setExito(respuesta.mensaje) // "Foto eliminada correctamente"
       cargar()
+      onCambio()
     } catch (err) {
       setError(err.message)
     }

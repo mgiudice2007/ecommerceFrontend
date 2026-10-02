@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { api } from '../../api/api'
+import { api, urlFoto } from '../../api/api'
+import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { useAuth } from '../../context/AuthContext'
 import { fechaLarga, hora } from '../../utils/formato'
 import TabClases from './TabClases'
@@ -21,14 +22,18 @@ function GestionVuelo() {
   const { usuario, esAdmin } = useAuth()
 
   const [vuelo, setVuelo] = useState(null)
+  const [portadaId, setPortadaId] = useState(null) // primera foto del vuelo, para el encabezado
   const [error, setError] = useState('')
   const [pestania, setPestania] = useState('clases')
 
   // Las pestañas la llaman cuando cambian algo (por ejemplo un descuento
   // cambia el precio final), para volver a traer el vuelo actualizado.
   const recargarVuelo = useCallback(() => {
-    api(`/api/vuelos/${id}`)
-      .then(setVuelo)
+    Promise.all([api(`/api/vuelos/${id}`), api(`/api/fotos?vueloId=${id}`)])
+      .then(([datosVuelo, fotos]) => {
+        setVuelo(datosVuelo)
+        setPortadaId(fotos.length > 0 ? fotos[0].id : null)
+      })
       .catch((err) => setError(err.message))
   }, [id])
 
@@ -60,62 +65,59 @@ function GestionVuelo() {
   }
 
   return (
-    <div className="contenedor pagina">
-      <Link to="/panel" className="panel-volver">
-        ← Volver al panel
-      </Link>
+    <>
+      <EncabezadoPagina
+        imagen={portadaId ? urlFoto(portadaId) : undefined}
+        etiqueta={`Vuelo ${vuelo.numeroVuelo} · ${vuelo.categoriaNombre}`}
+        titulo={`${vuelo.origenCiudad} → ${vuelo.destinoCiudad}`}
+        subtitulo={`${vuelo.origenIata} → ${vuelo.destinoIata} · Sale el ${fechaLarga(vuelo.fechaSalida)} a las ${hora(vuelo.fechaSalida)} hs`}
+        acciones={
+          <>
+            <Link to={`/vuelos/${vuelo.id}`} className="boton boton-contorno">
+              Ver como comprador
+            </Link>
+            <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-claro">
+              Editar datos
+            </Link>
+          </>
+        }
+      >
+        <Link to="/panel">← Volver al panel</Link>
+      </EncabezadoPagina>
 
-      {location.state?.recienCreado && (
-        <div className="mensaje mensaje-exito">
-          ¡Vuelo publicado! Ahora cargale al menos una clase con asientos para que se pueda comprar.
-        </div>
-      )}
-      {location.state?.fotosConError?.length > 0 && (
-        <div className="mensaje mensaje-error">
-          No se pudieron subir estas fotos: {location.state.fotosConError.join(', ')}. Probá de nuevo desde la
-          pestaña Fotos.
-        </div>
-      )}
+      <div className="contenedor sobre-encabezado">
+        {location.state?.recienCreado && (
+          <div className="mensaje mensaje-exito">
+            ¡Vuelo publicado! Ahora cargale al menos una clase con asientos para que se pueda comprar.
+          </div>
+        )}
+        {location.state?.fotosConError?.length > 0 && (
+          <div className="mensaje mensaje-error">
+            No se pudieron subir estas fotos: {location.state.fotosConError.join(', ')}. Probá de nuevo desde la
+            pestaña Fotos.
+          </div>
+        )}
 
-      <header className="tarjeta gestion-encabezado">
-        <div>
-          <span className="texto-suave">Vuelo {vuelo.numeroVuelo}</span>
-          <h1>
-            {vuelo.origenCiudad} ({vuelo.origenIata}) → {vuelo.destinoCiudad} ({vuelo.destinoIata})
-          </h1>
-          <span className="texto-suave">
-            Sale el {fechaLarga(vuelo.fechaSalida)} a las {hora(vuelo.fechaSalida)} hs · {vuelo.categoriaNombre}
-          </span>
+        <div className="gestion-pestanias" role="tablist">
+          {PESTANIAS.map((p) => (
+            <button
+              key={p.id}
+              role="tab"
+              aria-selected={pestania === p.id}
+              className={pestania === p.id ? 'activa' : ''}
+              onClick={() => setPestania(p.id)}
+            >
+              {p.titulo}
+            </button>
+          ))}
         </div>
-        <div className="gestion-encabezado-acciones">
-          <Link to={`/vuelos/${vuelo.id}`} className="boton boton-secundario">
-            Ver como comprador
-          </Link>
-          <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-secundario">
-            Editar datos
-          </Link>
-        </div>
-      </header>
 
-      <div className="gestion-pestanias" role="tablist">
-        {PESTANIAS.map((p) => (
-          <button
-            key={p.id}
-            role="tab"
-            aria-selected={pestania === p.id}
-            className={pestania === p.id ? 'activa' : ''}
-            onClick={() => setPestania(p.id)}
-          >
-            {p.titulo}
-          </button>
-        ))}
+        {/* Solo se muestra la pestaña elegida */}
+        {pestania === 'clases' && <TabClases vuelo={vuelo} onCambio={recargarVuelo} />}
+        {pestania === 'descuentos' && <TabDescuentos vuelo={vuelo} onCambio={recargarVuelo} />}
+        {pestania === 'fotos' && <TabFotos vuelo={vuelo} onCambio={recargarVuelo} />}
       </div>
-
-      {/* Solo se muestra la pestaña elegida */}
-      {pestania === 'clases' && <TabClases vuelo={vuelo} onCambio={recargarVuelo} />}
-      {pestania === 'descuentos' && <TabDescuentos vuelo={vuelo} onCambio={recargarVuelo} />}
-      {pestania === 'fotos' && <TabFotos vuelo={vuelo} />}
-    </div>
+    </>
   )
 }
 

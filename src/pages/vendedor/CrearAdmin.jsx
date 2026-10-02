@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
+import EncabezadoPagina from '../../components/EncabezadoPagina'
 import './Panel.css'
 
 const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password: '' }
@@ -39,65 +40,65 @@ function CrearAdmin() {
   }
 
   return (
-    <div className="contenedor pagina">
-      <Link to="/panel" className="panel-volver">
-        ← Volver al panel
-      </Link>
+    <>
+      <EncabezadoPagina
+        etiqueta="Solo administradores"
+        titulo="Crear administrador"
+        subtitulo="Un administrador puede ver y modificar los vuelos de todos los vendedores, y crear otros administradores."
+      >
+        <Link to="/panel/usuarios">← Volver a usuarios</Link>
+      </EncabezadoPagina>
 
-      <section className="tarjeta panel-formulario">
-        <span className="etiqueta">Solo administradores</span>
-        <h1 className="panel-formulario-titulo">Crear administrador</h1>
-        <p className="texto-suave">
-          Un administrador puede ver y modificar los vuelos de todos los vendedores, y crear otros administradores.
-        </p>
+      <div className="contenedor sobre-encabezado">
+        <section className="tarjeta panel-formulario">
+          {error && <div className="mensaje mensaje-error">{error}</div>}
+          {exito && <div className="mensaje mensaje-exito">{exito}</div>}
 
-        {error && <div className="mensaje mensaje-error">{error}</div>}
-        {exito && <div className="mensaje mensaje-exito">{exito}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="fila-campos">
-            <div className="campo">
-              <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+          <form onSubmit={handleSubmit}>
+            <div className="fila-campos">
+              <div className="campo">
+                <label htmlFor="nombre">Nombre</label>
+                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+              </div>
+              <div className="campo">
+                <label htmlFor="apellido">Apellido</label>
+                <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
+              </div>
             </div>
-            <div className="campo">
-              <label htmlFor="apellido">Apellido</label>
-              <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
-            </div>
-          </div>
 
-          <div className="fila-campos">
-            <div className="campo">
-              <label htmlFor="username">Usuario</label>
-              <input id="username" name="username" value={formData.username} onChange={handleChange} required />
+            <div className="fila-campos">
+              <div className="campo">
+                <label htmlFor="username">Usuario</label>
+                <input id="username" name="username" value={formData.username} onChange={handleChange} required />
+              </div>
+              <div className="campo">
+                <label htmlFor="mail">Correo electrónico</label>
+                <input id="mail" name="mail" type="email" value={formData.mail} onChange={handleChange} required />
+              </div>
             </div>
+
             <div className="campo">
-              <label htmlFor="mail">Correo electrónico</label>
-              <input id="mail" name="mail" type="email" value={formData.mail} onChange={handleChange} required />
+              <label htmlFor="password">Contraseña inicial</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                minLength={6}
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="new-password"
+                placeholder="Mínimo 6 caracteres"
+                required
+              />
             </div>
-          </div>
 
-          <div className="campo">
-            <label htmlFor="password">Contraseña inicial</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              minLength={6}
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-              placeholder="Mínimo 6 caracteres"
-              required
-            />
-          </div>
-
-          <button className="boton boton-primario" disabled={guardando}>
-            {guardando ? 'Creando…' : 'Crear administrador'}
-          </button>
-        </form>
-      </section>
-    </div>
+            <button className="boton boton-primario" disabled={guardando}>
+              {guardando ? 'Creando…' : 'Crear administrador'}
+            </button>
+          </form>
+        </section>
+      </div>
+    </>
   )
 }
 

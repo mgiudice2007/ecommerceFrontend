@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
+import EncabezadoPagina from '../../components/EncabezadoPagina'
+import FotoVuelo from '../../components/FotoVuelo'
 import { useAuth } from '../../context/AuthContext'
 import { fechaCorta, hora, precio } from '../../utils/formato'
 import { textoDescuento } from '../../utils/vuelos'
@@ -56,103 +58,113 @@ function PanelVuelos() {
   )
 
   return (
-    <div className="contenedor pagina">
-      <header className="panel-encabezado">
-        <div>
-          <span className="etiqueta">{esAdmin ? 'Administrador' : 'Vendedor'}</span>
-          <h1>{esAdmin ? 'Todos los vuelos' : 'Mis vuelos'}</h1>
-        </div>
-        <div className="panel-encabezado-acciones">
-          {esAdmin && (
-            <Link to="/panel/usuarios" className="boton boton-secundario">
-              Usuarios y permisos
+    <>
+      <EncabezadoPagina
+        etiqueta={esAdmin ? 'Administrador' : 'Vendedor'}
+        titulo={esAdmin ? 'Todos los vuelos' : 'Mis vuelos'}
+        subtitulo={
+          esAdmin
+            ? 'Supervisá los vuelos de todos los vendedores.'
+            : 'Publicá vuelos y manejá sus asientos, promociones y fotos.'
+        }
+        acciones={
+          <>
+            {esAdmin && (
+              <Link to="/panel/usuarios" className="boton boton-contorno">
+                Usuarios y permisos
+              </Link>
+            )}
+            <Link to="/panel/vuelos/nuevo" className="boton boton-claro">
+              + Publicar vuelo
             </Link>
-          )}
-          <Link to="/panel/vuelos/nuevo" className="boton boton-primario">
-            + Publicar vuelo
-          </Link>
-        </div>
-      </header>
+          </>
+        }
+      />
 
-      {vuelos && (
-        <div className="panel-numeros">
-          <div className="tarjeta">
-            <small>Vuelos publicados</small>
-            <strong>{vuelos.length}</strong>
+      <div className="contenedor sobre-encabezado">
+        {vuelos && (
+          <div className="panel-numeros">
+            <div className="tarjeta">
+              <small>Vuelos publicados</small>
+              <strong>{vuelos.length}</strong>
+            </div>
+            <div className="tarjeta">
+              <small>Asientos vendidos</small>
+              <strong>{resumen.vendidos}</strong>
+            </div>
+            <div className="tarjeta">
+              <small>Asientos cargados</small>
+              <strong>{resumen.totales}</strong>
+            </div>
           </div>
-          <div className="tarjeta">
-            <small>Asientos vendidos</small>
-            <strong>{resumen.vendidos}</strong>
+        )}
+
+        {error && <div className="mensaje mensaje-error">{error}</div>}
+        {mensaje && <div className="mensaje mensaje-exito">{mensaje}</div>}
+        {!vuelos && !error && <p className="texto-suave">Cargando vuelos…</p>}
+
+        {vuelos?.length === 0 && (
+          <div className="tarjeta panel-vacio">
+            <h2>Todavía no publicaste vuelos</h2>
+            <p className="texto-suave">Creá tu primer vuelo y después cargale las clases con asientos y precio.</p>
+            <Link to="/panel/vuelos/nuevo" className="boton boton-primario">
+              Publicar mi primer vuelo
+            </Link>
           </div>
-          <div className="tarjeta">
-            <small>Asientos cargados</small>
-            <strong>{resumen.totales}</strong>
-          </div>
-        </div>
-      )}
+        )}
 
-      {error && <div className="mensaje mensaje-error">{error}</div>}
-      {mensaje && <div className="mensaje mensaje-exito">{mensaje}</div>}
-      {!vuelos && !error && <p className="texto-suave">Cargando vuelos…</p>}
+        <div className="panel-lista">
+          {vuelos?.map((vuelo) => {
+            const asientos = asientosDe(vuelo)
+            const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+            const sinClases = vuelo.disponibilidades.length === 0
 
-      {vuelos?.length === 0 && (
-        <div className="tarjeta panel-vacio">
-          <h2>Todavía no publicaste vuelos</h2>
-          <p className="texto-suave">Creá tu primer vuelo y después cargale las clases con asientos y precio.</p>
-          <Link to="/panel/vuelos/nuevo" className="boton boton-primario">
-            Publicar mi primer vuelo
-          </Link>
-        </div>
-      )}
+            return (
+              <article key={vuelo.id} className="tarjeta panel-vuelo">
+                <div className="panel-vuelo-foto" aria-hidden="true">
+                  <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+                </div>
+                <div className="panel-vuelo-info">
+                  <div className="panel-vuelo-titulo">
+                    <strong>
+                      {vuelo.origenCiudad} → {vuelo.destinoCiudad}
+                    </strong>
+                    <span className="texto-suave">
+                      Vuelo {vuelo.numeroVuelo} · {fechaCorta(vuelo.fechaSalida)} {hora(vuelo.fechaSalida)} hs
+                      {esAdmin && ` · ${vuelo.vendedorUsername}`}
+                    </span>
+                  </div>
+                  <div className="panel-vuelo-etiquetas">
+                    <span className="etiqueta">{vuelo.categoriaNombre}</span>
+                    {descuento && <span className="etiqueta etiqueta-exito">{descuento}</span>}
+                    {sinClases && <span className="etiqueta etiqueta-aviso">Sin clases cargadas</span>}
+                  </div>
+                </div>
 
-      <div className="panel-lista">
-        {vuelos?.map((vuelo) => {
-          const asientos = asientosDe(vuelo)
-          const descuento = textoDescuento(vuelo.descuentoVigente, precio)
-          const sinClases = vuelo.disponibilidades.length === 0
-
-          return (
-            <article key={vuelo.id} className="tarjeta panel-vuelo">
-              <div className="panel-vuelo-info">
-                <div className="panel-vuelo-titulo">
+                <div className="panel-vuelo-asientos">
+                  <small>Vendidos</small>
                   <strong>
-                    {vuelo.origenIata} → {vuelo.destinoIata}
+                    {asientos.vendidos} / {asientos.totales}
                   </strong>
-                  <span className="texto-suave">
-                    Vuelo {vuelo.numeroVuelo} · {fechaCorta(vuelo.fechaSalida)} {hora(vuelo.fechaSalida)} hs
-                    {esAdmin && ` · ${vuelo.vendedorUsername}`}
-                  </span>
                 </div>
-                <div className="panel-vuelo-etiquetas">
-                  <span className="etiqueta">{vuelo.categoriaNombre}</span>
-                  {descuento && <span className="etiqueta etiqueta-exito">{descuento}</span>}
-                  {sinClases && <span className="etiqueta etiqueta-aviso">Sin clases cargadas</span>}
+
+                <div className="panel-vuelo-acciones">
+                  <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-primario">
+                    Gestionar
+                  </Link>
+                  <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-secundario">
+                    Editar
+                  </Link>
+                  <button className="boton boton-peligro" onClick={() => eliminar(vuelo)}>
+                    Eliminar
+                  </button>
                 </div>
-              </div>
-
-              <div className="panel-vuelo-asientos">
-                <small>Vendidos</small>
-                <strong>
-                  {asientos.vendidos} / {asientos.totales}
-                </strong>
-              </div>
-
-              <div className="panel-vuelo-acciones">
-                <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-primario">
-                  Gestionar
-                </Link>
-                <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-secundario">
-                  Editar
-                </Link>
-                <button className="boton boton-peligro" onClick={() => eliminar(vuelo)}>
-                  Eliminar
-                </button>
-              </div>
-            </article>
-          )
-        })}
+              </article>
+            )
+          })}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

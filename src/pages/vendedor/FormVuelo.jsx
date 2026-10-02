@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api/api'
+import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { useCatalogo } from '../../hooks/useCatalogo'
 import { paraInputFechaHora } from '../../utils/formato'
 import './Panel.css'
@@ -135,176 +136,179 @@ function FormVuelo() {
   }
 
   return (
-    <div className="contenedor pagina">
-      <Link to="/panel" className="panel-volver">
-        ← Volver al panel
-      </Link>
-
-      <section className="tarjeta panel-formulario">
-        <h1 className="panel-formulario-titulo">{esEdicion ? 'Editar vuelo' : 'Publicar un vuelo nuevo'}</h1>
-        <p className="texto-suave">
-          {esEdicion
+    <>
+      <EncabezadoPagina
+        etiqueta="Panel de vuelos"
+        titulo={esEdicion ? 'Editar vuelo' : 'Publicar un vuelo nuevo'}
+        subtitulo={
+          esEdicion
             ? 'Los cambios se ven enseguida en la búsqueda. Las compras ya hechas no cambian.'
-            : 'Cargá los datos y las fotos. Después vas a poder agregar las clases con asientos y los descuentos.'}
-        </p>
+            : 'Cargá los datos y las fotos. Después vas a poder agregar las clases con asientos y los descuentos.'
+        }
+      >
+        <Link to="/panel">← Volver al panel</Link>
+      </EncabezadoPagina>
 
-        {error && <div className="mensaje mensaje-error">{error}</div>}
+      <div className="contenedor sobre-encabezado">
+        <section className="tarjeta panel-formulario">
+          {error && <div className="mensaje mensaje-error">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="fila-campos">
-            <div className="campo">
-              <label htmlFor="numeroVuelo">Número de vuelo</label>
-              <input
-                id="numeroVuelo"
-                name="numeroVuelo"
-                value={formData.numeroVuelo}
-                onChange={handleChange}
-                placeholder="Ej: AR1500"
-                required
-              />
-            </div>
-            <div className="campo">
-              <label htmlFor="categoriaId">Tipo de vuelo</label>
-              <select id="categoriaId" name="categoriaId" value={formData.categoriaId} onChange={handleChange} required>
-                <option value="">Elegí una opción</option>
-                {categorias.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre} — {c.descripcion}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="fila-campos">
-            <div className="campo">
-              <label htmlFor="origenIata">Origen</label>
-              <select id="origenIata" name="origenIata" value={formData.origenIata} onChange={handleChange} required>
-                <option value="">Elegí el aeropuerto</option>
-                {aeropuertos.map((a) => (
-                  <option key={a.codigoIata} value={a.codigoIata}>
-                    {a.ciudad} — {a.nombre} ({a.codigoIata})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="campo">
-              <label htmlFor="destinoIata">Destino</label>
-              <select id="destinoIata" name="destinoIata" value={formData.destinoIata} onChange={handleChange} required>
-                <option value="">Elegí el aeropuerto</option>
-                {aeropuertos.map((a) => (
-                  <option key={a.codigoIata} value={a.codigoIata}>
-                    {a.ciudad} — {a.nombre} ({a.codigoIata})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="fila-campos">
-            <div className="campo">
-              <label htmlFor="fechaSalida">Salida</label>
-              <input
-                id="fechaSalida"
-                name="fechaSalida"
-                type="datetime-local"
-                value={formData.fechaSalida}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="campo">
-              <label htmlFor="fechaLlegada">Llegada</label>
-              <input
-                id="fechaLlegada"
-                name="fechaLlegada"
-                type="datetime-local"
-                value={formData.fechaLlegada}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="campo">
-            <label htmlFor="precio">Precio base</label>
-            <input
-              id="precio"
-              name="precio"
-              type="number"
-              min="1"
-              step="0.01"
-              value={formData.precio}
-              onChange={handleChange}
-              required
-            />
-            <span className="panel-ayuda">
-              Es el precio de referencia del vuelo. El precio de cada clase se carga aparte, con sus asientos.
-            </span>
-          </div>
-
-          <div className="campo">
-            <label htmlFor="descripcion">Descripción (opcional)</label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              rows="3"
-              value={formData.descripcion}
-              onChange={handleChange}
-              placeholder="Ej: Vuelo directo, incluye snack a bordo"
-            />
-          </div>
-
-          {esEdicion ? (
-            <p className="panel-ayuda">
-              Las fotos, clases y descuentos se manejan desde{' '}
-              <Link to={`/panel/vuelos/${id}`}>la gestión del vuelo</Link>.
-            </p>
-          ) : (
-            <div className="campo">
-              <label htmlFor="fotos">
-                Fotos ({fotos.length}/{MAXIMO_FOTOS})
-              </label>
-              {fotos.length < MAXIMO_FOTOS && (
-                <input id="fotos" type="file" accept="image/*" multiple onChange={agregarFotos} />
-              )}
-              <span className="panel-ayuda">
-                Podés elegir varias a la vez, hasta {MAXIMO_MB} MB cada una. La primera es la portada.
-              </span>
-
-              {fotos.length > 0 && (
-                <div className="form-fotos">
-                  {fotos.map((foto, indice) => (
-                    <figure key={foto.vistaPrevia}>
-                      <img src={foto.vistaPrevia} alt={foto.archivo.name} />
-                      {indice === 0 && <span className="etiqueta">Portada</span>}
-                      <button type="button" onClick={() => quitarFoto(indice)} aria-label={`Quitar ${foto.archivo.name}`}>
-                        ✕
-                      </button>
-                    </figure>
+          <form onSubmit={handleSubmit}>
+            <div className="fila-campos">
+              <div className="campo">
+                <label htmlFor="numeroVuelo">Número de vuelo</label>
+                <input
+                  id="numeroVuelo"
+                  name="numeroVuelo"
+                  value={formData.numeroVuelo}
+                  onChange={handleChange}
+                  placeholder="Ej: AR1500"
+                  required
+                />
+              </div>
+              <div className="campo">
+                <label htmlFor="categoriaId">Tipo de vuelo</label>
+                <select id="categoriaId" name="categoriaId" value={formData.categoriaId} onChange={handleChange} required>
+                  <option value="">Elegí una opción</option>
+                  {categorias.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nombre} — {c.descripcion}
+                    </option>
                   ))}
-                </div>
-              )}
+                </select>
+              </div>
             </div>
-          )}
 
-          <div className="panel-botones">
-            <button className="boton boton-primario" disabled={guardando}>
-              {guardando
-                ? fotos.length > 0 && !esEdicion
-                  ? 'Publicando y subiendo fotos…'
-                  : 'Guardando…'
-                : esEdicion
-                  ? 'Guardar cambios'
-                  : 'Publicar vuelo'}
-            </button>
-            <Link to="/panel" className="boton boton-secundario">
-              Cancelar
-            </Link>
-          </div>
-        </form>
-      </section>
-    </div>
+            <div className="fila-campos">
+              <div className="campo">
+                <label htmlFor="origenIata">Origen</label>
+                <select id="origenIata" name="origenIata" value={formData.origenIata} onChange={handleChange} required>
+                  <option value="">Elegí el aeropuerto</option>
+                  {aeropuertos.map((a) => (
+                    <option key={a.codigoIata} value={a.codigoIata}>
+                      {a.ciudad} — {a.nombre} ({a.codigoIata})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="campo">
+                <label htmlFor="destinoIata">Destino</label>
+                <select id="destinoIata" name="destinoIata" value={formData.destinoIata} onChange={handleChange} required>
+                  <option value="">Elegí el aeropuerto</option>
+                  {aeropuertos.map((a) => (
+                    <option key={a.codigoIata} value={a.codigoIata}>
+                      {a.ciudad} — {a.nombre} ({a.codigoIata})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="fila-campos">
+              <div className="campo">
+                <label htmlFor="fechaSalida">Salida</label>
+                <input
+                  id="fechaSalida"
+                  name="fechaSalida"
+                  type="datetime-local"
+                  value={formData.fechaSalida}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="campo">
+                <label htmlFor="fechaLlegada">Llegada</label>
+                <input
+                  id="fechaLlegada"
+                  name="fechaLlegada"
+                  type="datetime-local"
+                  value={formData.fechaLlegada}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="campo">
+              <label htmlFor="precio">Precio base</label>
+              <input
+                id="precio"
+                name="precio"
+                type="number"
+                min="1"
+                step="0.01"
+                value={formData.precio}
+                onChange={handleChange}
+                required
+              />
+              <span className="panel-ayuda">
+                Es el precio de referencia del vuelo. El precio de cada clase se carga aparte, con sus asientos.
+              </span>
+            </div>
+
+            <div className="campo">
+              <label htmlFor="descripcion">Descripción (opcional)</label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="3"
+                value={formData.descripcion}
+                onChange={handleChange}
+                placeholder="Ej: Vuelo directo, incluye snack a bordo"
+              />
+            </div>
+
+            {esEdicion ? (
+              <p className="panel-ayuda">
+                Las fotos, clases y descuentos se manejan desde{' '}
+                <Link to={`/panel/vuelos/${id}`}>la gestión del vuelo</Link>.
+              </p>
+            ) : (
+              <div className="campo">
+                <label htmlFor="fotos">
+                  Fotos ({fotos.length}/{MAXIMO_FOTOS})
+                </label>
+                {fotos.length < MAXIMO_FOTOS && (
+                  <input id="fotos" type="file" accept="image/*" multiple onChange={agregarFotos} />
+                )}
+                <span className="panel-ayuda">
+                  Podés elegir varias a la vez, hasta {MAXIMO_MB} MB cada una. La primera es la portada.
+                </span>
+
+                {fotos.length > 0 && (
+                  <div className="form-fotos">
+                    {fotos.map((foto, indice) => (
+                      <figure key={foto.vistaPrevia}>
+                        <img src={foto.vistaPrevia} alt={foto.archivo.name} />
+                        {indice === 0 && <span className="etiqueta">Portada</span>}
+                        <button type="button" onClick={() => quitarFoto(indice)} aria-label={`Quitar ${foto.archivo.name}`}>
+                          ✕
+                        </button>
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="panel-botones">
+              <button className="boton boton-primario" disabled={guardando}>
+                {guardando
+                  ? fotos.length > 0 && !esEdicion
+                    ? 'Publicando y subiendo fotos…'
+                    : 'Guardando…'
+                  : esEdicion
+                    ? 'Guardar cambios'
+                    : 'Publicar vuelo'}
+              </button>
+              <Link to="/panel" className="boton boton-secundario">
+                Cancelar
+              </Link>
+            </div>
+          </form>
+        </section>
+      </div>
+    </>
   )
 }
 

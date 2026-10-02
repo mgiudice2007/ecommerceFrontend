@@ -127,6 +127,29 @@ h3 {
   width: 100%;
 }
 
+/* Botones para usar sobre fondos azules (encabezados) */
+.boton-claro {
+  background: #fff;
+  color: var(--azul);
+}
+
+.boton-claro:hover:not(:disabled) {
+  background: var(--celeste-suave);
+  text-decoration: none;
+}
+
+.boton-contorno {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  color: #fff;
+}
+
+.boton-contorno:hover:not(:disabled) {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
 /* ---------- Formularios ---------- */
 .campo {
   display: flex;
