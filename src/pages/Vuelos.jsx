@@ -14,9 +14,16 @@ function Vuelos() {
   const [searchParams, setSearchParams] = useSearchParams()
   const pagina = Number(searchParams.get('page') ?? 0)
 
-  const [resultado, setResultado] = useState(null)
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
+  // La busqueda actual en texto (por ejemplo "destino=MAD&page=1")
+  const busqueda = searchParams.toString()
+
+  // Guardamos la respuesta junto con la busqueda que la pidio. Asi "cargando"
+  // no hace falta guardarlo: es cuando la respuesta todavia es de otra busqueda.
+  const [respuesta, setRespuesta] = useState({ busqueda: null, datos: null, error: '' })
+  const cargando = respuesta.busqueda !== busqueda
+  const resultado = cargando ? null : respuesta.datos
+  const error = cargando ? '' : respuesta.error
+
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',
     precioMax: searchParams.get('precioMax') ?? '',
@@ -24,17 +31,14 @@ function Vuelos() {
 
   // Cada vez que cambian los filtros de la URL, se vuelve a pedir al backend
   useEffect(() => {
-    const params = new URLSearchParams(searchParams)
-    params.set('page', pagina)
+    const params = new URLSearchParams(busqueda)
+    params.set('page', params.get('page') ?? 0)
     params.set('size', POR_PAGINA)
 
-    setCargando(true)
-    setError('')
     api(`/api/vuelos?${params.toString()}`)
-      .then(setResultado)
-      .catch((err) => setError(err.message))
-      .finally(() => setCargando(false))
-  }, [searchParams, pagina])
+      .then((datos) => setRespuesta({ busqueda, datos, error: '' }))
+      .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
+  }, [busqueda])
 
   const cambiarFiltro = (cambios) => {
     const params = new URLSearchParams(searchParams)

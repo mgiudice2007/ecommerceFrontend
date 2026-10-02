@@ -79,5 +79,5 @@ export function AuthProvider({ children }) {
 }
 
 // Hook propio para usar la sesion: const { usuario, login } = useAuth()
-// oxlint-disable-next-line react/only-export-components
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext)
