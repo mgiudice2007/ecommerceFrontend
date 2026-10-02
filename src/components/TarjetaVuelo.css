@@ -32,6 +32,10 @@
   flex: 1;
 }
 
+.tarjeta-vuelo-encabezado strong {
+  font-size: 17px;
+}
+
 .tarjeta-vuelo-encabezado small {
   color: var(--texto-suave);
 }
@@ -172,9 +176,27 @@
   width: 100%;
 }
 
-@media (max-width: 960px) {
+/* Pantallas medianas: foto + datos arriba y el precio en una franja abajo */
+@media (max-width: 1180px) {
   .tarjeta-vuelo {
-    grid-template-columns: 140px 1fr 200px;
+    grid-template-columns: 170px 1fr;
+  }
+
+  .tarjeta-vuelo-precio {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 12px;
+    padding: 14px 0 0;
+    border-left: none;
+    border-top: 1px dashed var(--borde);
+  }
+
+  .tarjeta-vuelo-precio .boton {
+    width: auto;
+    margin: 0 0 0 8px;
   }
 }
 

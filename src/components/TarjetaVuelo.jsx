@@ -19,9 +19,12 @@ function TarjetaVuelo({ vuelo }) {
         <div className="tarjeta-vuelo-encabezado">
           <span className="tarjeta-vuelo-avion" aria-hidden="true">✈</span>
           <div>
-            <strong>Vuelo {vuelo.numeroVuelo}</strong>
+            {/* Como en las aerolineas: la ruta es el titulo y el numero de vuelo un dato secundario */}
+            <strong>
+              {vuelo.origenCiudad} → {vuelo.destinoCiudad}
+            </strong>
             <small>
-              {vuelo.categoriaNombre} · {fechaCorta(vuelo.fechaSalida)}
+              Vuelo {vuelo.numeroVuelo} · {vuelo.categoriaNombre} · {fechaCorta(vuelo.fechaSalida)}
             </small>
           </div>
           {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}
