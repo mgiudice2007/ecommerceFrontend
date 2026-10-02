@@ -3,6 +3,10 @@
 // - convertir el body a JSON,
 // - y transformar los errores del backend en un mensaje legible.
 
+// Direccion del backend de Spring Boot. El frontend corre en otro puerto (5173),
+// asi que el backend tiene que permitirlo con CORS (ya esta en SecurityConfig).
+export const BASE_URL = 'http://localhost:8080'
+
 const TOKEN_KEY = 'token'
 
 export const obtenerToken = () => localStorage.getItem(TOKEN_KEY)
@@ -42,7 +46,7 @@ export const api = async (url, opciones = {}) => {
 
   let respuesta
   try {
-    respuesta = await fetch(url, {
+    respuesta = await fetch(`${BASE_URL}${url}`, {
       method,
       headers,
       body: body ? (esArchivo ? body : JSON.stringify(body)) : undefined,
@@ -61,4 +65,4 @@ export const api = async (url, opciones = {}) => {
 }
 
 // URL de la imagen de una foto (el backend devuelve el binario directo).
-export const urlFoto = (fotoId) => `/api/fotos/${fotoId}`
+export const urlFoto = (fotoId) => `${BASE_URL}/api/fotos/${fotoId}`

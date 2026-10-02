@@ -21,8 +21,8 @@ Consume la API REST del backend en Spring Boot
 
 4. Abrir http://localhost:5173
 
-Vite manda todo lo que empieza con `/api` al backend (ver `vite.config.js`),
-así que no hace falta configurar nada más.
+El frontend le habla directo al backend en `http://localhost:8080` (ver `BASE_URL`
+en `src/api/api.js`). Como corren en puertos distintos, el backend lo permite con CORS.
 
 ## Usuarios de prueba
 
