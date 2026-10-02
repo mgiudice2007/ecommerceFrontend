@@ -4,28 +4,32 @@ import { precioDesde, textoDescuento } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaDestino.css'
 
-// Tarjeta con foto para los "Destinos destacados" del inicio.
-function TarjetaDestino({ vuelo }) {
+// Tarjeta con foto grande para las secciones del inicio.
+// pais: viene del catalogo de aeropuertos (el vuelo solo trae la ciudad)
+function TarjetaDestino({ vuelo, pais }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+  const desde = precioDesde(vuelo)
+  const conRebaja = desde.precioConDescuento < desde.precio
 
   return (
     <Link to={`/vuelos/${vuelo.id}`} className="tarjeta-destino">
       <div className="tarjeta-destino-foto">
         <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
-        <span className="etiqueta">{descuento ?? vuelo.categoriaNombre}</span>
       </div>
 
-      <div className="tarjeta-destino-cuerpo">
+      {descuento && <span className="tarjeta-destino-oferta">{descuento}</span>}
+
+      <div className="tarjeta-destino-texto">
+        <span className="tarjeta-destino-pais">{pais ?? vuelo.categoriaNombre}</span>
         <h3>{vuelo.destinoCiudad}</h3>
-        <p className="texto-suave">
-          Desde {vuelo.origenCiudad} ({vuelo.origenIata}) · {fechaCorta(vuelo.fechaSalida)}
-        </p>
-        <div className="tarjeta-destino-pie">
-          <div>
-            <small>Final por pasajero</small>
-            <strong>{precio(precioDesde(vuelo).precioConDescuento)}</strong>
-          </div>
-          <span className="tarjeta-destino-flecha" aria-hidden="true">→</span>
+        <span className="tarjeta-destino-ruta">
+          Desde {vuelo.origenCiudad} · {fechaCorta(vuelo.fechaSalida)}
+        </span>
+
+        <div className="tarjeta-destino-precio">
+          <small>Ida desde</small>
+          {conRebaja && <s>{precio(desde.precio)}</s>}
+          <strong>{precio(desde.precioConDescuento)}</strong>
         </div>
       </div>
     </Link>

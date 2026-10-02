@@ -21,7 +21,7 @@ function TarjetaVuelo({ vuelo }) {
           <div>
             <strong>Vuelo {vuelo.numeroVuelo}</strong>
             <small>
-              {vuelo.categoriaNombre} · {fechaCorta(vuelo.fechaSalida)} · vende {vuelo.vendedorUsername}
+              {vuelo.categoriaNombre} · {fechaCorta(vuelo.fechaSalida)}
             </small>
           </div>
           {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}

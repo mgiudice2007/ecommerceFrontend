@@ -1,78 +1,103 @@
 .tarjeta-destino {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  display: block;
+  height: 340px;
   overflow: hidden;
-  border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
-  background: var(--superficie);
   box-shadow: var(--sombra);
-  color: var(--texto);
+  color: #fff;
   font-weight: 400;
-  transition: transform 0.15s;
+  isolation: isolate;
 }
 
 .tarjeta-destino:hover {
-  transform: translateY(-3px);
   text-decoration: none;
 }
 
 .tarjeta-destino-foto {
-  position: relative;
-  height: 170px;
-}
-
-.tarjeta-destino-foto .etiqueta {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  background: rgba(255, 255, 255, 0.92);
+  inset: 0;
+  z-index: -2;
+  transition: transform 0.5s ease;
 }
 
-.tarjeta-destino-cuerpo {
+.tarjeta-destino:hover .tarjeta-destino-foto {
+  transform: scale(1.06);
+}
+
+/* Degradado oscuro abajo para que el texto blanco se lea sobre cualquier foto */
+.tarjeta-destino::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(4, 30, 66, 0) 35%, rgba(4, 30, 66, 0.55) 60%, rgba(4, 30, 66, 0.92) 100%);
+}
+
+.tarjeta-destino-oferta {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--durazno);
+  color: var(--azul-noche);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tarjeta-destino-texto {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  padding: 16px;
+  padding: 20px;
 }
 
-.tarjeta-destino-cuerpo h3 {
-  font-size: 18px;
-}
-
-.tarjeta-destino-cuerpo p {
-  margin: 4px 0 16px;
-  font-size: 14px;
-}
-
-.tarjeta-destino-pie {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: auto;
-}
-
-.tarjeta-destino-pie div {
-  display: flex;
-  flex-direction: column;
-}
-
-.tarjeta-destino-pie small {
-  color: var(--texto-suave);
+.tarjeta-destino-pais {
   font-size: 12px;
-}
-
-.tarjeta-destino-pie strong {
-  color: var(--azul);
-  font-size: 20px;
-}
-
-.tarjeta-destino-flecha {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--celeste-suave);
-  color: var(--azul);
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.tarjeta-destino h3 {
+  margin: 2px 0 2px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.tarjeta-destino-ruta {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.tarjeta-destino-precio {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.tarjeta-destino-precio small {
+  width: 100%;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.tarjeta-destino-precio s {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.tarjeta-destino-precio strong {
+  font-size: 24px;
+  font-weight: 800;
 }

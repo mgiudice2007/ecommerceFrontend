@@ -1,29 +1,31 @@
-/* Colores y medidas de BCA Airlines (sacados del diseño de Figma).
+/* Colores y medidas de BCA Airlines: azul aerolínea + celeste.
    Se usan en todo el sitio con var(--nombre). */
 :root {
-  --azul-noche: #0a2540;
-  --azul: #0b4f7c;
-  --azul-hover: #093f63;
-  --celeste: #2b8fd6;
-  --celeste-suave: #e6f1fb;
-  --durazno: #f9d9a8;
+  --azul-noche: #041e42;
+  --azul: #0057b8;
+  --azul-hover: #00458f;
+  --celeste: #1fa2e0;
+  --celeste-suave: #e7f4fc;
+  --durazno: #ffc72c; /* acento dorado para ofertas y destacados */
 
-  --fondo: #f4f6fb;
+  --fondo: #f3f6fa;
   --superficie: #ffffff;
-  --superficie-2: #eef2f8;
-  --borde: #dfe5ee;
+  --superficie-2: #edf2f8;
+  --borde: #dce4ee;
 
-  --texto: #12263a;
-  --texto-suave: #5b6b7c;
+  --texto: #0f2440;
+  --texto-suave: #5a6b80;
 
-  --verde: #1f8a5b;
-  --verde-suave: #e3f5ec;
-  --rojo: #c0392b;
-  --rojo-suave: #fbe9e7;
+  --verde: #12805c;
+  --verde-suave: #e1f5ec;
+  --rojo: #d0342c;
+  --rojo-suave: #fdecea;
 
   --radio: 12px;
-  --radio-grande: 18px;
-  --sombra: 0 6px 24px rgba(10, 37, 64, 0.08);
+  --radio-grande: 20px;
+  --sombra: 0 8px 28px rgba(4, 30, 66, 0.09);
+  --sombra-fuerte: 0 18px 50px rgba(4, 30, 66, 0.18);
+  --degradado-cielo: linear-gradient(135deg, #0057b8 0%, #1fa2e0 100%);
 }
 
 * {
@@ -66,8 +68,7 @@ h3 {
 /* Solo arriba y abajo: el margen de los costados lo pone .contenedor */
 .pagina {
   padding-top: 40px;
-  padding-bottom: 64px;
-  min-height: calc(100vh - 280px);
+  min-height: calc(100vh - 340px);
 }
 
 /* ---------- Botones ---------- */
@@ -213,6 +214,5 @@ h3 {
 
   .pagina {
     padding-top: 24px;
-    padding-bottom: 48px;
   }
 }

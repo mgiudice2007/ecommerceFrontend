@@ -62,98 +62,105 @@ function Vuelos() {
   }
 
   return (
-    <div className="contenedor pagina">
-      <h1 className="vuelos-titulo">Buscar vuelos</h1>
+    <>
+      <section className="vuelos-encabezado">
+        <div className="contenedor">
+          <h1>Buscá tu vuelo</h1>
+          <p>Vuelos directos a Argentina, América y Europa, con el precio final a la vista.</p>
+        </div>
+      </section>
 
-      {/* La key hace que el buscador se reinicie con los filtros nuevos si cambia la URL */}
-      <Buscador key={searchParams.toString()} inicial={filtrosIniciales} />
+      <div className="contenedor vuelos-pagina">
+        {/* La key hace que el buscador se reinicie con los filtros nuevos si cambia la URL */}
+        <Buscador key={searchParams.toString()} inicial={filtrosIniciales} />
 
-      <div className="vuelos-layout">
-        <aside className="tarjeta vuelos-filtros">
-          <h2>Filtrar por precio</h2>
-          <form onSubmit={aplicarPrecios}>
-            <div className="campo">
-              <label htmlFor="precioMin">Precio mínimo</label>
-              <input
-                id="precioMin"
-                type="number"
-                min="0"
-                value={precios.precioMin}
-                onChange={(e) => setPrecios({ ...precios, precioMin: e.target.value })}
-                placeholder="$ 0"
-              />
-            </div>
-            <div className="campo">
-              <label htmlFor="precioMax">Precio máximo</label>
-              <input
-                id="precioMax"
-                type="number"
-                min="0"
-                value={precios.precioMax}
-                onChange={(e) => setPrecios({ ...precios, precioMax: e.target.value })}
-                placeholder="Sin límite"
-              />
-            </div>
-            <p className="vuelos-aclaracion">Se compara con el precio base del vuelo, sin descuentos.</p>
-            <button className="boton boton-primario boton-ancho">Aplicar</button>
-            <button type="button" className="boton boton-secundario boton-ancho" onClick={limpiarPrecios}>
-              Limpiar
-            </button>
-          </form>
-        </aside>
-
-        <section>
-          {error && <div className="mensaje mensaje-error">{error}</div>}
-
-          {cargando && <p className="texto-suave">Buscando vuelos…</p>}
-
-          {!cargando && resultado && (
-            <>
-              <p className="vuelos-cantidad">
-                {resultado.totalElements === 1
-                  ? '1 vuelo encontrado'
-                  : `${resultado.totalElements} vuelos encontrados`}
-              </p>
-
-              {resultado.content.length === 0 && (
-                <div className="tarjeta vuelos-vacio">
-                  <h3>No encontramos vuelos con esos filtros</h3>
-                  <p className="texto-suave">Probá con otro origen o destino, o sacá algún filtro.</p>
-                </div>
-              )}
-
-              <div className="vuelos-lista">
-                {resultado.content.map((vuelo) => (
-                  <TarjetaVuelo key={vuelo.id} vuelo={vuelo} />
-                ))}
+        <div className="vuelos-layout">
+          <aside className="tarjeta vuelos-filtros">
+            <h2>Filtrar por precio</h2>
+            <form onSubmit={aplicarPrecios}>
+              <div className="campo">
+                <label htmlFor="precioMin">Precio mínimo</label>
+                <input
+                  id="precioMin"
+                  type="number"
+                  min="0"
+                  value={precios.precioMin}
+                  onChange={(e) => setPrecios({ ...precios, precioMin: e.target.value })}
+                  placeholder="$ 0"
+                />
               </div>
+              <div className="campo">
+                <label htmlFor="precioMax">Precio máximo</label>
+                <input
+                  id="precioMax"
+                  type="number"
+                  min="0"
+                  value={precios.precioMax}
+                  onChange={(e) => setPrecios({ ...precios, precioMax: e.target.value })}
+                  placeholder="Sin límite"
+                />
+              </div>
+              <p className="vuelos-aclaracion">Se compara con el precio base del vuelo, sin descuentos.</p>
+              <button className="boton boton-primario boton-ancho">Aplicar</button>
+              <button type="button" className="boton boton-secundario boton-ancho" onClick={limpiarPrecios}>
+                Limpiar
+              </button>
+            </form>
+          </aside>
 
-              {resultado.totalPages > 1 && (
-                <nav className="vuelos-paginas" aria-label="Páginas de resultados">
-                  <button
-                    className="boton boton-secundario"
-                    disabled={resultado.first}
-                    onClick={() => cambiarFiltro({ page: pagina - 1 })}
-                  >
-                    ← Anterior
-                  </button>
-                  <span>
-                    Página {pagina + 1} de {resultado.totalPages}
-                  </span>
-                  <button
-                    className="boton boton-secundario"
-                    disabled={resultado.last}
-                    onClick={() => cambiarFiltro({ page: pagina + 1 })}
-                  >
-                    Siguiente →
-                  </button>
-                </nav>
-              )}
-            </>
-          )}
-        </section>
+          <section>
+            {error && <div className="mensaje mensaje-error">{error}</div>}
+
+            {cargando && <p className="texto-suave">Buscando vuelos…</p>}
+
+            {!cargando && resultado && (
+              <>
+                <p className="vuelos-cantidad">
+                  {resultado.totalElements === 1
+                    ? '1 vuelo encontrado'
+                    : `${resultado.totalElements} vuelos encontrados`}
+                </p>
+
+                {resultado.content.length === 0 && (
+                  <div className="tarjeta vuelos-vacio">
+                    <h3>No encontramos vuelos con esos filtros</h3>
+                    <p className="texto-suave">Probá con otro origen o destino, o sacá algún filtro.</p>
+                  </div>
+                )}
+
+                <div className="vuelos-lista">
+                  {resultado.content.map((vuelo) => (
+                    <TarjetaVuelo key={vuelo.id} vuelo={vuelo} />
+                  ))}
+                </div>
+
+                {resultado.totalPages > 1 && (
+                  <nav className="vuelos-paginas" aria-label="Páginas de resultados">
+                    <button
+                      className="boton boton-secundario"
+                      disabled={resultado.first}
+                      onClick={() => cambiarFiltro({ page: pagina - 1 })}
+                    >
+                      ← Anterior
+                    </button>
+                    <span>
+                      Página {pagina + 1} de {resultado.totalPages}
+                    </span>
+                    <button
+                      className="boton boton-secundario"
+                      disabled={resultado.last}
+                      onClick={() => cambiarFiltro({ page: pagina + 1 })}
+                    >
+                      Siguiente →
+                    </button>
+                  </nav>
+                )}
+              </>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

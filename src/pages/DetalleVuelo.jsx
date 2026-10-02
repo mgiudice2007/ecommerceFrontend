@@ -107,9 +107,7 @@ function DetalleVuelo() {
                 <h1>
                   {vuelo.origenCiudad} → {vuelo.destinoCiudad}
                 </h1>
-                <p className="texto-suave">
-                  Vuelo {vuelo.numeroVuelo} · publicado por {vuelo.vendedorUsername}
-                </p>
+                <p className="texto-suave">Vuelo {vuelo.numeroVuelo} · Directo</p>
               </div>
             </div>
 
