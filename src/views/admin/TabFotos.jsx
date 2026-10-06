@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api, urlFoto } from '../../api/api'
 
 const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
@@ -11,17 +11,14 @@ function TabFotos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [subiendo, setSubiendo] = useState(false)
-  const inputArchivo = useRef(null) // para poder vaciar el <input type="file"> despues de subir
-
-  const cargar = useCallback(() => {
-    api(`/api/fotos?vueloId=${vuelo.id}`)
-      .then(setFotos)
-      .catch((err) => setError(err.message))
-  }, [vuelo.id])
+  // Cada vez que cambia, el useEffect vuelve a pedir las fotos
+  const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    api(`/api/fotos?vueloId=${vuelo.id}`)
+      .then((data) => setFotos(data))
+      .catch((err) => setError(err.message))
+  }, [vuelo.id, recargar])
 
   const elegirArchivo = (e) => {
     const elegido = e.target.files[0] ?? null
@@ -35,9 +32,10 @@ function TabFotos({ vuelo, onCambio }) {
     setArchivo(elegido)
   }
 
-  const subir = async (e) => {
+  const subir = (e) => {
     e.preventDefault()
     if (!archivo) return
+    const formulario = e.target // para vaciar el <input type="file"> despues de subir
 
     // Igual que en la clase de subida de imagenes: los datos van en un FormData.
     // El campo del archivo se tiene que llamar "file", como espera el backend.
@@ -48,32 +46,29 @@ function TabFotos({ vuelo, onCambio }) {
     setSubiendo(true)
     setError('')
     setExito('')
-    try {
-      await api('/api/fotos', { method: 'POST', body: formData })
-      setExito('Foto subida.')
-      setArchivo(null)
-      inputArchivo.current.value = ''
-      cargar()
-      onCambio()
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setSubiendo(false)
-    }
+    api('/api/fotos', { method: 'POST', body: formData })
+      .then(() => {
+        setExito('Foto subida.')
+        setArchivo(null)
+        formulario.reset()
+        setRecargar(recargar + 1)
+        onCambio()
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setSubiendo(false))
   }
 
-  const eliminar = async (foto) => {
+  const eliminar = (foto) => {
     if (!window.confirm('¿Eliminar esta foto?')) return
     setError('')
     setExito('')
-    try {
-      const respuesta = await api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
-      setExito(respuesta.mensaje) // "Foto eliminada correctamente"
-      cargar()
-      onCambio()
-    } catch (err) {
-      setError(err.message)
-    }
+    api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
+      .then((respuesta) => {
+        setExito(respuesta.mensaje) // "Foto eliminada correctamente"
+        setRecargar(recargar + 1)
+        onCambio()
+      })
+      .catch((err) => setError(err.message))
   }
 
   const lleno = fotos.length >= MAXIMO_FOTOS
@@ -115,7 +110,7 @@ function TabFotos({ vuelo, onCambio }) {
           <form onSubmit={subir}>
             <div className="campo">
               <label htmlFor="archivo">Imagen (JPG, PNG o WEBP, hasta {MAXIMO_MB} MB)</label>
-              <input id="archivo" ref={inputArchivo} type="file" accept="image/*" onChange={elegirArchivo} />
+              <input id="archivo" type="file" accept="image/*" onChange={elegirArchivo} />
             </div>
             <button className="boton boton-primario boton-ancho" disabled={!archivo || subiendo}>
               {subiendo ? 'Subiendo…' : 'Subir foto'}

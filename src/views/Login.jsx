@@ -17,23 +17,22 @@ function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
     setCargando(true)
-    try {
-      const usuario = await login(formData.username, formData.password)
 
-      // Si venia de una pagina protegida vuelve ahi; si no, segun su rol
-      const destino =
-        location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/vuelos' : '/panel')
-      navigate(destino, { replace: true })
-    } catch (err) {
-      // Si la clave esta mal el backend responde "Usuario o contraseña incorrectos"
-      setError(err.message)
-    } finally {
-      setCargando(false)
-    }
+    login(formData.username, formData.password)
+      .then((usuario) => {
+        // Si venia de una pagina protegida vuelve ahi; si no, segun su rol
+        const destino = location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/vuelos' : '/panel')
+        navigate(destino, { replace: true })
+      })
+      .catch((err) => {
+        // Si la clave esta mal el backend responde "Usuario o contraseña incorrectos"
+        setError(err.message)
+        setCargando(false)
+      })
   }
 
   return (

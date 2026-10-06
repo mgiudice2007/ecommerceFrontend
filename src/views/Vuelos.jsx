@@ -51,14 +51,16 @@ function Vuelos() {
       return
     }
 
-    // Dos busquedas al mismo tiempo: la ida (origen -> destino) y la vuelta (destino -> origen)
+    // Dos busquedas: primero la ida (origen -> destino) y despues la vuelta (destino -> origen)
     params.delete('page')
     const vuelta = new URLSearchParams(params)
     vuelta.set('origen', params.get('destino'))
     vuelta.set('destino', params.get('origen'))
 
-    Promise.all([buscarVuelos(params), buscarVuelos(vuelta)])
-      .then(([ida, regreso]) => setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' }))
+    buscarVuelos(params)
+      .then((ida) =>
+        buscarVuelos(vuelta).then((regreso) => setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })),
+      )
       .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
   }, [busqueda])
 

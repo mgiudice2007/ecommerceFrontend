@@ -5,16 +5,22 @@ import { api } from '../api/api'
 // clases) que usan los buscadores y formularios. Lo puede usar cualquier
 // componente con: const { aeropuertos, categorias, clases } = useCatalogo()
 export function useCatalogo() {
-  const [catalogo, setCatalogo] = useState({ aeropuertos: [], categorias: [], clases: [] })
+  const [aeropuertos, setAeropuertos] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [clases, setClases] = useState([])
 
   useEffect(() => {
-    // Los tres pedidos salen al mismo tiempo y esperamos a que terminen todos
-    Promise.all([api('/api/aeropuertos'), api('/api/categorias'), api('/api/clases')])
-      .then(([aeropuertos, categorias, clases]) => setCatalogo({ aeropuertos, categorias, clases }))
-      .catch(() => {
-        // Si falla, los selects quedan vacios pero la pagina sigue funcionando
-      })
+    // Si algun pedido falla, ese select queda vacio pero la pagina sigue funcionando
+    api('/api/aeropuertos')
+      .then((data) => setAeropuertos(data))
+      .catch(() => setAeropuertos([]))
+    api('/api/categorias')
+      .then((data) => setCategorias(data))
+      .catch(() => setCategorias([]))
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
   }, [])
 
-  return catalogo
+  return { aeropuertos, categorias, clases }
 }

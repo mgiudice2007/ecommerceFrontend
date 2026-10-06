@@ -23,40 +23,45 @@ function Carrito() {
 
   // Todas las operaciones del carrito devuelven el carrito actualizado,
   // asi que despues de cada una reemplazamos el estado con lo que vuelve.
-  const ejecutar = async (pedido) => {
-    setOcupado(true)
-    setError('')
-    try {
-      const actualizado = await pedido()
-      setCarrito(actualizado)
-      actualizarCarrito(actualizado)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setOcupado(false)
-    }
+  const mostrarCarrito = (actualizado) => {
+    setCarrito(actualizado)
+    actualizarCarrito(actualizado)
   }
 
-  const cambiarCantidad = (item, cantidad) =>
-    ejecutar(() => api(`/api/carrito/items/${item.id}`, { method: 'PUT', body: { cantidad } }))
+  const cambiarCantidad = (item, cantidad) => {
+    setOcupado(true)
+    setError('')
+    api(`/api/carrito/items/${item.id}`, { method: 'PUT', body: { cantidad } })
+      .then(mostrarCarrito)
+      .catch((err) => setError(err.message))
+      .finally(() => setOcupado(false))
+  }
 
-  const eliminar = (item) => ejecutar(() => api(`/api/carrito/items/${item.id}`, { method: 'DELETE' }))
+  const eliminar = (item) => {
+    setOcupado(true)
+    setError('')
+    api(`/api/carrito/items/${item.id}`, { method: 'DELETE' })
+      .then(mostrarCarrito)
+      .catch((err) => setError(err.message))
+      .finally(() => setOcupado(false))
+  }
 
   // La compra no pide datos de pago: POST /api/carrito/checkout valida el stock,
   // descuenta los asientos, crea la orden y vacia el carrito. Despues se muestra
   // la pantalla de "Compra confirmada".
-  const confirmarCompra = async () => {
+  const confirmarCompra = () => {
     setComprando(true)
     setError('')
-    try {
-      const orden = await api('/api/carrito/checkout', { method: 'POST' })
-      actualizarCarrito({ items: [] })
-      navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
-    } catch (err) {
-      // Por ejemplo: alguien compro los ultimos asientos mientras tanto
-      setError(err.message)
-      setComprando(false)
-    }
+    api('/api/carrito/checkout', { method: 'POST' })
+      .then((orden) => {
+        actualizarCarrito({ items: [] })
+        navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
+      })
+      .catch((err) => {
+        // Por ejemplo: alguien compro los ultimos asientos mientras tanto
+        setError(err.message)
+        setComprando(false)
+      })
   }
 
   if (!carrito) {

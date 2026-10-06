@@ -14,11 +14,11 @@ import Perfil from './views/Perfil'
 import NoEncontrada from './views/NoEncontrada'
 import Registro from './views/Registro'
 import Vuelos from './views/Vuelos'
-import CrearAdmin from './views/vendedor/CrearAdmin'
-import FormVuelo from './views/vendedor/FormVuelo'
-import GestionVuelo from './views/vendedor/GestionVuelo'
-import PanelVuelos from './views/vendedor/PanelVuelos'
-import Usuarios from './views/vendedor/Usuarios'
+import CrearAdmin from './views/admin/CrearAdmin'
+import FormVuelo from './views/admin/FormVuelo'
+import GestionVuelo from './views/admin/GestionVuelo'
+import PanelVuelos from './views/admin/PanelVuelos'
+import Usuarios from './views/admin/Usuarios'
 
 function App() {
   return (

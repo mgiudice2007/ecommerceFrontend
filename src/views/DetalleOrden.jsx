@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, precio } from '../utils/formato'
-import { cancelarOrden } from '../utils/ordenes'
+import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 // Detalle de una compra (GET /api/ordenes/:id).
@@ -37,16 +37,14 @@ function DetalleOrden() {
 
   const cancelada = orden.estado === 'CANCELADA'
 
-  const cancelar = async () => {
+  const cancelar = () => {
+    if (!confirmarCancelacion(orden)) return
+
     setCancelando(true)
-    try {
-      const actualizada = await cancelarOrden(orden)
-      if (actualizada) setOrden(actualizada)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setCancelando(false)
-    }
+    cancelarOrden(orden)
+      .then((actualizada) => setOrden(actualizada))
+      .catch((err) => setError(err.message))
+      .finally(() => setCancelando(false))
   }
 
   return (

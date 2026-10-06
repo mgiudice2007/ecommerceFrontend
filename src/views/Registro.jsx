@@ -25,7 +25,7 @@ function Registro() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
 
@@ -35,26 +35,25 @@ function Registro() {
     }
 
     setCargando(true)
-    try {
-      // confirmarPassword es solo del formulario: al backend se manda el resto.
-      // El registro es solo para pasajeros: el backend crea siempre un COMPRADOR.
-      const datos = {
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        username: formData.username,
-        mail: formData.mail,
-        password: formData.password,
-      }
-      await api('/api/auth/registro', { method: 'POST', body: datos })
 
-      // Despues de registrarse lo dejamos logueado directamente
-      await login(datos.username, datos.password)
-      navigate('/vuelos', { replace: true })
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setCargando(false)
+    // confirmarPassword es solo del formulario: al backend se manda el resto.
+    // El registro es solo para pasajeros: el backend crea siempre un COMPRADOR.
+    const datosAEnviar = {
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      username: formData.username,
+      mail: formData.mail,
+      password: formData.password,
     }
+
+    api('/api/auth/registro', { method: 'POST', body: datosAEnviar })
+      // Despues de registrarse lo dejamos logueado directamente
+      .then(() => login(datosAEnviar.username, datosAEnviar.password))
+      .then(() => navigate('/vuelos', { replace: true }))
+      .catch((err) => {
+        setError(err.message)
+        setCargando(false)
+      })
   }
 
   return (

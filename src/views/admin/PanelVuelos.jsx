@@ -32,20 +32,19 @@ function PanelVuelos() {
 
   // PATCH /api/vuelos/:id/estado cambia solo el estado del vuelo (activo, demorado,
   // pausado, cancelado o eliminado) y devuelve { id, estado, mensaje }.
-  const cambiarEstado = async (vuelo, estado) => {
+  const cambiarEstado = (vuelo, estado) => {
     setError('')
     setMensaje('')
-    try {
-      const respuesta = await api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
-      setVuelos(
-        estado === 'ELIMINADO'
-          ? vuelos.filter((v) => v.id !== vuelo.id) // la baja logica lo saca del listado
-          : vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)),
-      )
-      setMensaje(respuesta.mensaje) // por ejemplo "El vuelo BC1402 fue marcado como demorado"
-    } catch (err) {
-      setError(err.message)
-    }
+    api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
+      .then((respuesta) => {
+        if (estado === 'ELIMINADO') {
+          setVuelos(vuelos.filter((v) => v.id !== vuelo.id)) // la baja logica lo saca del listado
+        } else {
+          setVuelos(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
+        }
+        setMensaje(respuesta.mensaje) // por ejemplo "El vuelo BC1402 fue marcado como demorado"
+      })
+      .catch((err) => setError(err.message))
   }
 
   const eliminar = (vuelo) => {

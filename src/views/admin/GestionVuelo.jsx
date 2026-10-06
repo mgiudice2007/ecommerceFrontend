@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api, urlFoto } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
-import { useAuth } from '../../context/AuthContext'
 import { fechaLarga, hora } from '../../utils/formato'
 import TabClases from './TabClases'
 import TabDescuentos from './TabDescuentos'
@@ -19,27 +18,27 @@ const PESTANIAS = [
 function GestionVuelo() {
   const { id } = useParams()
   const location = useLocation()
-  const { usuario, esAdmin } = useAuth()
 
   const [vuelo, setVuelo] = useState(null)
   const [portadaId, setPortadaId] = useState(null) // primera foto del vuelo, para el encabezado
   const [error, setError] = useState('')
   const [pestania, setPestania] = useState('clases')
 
-  // Las pestañas la llaman cuando cambian algo (por ejemplo un descuento
-  // cambia el precio final), para volver a traer el vuelo actualizado.
-  const recargarVuelo = useCallback(() => {
-    Promise.all([api(`/api/vuelos/${id}`), api(`/api/fotos?vueloId=${id}`)])
-      .then(([datosVuelo, fotos]) => {
-        setVuelo(datosVuelo)
-        setPortadaId(fotos.length > 0 ? fotos[0].id : null)
-      })
-      .catch((err) => setError(err.message))
-  }, [id])
+  // Cada vez que cambia, el useEffect vuelve a traer el vuelo
+  const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
-    recargarVuelo()
-  }, [recargarVuelo])
+    api(`/api/vuelos/${id}`)
+      .then((data) => setVuelo(data))
+      .catch((err) => setError(err.message))
+    api(`/api/fotos?vueloId=${id}`)
+      .then((fotos) => setPortadaId(fotos.length > 0 ? fotos[0].id : null))
+      .catch(() => setPortadaId(null))
+  }, [id, recargar])
+
+  // Las pestañas la llaman cuando cambian algo (por ejemplo un descuento
+  // cambia el precio final), para volver a traer el vuelo actualizado.
+  const recargarVuelo = () => setRecargar(recargar + 1)
 
   if (error) {
     return (
@@ -54,15 +53,6 @@ function GestionVuelo() {
     return <div className="contenedor pagina texto-suave">Cargando vuelo…</div>
   }
 
-  // El backend tambien lo controla, pero asi evitamos mostrar formularios que van a fallar
-  if (!esAdmin && vuelo.vendedorUsername !== usuario.username) {
-    return (
-      <div className="contenedor pagina">
-        <div className="mensaje mensaje-error">Este vuelo es de otro vendedor: no lo podés modificar.</div>
-        <Link to="/panel">← Volver al panel</Link>
-      </div>
-    )
-  }
 
   return (
     <>

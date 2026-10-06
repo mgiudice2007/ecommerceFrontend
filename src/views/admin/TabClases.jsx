@@ -17,56 +17,47 @@ function TabClases({ vuelo, onCambio }) {
   // Solo se pueden agregar las clases que el vuelo todavia no tiene
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
 
-  const guardar = async (pedido, textoExito) => {
+  const agregar = (e) => {
+    e.preventDefault()
     setError('')
     setExito('')
     setGuardando(true)
-    try {
-      await pedido()
-      setExito(textoExito)
-      onCambio() // recarga el vuelo para ver los asientos actualizados
-      return true
-    } catch (err) {
-      setError(err.message)
-      return false
-    } finally {
-      setGuardando(false)
+
+    const body = {
+      vueloId: vuelo.id,
+      claseId: Number(nueva.claseId),
+      asientosTotales: Number(nueva.asientosTotales),
+      precio: Number(nueva.precio),
     }
+    api('/api/disponibilidades', { method: 'POST', body })
+      .then(() => {
+        setExito('Clase agregada. Ya se puede comprar.')
+        setNueva({ claseId: '', asientosTotales: '', precio: '' })
+        onCambio() // recarga el vuelo para ver los asientos actualizados
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(false))
   }
 
-  const agregar = async (e) => {
-    e.preventDefault()
-    const ok = await guardar(
-      () =>
-        api('/api/disponibilidades', {
-          method: 'POST',
-          body: {
-            vueloId: vuelo.id,
-            claseId: Number(nueva.claseId),
-            asientosTotales: Number(nueva.asientosTotales),
-            precio: Number(nueva.precio),
-          },
-        }),
-      'Clase agregada. Ya se puede comprar.',
-    )
-    if (ok) setNueva({ claseId: '', asientosTotales: '', precio: '' })
-  }
+  const guardarEdicion = (disponibilidad) => {
+    setError('')
+    setExito('')
+    setGuardando(true)
 
-  const guardarEdicion = async (disponibilidad) => {
-    const ok = await guardar(
-      () =>
-        api(`/api/disponibilidades/${disponibilidad.id}`, {
-          method: 'PUT',
-          body: {
-            vueloId: vuelo.id,
-            claseId: disponibilidad.claseId,
-            asientosTotales: Number(editando.asientosTotales),
-            precio: Number(editando.precio),
-          },
-        }),
-      `Se actualizó la clase ${disponibilidad.claseNombre}.`,
-    )
-    if (ok) setEditando(null)
+    const body = {
+      vueloId: vuelo.id,
+      claseId: disponibilidad.claseId,
+      asientosTotales: Number(editando.asientosTotales),
+      precio: Number(editando.precio),
+    }
+    api(`/api/disponibilidades/${disponibilidad.id}`, { method: 'PUT', body })
+      .then(() => {
+        setExito(`Se actualizó la clase ${disponibilidad.claseNombre}.`)
+        setEditando(null)
+        onCambio()
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(false))
   }
 
   return (

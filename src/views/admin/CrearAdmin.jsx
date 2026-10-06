@@ -19,24 +19,20 @@ function CrearAdmin() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
     setExito('')
     setGuardando(true)
-    try {
-      // El backend fuerza rol ADMIN, pero el campo es obligatorio en el body
-      const creado = await api('/api/auth/registro/administrador', {
-        method: 'POST',
-        body: { ...formData, rol: 'ADMIN' },
+
+    // El backend fuerza el rol ADMIN en este endpoint
+    api('/api/auth/registro/administrador', { method: 'POST', body: { ...formData, rol: 'ADMIN' } })
+      .then((creado) => {
+        setExito(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
+        setFormData(FORM_VACIO)
       })
-      setExito(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
-      setFormData(FORM_VACIO)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setGuardando(false)
-    }
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(false))
   }
 
   return (

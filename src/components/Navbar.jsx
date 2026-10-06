@@ -11,10 +11,11 @@ function Navbar() {
 
   const cerrarMenu = () => setMenuAbierto(false)
 
-  const cerrarSesion = async () => {
-    await logout()
-    cerrarMenu()
-    navigate('/')
+  const cerrarSesion = () => {
+    logout().then(() => {
+      cerrarMenu()
+      navigate('/')
+    })
   }
 
   return (

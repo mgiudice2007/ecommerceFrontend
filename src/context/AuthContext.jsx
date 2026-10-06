@@ -23,7 +23,8 @@ const leerToken = (token) => {
 }
 
 export function AuthProvider({ children }) {
-  const [usuario, setUsuario] = useState(() => leerToken(obtenerToken()))
+  // Al abrir la pagina, si habia un token guardado, el usuario sigue logueado
+  const [usuario, setUsuario] = useState(leerToken(obtenerToken()))
   const [cantidadCarrito, setCantidadCarrito] = useState(0)
 
   // Recibe el carrito que devuelve el backend (CarritoResponse) y cuenta los pasajes.
@@ -41,27 +42,23 @@ export function AuthProvider({ children }) {
     }
   }, [usuario])
 
-  const login = async (username, password) => {
-    const { token } = await api('/api/auth/login', {
-      method: 'POST',
-      body: { username, password },
+  // Devuelve una promesa con los datos del usuario (id, username y rol)
+  const login = (username, password) =>
+    api('/api/auth/login', { method: 'POST', body: { username, password } }).then((data) => {
+      guardarToken(data.token) // como en clase: localStorage.setItem
+      const datos = leerToken(data.token)
+      setUsuario(datos)
+      return datos
     })
-    guardarToken(token)
-    const datos = leerToken(token)
-    setUsuario(datos)
-    return datos
-  }
 
-  const logout = async () => {
-    try {
-      await api('/api/auth/logout', { method: 'POST' })
-    } catch {
-      // Aunque falle el pedido, del lado del front la sesion se cierra igual
-    }
-    borrarToken()
-    setUsuario(null)
-    setCantidadCarrito(0)
-  }
+  const logout = () =>
+    api('/api/auth/logout', { method: 'POST' })
+      .catch(() => null) // aunque falle el pedido, del lado del front la sesion se cierra igual
+      .then(() => {
+        borrarToken()
+        setUsuario(null)
+        setCantidadCarrito(0)
+      })
 
   const valor = {
     usuario,

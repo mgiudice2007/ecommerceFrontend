@@ -26,15 +26,18 @@ function DetalleVuelo() {
   const [mensaje, setMensaje] = useState(null) // { tipo: 'exito' | 'error', texto }
 
   useEffect(() => {
-    // El vuelo y sus fotos se piden al mismo tiempo
-    Promise.all([api(`/api/vuelos/${id}`), api(`/api/fotos?vueloId=${id}`)])
-      .then(([datosVuelo, datosFotos]) => {
-        setVuelo(datosVuelo)
-        setFotos(datosFotos)
+    api(`/api/vuelos/${id}`)
+      .then((data) => {
+        setVuelo(data)
         // Arranca elegida la primera clase que tenga asientos
-        setElegida(datosVuelo.disponibilidades.find((d) => d.hayStock) ?? null)
+        setElegida(data.disponibilidades.find((d) => d.hayStock) ?? null)
       })
       .catch((err) => setError(err.message))
+
+    // Las fotos van aparte: si fallan, el vuelo se muestra igual
+    api(`/api/fotos?vueloId=${id}`)
+      .then((data) => setFotos(data))
+      .catch(() => setFotos([]))
   }, [id])
 
   if (error) {
@@ -67,7 +70,7 @@ function DetalleVuelo() {
     }
   }
 
-  const agregarAlCarrito = async () => {
+  const agregarAlCarrito = () => {
     if (!estaLogueado) {
       // Lo mandamos a loguearse y despues vuelve a este vuelo
       navigate('/login', { state: { desde: location.pathname } })
@@ -76,18 +79,16 @@ function DetalleVuelo() {
 
     setAgregando(true)
     setMensaje(null)
-    try {
-      const carrito = await api('/api/carrito/items', {
-        method: 'POST',
-        body: { disponibilidadId: elegida.id, cantidad },
+    api('/api/carrito/items', {
+      method: 'POST',
+      body: { disponibilidadId: elegida.id, cantidad },
+    })
+      .then((carrito) => {
+        actualizarCarrito(carrito)
+        setMensaje({ tipo: 'exito', texto: `Agregaste ${cantidad} pasaje(s) en ${elegida.claseNombre} al carrito.` })
       })
-      actualizarCarrito(carrito)
-      setMensaje({ tipo: 'exito', texto: `Agregaste ${cantidad} pasaje(s) en ${elegida.claseNombre} al carrito.` })
-    } catch (err) {
-      setMensaje({ tipo: 'error', texto: err.message })
-    } finally {
-      setAgregando(false)
-    }
+      .catch((err) => setMensaje({ tipo: 'error', texto: err.message }))
+      .finally(() => setAgregando(false))
   }
 
   // La primera foto del vuelo es el fondo de la portada (si no tiene, queda el azul)
@@ -148,7 +149,7 @@ function DetalleVuelo() {
             <section>
               <h2 className="detalle-subtitulo">Seleccioná tu clase</h2>
               {vuelo.disponibilidades.length === 0 ? (
-                <p className="texto-suave">El vendedor todavía no cargó asientos para este vuelo.</p>
+                <p className="texto-suave">Todavía no hay asientos a la venta para este vuelo.</p>
               ) : (
                 <div className="detalle-clases">
                   {vuelo.disponibilidades.map((d) => (

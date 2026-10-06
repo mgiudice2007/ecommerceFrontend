@@ -84,24 +84,21 @@ function FormVuelo() {
     setFotos(fotos.filter((_, i) => i !== indice))
   }
 
-  // Sube las fotos una por una al vuelo recien creado (POST /api/fotos, multipart).
-  // Devuelve los nombres de las que fallaron, para avisar sin perder el vuelo creado.
-  const subirFotos = async (vueloId) => {
+  // Sube las fotos al vuelo recien creado (POST /api/fotos, multipart).
+  // Promise.all espera a que terminen todas; devuelve los nombres de las que
+  // fallaron, para avisar sin perder el vuelo creado.
+  const subirFotos = (vueloId) => {
     const fallidas = []
-    for (const { archivo } of fotos) {
+    const pedidos = fotos.map(({ archivo }) => {
       const datos = new FormData()
       datos.append('vueloId', vueloId)
       datos.append('file', archivo)
-      try {
-        await api('/api/fotos', { method: 'POST', body: datos })
-      } catch {
-        fallidas.push(archivo.name)
-      }
-    }
-    return fallidas
+      return api('/api/fotos', { method: 'POST', body: datos }).catch(() => fallidas.push(archivo.name))
+    })
+    return Promise.all(pedidos).then(() => fallidas)
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
 
@@ -115,20 +112,29 @@ function FormVuelo() {
     }
 
     setGuardando(true)
-    try {
-      const body = { ...formData, categoriaId: Number(formData.categoriaId), precio: Number(formData.precio) }
-      const vuelo = esEdicion
-        ? await api(`/api/vuelos/${id}`, { method: 'PUT', body })
-        : await api('/api/vuelos', { method: 'POST', body })
+    const body = { ...formData, categoriaId: Number(formData.categoriaId), precio: Number(formData.precio) }
 
-      const fotosConError = esEdicion ? [] : await subirFotos(vuelo.id)
-
-      // Un vuelo nuevo nace sin asientos: lo mandamos a cargarle las clases
-      navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: !esEdicion, fotosConError } })
-    } catch (err) {
-      setError(err.message)
-      setGuardando(false)
+    if (esEdicion) {
+      api(`/api/vuelos/${id}`, { method: 'PUT', body })
+        .then((vuelo) => navigate(`/panel/vuelos/${vuelo.id}`))
+        .catch((err) => {
+          setError(err.message)
+          setGuardando(false)
+        })
+      return
     }
+
+    api('/api/vuelos', { method: 'POST', body })
+      .then((vuelo) =>
+        subirFotos(vuelo.id).then((fotosConError) =>
+          // Un vuelo nuevo nace sin asientos: lo mandamos a cargarle las clases
+          navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: true, fotosConError } }),
+        ),
+      )
+      .catch((err) => {
+        setError(err.message)
+        setGuardando(false)
+      })
   }
 
   if (cargando) {

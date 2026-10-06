@@ -51,5 +51,5 @@ src/
 ├── utils/                formato de precios y fechas, cálculos de vuelos y órdenes
 ├── components/           piezas reutilizables (Navbar, TarjetaVuelo, Buscador, ...)
 └── views/                una vista (pantalla) por ruta
-    └── vendedor/         panel del vendedor y del administrador
+    └── admin/            panel del administrador (único vendedor)
 ```

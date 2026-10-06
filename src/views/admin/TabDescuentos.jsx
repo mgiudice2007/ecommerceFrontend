@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
 import { precio } from '../../utils/formato'
 
@@ -20,69 +20,59 @@ function TabDescuentos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
-
-  const cargar = useCallback(() => {
-    api(`/api/descuentos?vueloId=${vuelo.id}`)
-      .then(setDescuentos)
-      .catch((err) => setError(err.message))
-  }, [vuelo.id])
+  // Cada vez que cambia, el useEffect vuelve a pedir la lista de descuentos
+  const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    api(`/api/descuentos?vueloId=${vuelo.id}`)
+      .then((data) => setDescuentos(data))
+      .catch((err) => setError(err.message))
+  }, [vuelo.id, recargar])
 
-  const ejecutar = async (pedido, textoExito) => {
+  // Manda el pedido y, si sale bien, muestra el mensaje y recarga los descuentos.
+  // Devuelve true o false para saber si salio bien.
+  const ejecutar = (url, options, textoExito) => {
     setError('')
     setExito('')
     setGuardando(true)
-    try {
-      const respuesta = await pedido()
-      setExito(textoExito ?? respuesta.mensaje)
-      cargar()
-      onCambio() // el precio final del vuelo puede haber cambiado
-      return true
-    } catch (err) {
-      setError(err.message)
-      return false
-    } finally {
-      setGuardando(false)
-    }
+    return api(url, options)
+      .then((respuesta) => {
+        setExito(textoExito ?? respuesta.mensaje)
+        setRecargar(recargar + 1)
+        onCambio() // el precio final del vuelo puede haber cambiado
+        return true
+      })
+      .catch((err) => {
+        setError(err.message)
+        return false
+      })
+      .finally(() => setGuardando(false))
   }
 
-  const crear = async (e) => {
+  const crear = (e) => {
     e.preventDefault()
-    const ok = await ejecutar(
-      () =>
-        api('/api/descuentos', {
-          method: 'POST',
-          body: { ...nuevo, vueloId: vuelo.id, valor: Number(nuevo.valor) },
-        }),
-      'Descuento creado.',
-    )
-    if (ok) setNuevo({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
+    const body = { ...nuevo, vueloId: vuelo.id, valor: Number(nuevo.valor) }
+    ejecutar('/api/descuentos', { method: 'POST', body }, 'Descuento creado.').then((ok) => {
+      if (ok) setNuevo({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
+    })
   }
 
   // Prende o apaga un descuento sin borrarlo (PUT con activo cambiado)
-  const alternarActivo = (d) =>
-    ejecutar(
-      () =>
-        api(`/api/descuentos/${d.id}`, {
-          method: 'PUT',
-          body: {
-            vueloId: vuelo.id,
-            tipoDescuento: d.tipoDescuento,
-            valor: d.valor,
-            fechaDesde: d.fechaDesde,
-            fechaHasta: d.fechaHasta,
-            activo: !d.activo,
-          },
-        }),
-      d.activo ? 'Descuento pausado.' : 'Descuento activado.',
-    )
+  const alternarActivo = (d) => {
+    const body = {
+      vueloId: vuelo.id,
+      tipoDescuento: d.tipoDescuento,
+      valor: d.valor,
+      fechaDesde: d.fechaDesde,
+      fechaHasta: d.fechaHasta,
+      activo: !d.activo,
+    }
+    ejecutar(`/api/descuentos/${d.id}`, { method: 'PUT', body }, d.activo ? 'Descuento pausado.' : 'Descuento activado.')
+  }
 
   const eliminar = (d) => {
     if (!window.confirm('¿Eliminar este descuento? Las compras ya hechas mantienen su precio.')) return
-    ejecutar(() => api(`/api/descuentos/${d.id}`, { method: 'DELETE' }))
+    ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
   }
 
   const textoValor = (d) => (d.tipoDescuento === 'PORCENTAJE' ? `${Number(d.valor)}%` : precio(d.valor))

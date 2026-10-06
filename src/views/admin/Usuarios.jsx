@@ -45,7 +45,7 @@ function Usuarios() {
     setCambios(nuevos)
   }
 
-  const guardar = async (usuario) => {
+  const guardar = (usuario) => {
     const rol = cambios[usuario.id]
     const nombreRol = nombreDeRol(rol)
     if (!window.confirm(`¿Cambiar a ${usuario.username} a ${nombreRol}?`)) return
@@ -53,17 +53,17 @@ function Usuarios() {
     setError('')
     setExito('')
     setGuardando(usuario.id)
-    try {
-      const actualizado = await api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
-      setUsuarios(usuarios.map((u) => (u.id === actualizado.id ? actualizado : u)))
-      const { [usuario.id]: _guardado, ...resto } = cambios
-      setCambios(resto)
-      setExito(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setGuardando(null)
-    }
+    api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
+      .then((actualizado) => {
+        setUsuarios(usuarios.map((u) => (u.id === actualizado.id ? actualizado : u)))
+        // Ya se guardo: deja de ser un cambio pendiente
+        const pendientes = { ...cambios }
+        delete pendientes[usuario.id]
+        setCambios(pendientes)
+        setExito(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(null))
   }
 
   const texto = busqueda.trim().toLowerCase()

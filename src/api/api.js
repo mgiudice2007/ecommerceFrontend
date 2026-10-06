@@ -29,7 +29,7 @@ const mensajeDeError = (data, status) => {
   return 'Ocurrió un error inesperado'
 }
 
-export const api = async (url, opciones = {}) => {
+export const api = (url, opciones = {}) => {
   const { method = 'GET', body } = opciones
   const headers = {}
 
@@ -44,24 +44,28 @@ export const api = async (url, opciones = {}) => {
     headers['Content-Type'] = 'application/json'
   }
 
-  let respuesta
-  try {
-    respuesta = await fetch(`${BASE_URL}${url}`, {
-      method,
-      headers,
-      body: body ? (esArchivo ? body : JSON.stringify(body)) : undefined,
+  // Igual que en clase: las options del fetch con method, headers y body
+  const options = {
+    method,
+    headers,
+    body: body ? (esArchivo ? body : JSON.stringify(body)) : undefined,
+  }
+
+  return fetch(`${BASE_URL}${url}`, options)
+    .catch(() => {
+      // fetch solo falla aca si no pudo llegar al servidor
+      throw new Error('No se pudo conectar con el servidor. ¿Está levantado el backend?')
     })
-  } catch {
-    throw new Error('No se pudo conectar con el servidor. ¿Está levantado el backend?')
-  }
-
-  const texto = await respuesta.text()
-  const data = texto ? JSON.parse(texto) : null
-
-  if (!respuesta.ok) {
-    throw new Error(mensajeDeError(data, respuesta.status))
-  }
-  return data
+    .then((response) =>
+      // Leemos el cuerpo como texto porque algunas respuestas pueden venir vacias
+      response.text().then((texto) => {
+        const data = texto ? JSON.parse(texto) : null
+        if (!response.ok) {
+          throw new Error(mensajeDeError(data, response.status))
+        }
+        return data
+      }),
+    )
 }
 
 // URL de la imagen de una foto (el backend devuelve el binario directo).

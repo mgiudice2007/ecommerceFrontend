@@ -42,27 +42,25 @@ function Perfil() {
     setExito('')
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
     setExito('')
     setGuardando(true)
-    try {
-      const actualizado = await api('/api/auth/me', {
-        method: 'PUT',
-        body: {
-          ...formData,
-          // El backend espera null (no "") si no hay fecha
-          fechaNacimiento: formData.fechaNacimiento || null,
-        },
-      })
-      cargarFormulario(actualizado)
-      setExito('Tus datos se guardaron correctamente.')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setGuardando(false)
+
+    const datosAEnviar = {
+      ...formData,
+      // El backend espera null (no "") si no hay fecha
+      fechaNacimiento: formData.fechaNacimiento || null,
     }
+
+    api('/api/auth/me', { method: 'PUT', body: datosAEnviar })
+      .then((actualizado) => {
+        cargarFormulario(actualizado)
+        setExito('Tus datos se guardaron correctamente.')
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(false))
   }
 
   if (!usuario) {
@@ -105,7 +103,7 @@ function Perfil() {
             <p className="texto-suave perfil-aclaracion">
               {usuario.rol === 'COMPRADOR'
                 ? 'Son los datos del pasajero titular. Completalos antes de volar.'
-                : 'Tus datos de contacto como vendedor.'}
+                : 'Tus datos de contacto.'}
             </p>
 
             {faltanDatos && (

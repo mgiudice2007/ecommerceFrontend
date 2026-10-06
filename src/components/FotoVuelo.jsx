@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, urlFoto } from '../api/api'
 import './FotoVuelo.css'
 
-// Muestra la primera foto que el vendedor subio para el vuelo.
+// Muestra la primera foto que el admin subio para el vuelo.
 // Si no subio ninguna, muestra un fondo azul con el codigo del destino.
 function FotoVuelo({ vueloId, destinoIata, destinoCiudad }) {
   const [fotoId, setFotoId] = useState(null)

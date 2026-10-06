@@ -4,7 +4,7 @@ import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FotoVuelo from '../components/FotoVuelo'
 import { fechaLarga, hora, precio } from '../utils/formato'
-import { cancelarOrden } from '../utils/ordenes'
+import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
 import './MisCompras.css'
 
 function MisCompras() {
@@ -19,22 +19,20 @@ function MisCompras() {
       .catch((err) => setError(err.message))
   }, [])
 
-  const cancelar = async (orden) => {
+  const cancelar = (orden) => {
+    if (!confirmarCancelacion(orden)) return
+
     setError('')
     setMensaje('')
     setCancelando(orden.id)
-    try {
-      const actualizada = await cancelarOrden(orden)
-      if (actualizada) {
+    cancelarOrden(orden)
+      .then((actualizada) => {
         // Reemplazamos solo la orden que cambio, el resto queda igual
         setOrdenes(ordenes.map((o) => (o.id === actualizada.id ? actualizada : o)))
         setMensaje(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
-      }
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setCancelando(null)
-    }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setCancelando(null))
   }
 
   return (
