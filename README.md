@@ -50,6 +50,6 @@ src/
 ├── hooks/useCatalogo     aeropuertos, categorías y clases para los selects
 ├── utils/                formato de precios y fechas, cálculos de vuelos y órdenes
 ├── components/           piezas reutilizables (Navbar, TarjetaVuelo, Buscador, ...)
-└── pages/                una pantalla por ruta
+└── views/                una vista (pantalla) por ruta
     └── vendedor/         panel del vendedor y del administrador
 ```
