@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { duracion, fechaCorta, hora, precio } from '../utils/formato'
+import { diasHastaLlegada, duracion, fechaConDia, hora, precio } from '../utils/formato'
 import { estaOperativo, precioDesde, textoDescuento, textoEstado } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
@@ -8,6 +8,7 @@ import './TarjetaVuelo.css'
 function TarjetaVuelo({ vuelo }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)
+  const diasDespues = diasHastaLlegada(vuelo.fechaSalida, vuelo.fechaLlegada)
 
   return (
     <article className="tarjeta tarjeta-vuelo">
@@ -24,7 +25,7 @@ function TarjetaVuelo({ vuelo }) {
               {vuelo.origenCiudad} → {vuelo.destinoCiudad}
             </strong>
             <small>
-              Vuelo {vuelo.numeroVuelo} · {vuelo.categoriaNombre} · {fechaCorta(vuelo.fechaSalida)}
+              Vuelo {vuelo.numeroVuelo} · {vuelo.categoriaNombre}
             </small>
           </div>
           {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}
@@ -33,8 +34,11 @@ function TarjetaVuelo({ vuelo }) {
           )}
         </div>
 
+        <p className="tarjeta-vuelo-fecha">📅 {fechaConDia(vuelo.fechaSalida)}</p>
+
         <div className="tarjeta-vuelo-horarios">
           <div>
+            <small className="tarjeta-vuelo-rotulo">Sale</small>
             <strong>{hora(vuelo.fechaSalida)}</strong>
             <span>{vuelo.origenIata}</span>
             <small>{vuelo.origenCiudad}</small>
@@ -47,6 +51,10 @@ function TarjetaVuelo({ vuelo }) {
           </div>
 
           <div className="derecha">
+            <small className="tarjeta-vuelo-rotulo">
+              Llega
+              {diasDespues > 0 && <span className="tarjeta-vuelo-dia-extra">+{diasDespues} día</span>}
+            </small>
             <strong>{hora(vuelo.fechaLlegada)}</strong>
             <span>{vuelo.destinoIata}</span>
             <small>{vuelo.destinoCiudad}</small>
