@@ -5,7 +5,6 @@ import RutaProtegida from './components/RutaProtegida'
 import VolverArriba from './components/VolverArriba'
 import { AuthProvider } from './context/AuthContext'
 import Carrito from './views/Carrito'
-import Checkout from './views/Checkout'
 import DetalleOrden from './views/DetalleOrden'
 import DetalleVuelo from './views/DetalleVuelo'
 import Inicio from './views/Inicio'
@@ -46,14 +45,6 @@ function App() {
             }
           />
           <Route
-            path="/checkout"
-            element={
-              <RutaProtegida roles={['COMPRADOR']}>
-                <Checkout />
-              </RutaProtegida>
-            }
-          />
-          <Route
             path="/mis-compras"
             element={
               <RutaProtegida roles={['COMPRADOR']}>
@@ -80,11 +71,11 @@ function App() {
             }
           />
 
-          {/* Vendedores y administradores */}
+          {/* Solo el administrador: es el unico vendedor de la aerolinea */}
           <Route
             path="/panel"
             element={
-              <RutaProtegida roles={['VENDEDOR', 'ADMIN']}>
+              <RutaProtegida roles={['ADMIN']}>
                 <PanelVuelos />
               </RutaProtegida>
             }
@@ -92,7 +83,7 @@ function App() {
           <Route
             path="/panel/vuelos/nuevo"
             element={
-              <RutaProtegida roles={['VENDEDOR', 'ADMIN']}>
+              <RutaProtegida roles={['ADMIN']}>
                 <FormVuelo />
               </RutaProtegida>
             }
@@ -100,7 +91,7 @@ function App() {
           <Route
             path="/panel/vuelos/:id"
             element={
-              <RutaProtegida roles={['VENDEDOR', 'ADMIN']}>
+              <RutaProtegida roles={['ADMIN']}>
                 <GestionVuelo />
               </RutaProtegida>
             }
@@ -108,7 +99,7 @@ function App() {
           <Route
             path="/panel/vuelos/:id/editar"
             element={
-              <RutaProtegida roles={['VENDEDOR', 'ADMIN']}>
+              <RutaProtegida roles={['ADMIN']}>
                 <FormVuelo />
               </RutaProtegida>
             }

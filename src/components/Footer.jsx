@@ -36,12 +36,6 @@ function Footer() {
           <Link to="/carrito">Mi carrito</Link>
           <Link to="/perfil">Mi perfil</Link>
         </div>
-
-        <div>
-          <h4>Vendedores</h4>
-          <Link to="/registro">Publicar vuelos</Link>
-          <Link to="/panel">Panel de vuelos</Link>
-        </div>
       </div>
 
       <div className="contenedor footer-legal">

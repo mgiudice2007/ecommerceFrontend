@@ -6,7 +6,7 @@ import { cancelarOrden } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 // Detalle de una compra (GET /api/ordenes/:id).
-// Si venimos recien del checkout, muestra el encabezado de "Compra confirmada".
+// Si venimos recien de confirmar la compra, muestra el encabezado de "Compra confirmada".
 function DetalleOrden() {
   const { id } = useParams()
   const location = useLocation()

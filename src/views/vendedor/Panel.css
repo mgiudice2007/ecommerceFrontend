@@ -34,6 +34,10 @@
   margin: 8px 0 20px;
 }
 
+.panel-buscar {
+  max-width: 480px;
+}
+
 .panel-lista {
   display: flex;
   flex-direction: column;

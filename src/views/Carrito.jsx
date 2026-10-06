@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
@@ -9,7 +9,9 @@ import './Carrito.css'
 
 function Carrito() {
   const { actualizarCarrito } = useAuth()
+  const navigate = useNavigate()
   const [carrito, setCarrito] = useState(null)
+  const [comprando, setComprando] = useState(false)
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
 
@@ -39,6 +41,23 @@ function Carrito() {
     ejecutar(() => api(`/api/carrito/items/${item.id}`, { method: 'PUT', body: { cantidad } }))
 
   const eliminar = (item) => ejecutar(() => api(`/api/carrito/items/${item.id}`, { method: 'DELETE' }))
+
+  // La compra no pide datos de pago: POST /api/carrito/checkout valida el stock,
+  // descuenta los asientos, crea la orden y vacia el carrito. Despues se muestra
+  // la pantalla de "Compra confirmada".
+  const confirmarCompra = async () => {
+    setComprando(true)
+    setError('')
+    try {
+      const orden = await api('/api/carrito/checkout', { method: 'POST' })
+      actualizarCarrito({ items: [] })
+      navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
+    } catch (err) {
+      // Por ejemplo: alguien compro los ultimos asientos mientras tanto
+      setError(err.message)
+      setComprando(false)
+    }
+  }
 
   if (!carrito) {
     return (
@@ -101,11 +120,15 @@ function Carrito() {
                 <strong>{precio(carrito.total)}</strong>
               </div>
               <p className="texto-suave carrito-aclaracion">
-                Los precios ya incluyen los descuentos vigentes. Se confirman al momento de pagar.
+                Los precios ya incluyen los descuentos vigentes. Al confirmar, tus asientos quedan reservados.
               </p>
-              <Link to="/checkout" className="boton boton-primario boton-ancho">
-                Continuar al pago →
-              </Link>
+              <button
+                className="boton boton-primario boton-ancho"
+                onClick={confirmarCompra}
+                disabled={comprando || ocupado}
+              >
+                {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(carrito.total)}`}
+              </button>
               <Link to="/vuelos" className="carrito-seguir">
                 Seguir buscando vuelos
               </Link>

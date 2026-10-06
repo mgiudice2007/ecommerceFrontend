@@ -78,52 +78,6 @@
   letter-spacing: 0.06em;
 }
 
-/* Selector de rol en el registro */
-.auth-roles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 0 0 20px;
-  padding: 0;
-  border: none;
-}
-
-.auth-roles legend {
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.auth-rol {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px 16px;
-  border: 2px solid var(--borde);
-  border-radius: var(--radio);
-  cursor: pointer;
-}
-
-.auth-rol input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.auth-rol small {
-  color: var(--texto-suave);
-}
-
-.auth-rol.seleccionado {
-  border-color: var(--azul);
-  background: var(--celeste-suave);
-}
-
-.auth-rol:has(input:focus-visible) {
-  outline: 2px solid var(--celeste);
-  outline-offset: 2px;
-}
-
 @media (max-width: 860px) {
   .auth {
     grid-template-columns: 1fr;
@@ -138,8 +92,3 @@
   }
 }
 
-@media (max-width: 480px) {
-  .auth-roles {
-    grid-template-columns: 1fr;
-  }
-}

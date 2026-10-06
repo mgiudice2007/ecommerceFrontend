@@ -1,4 +1,4 @@
-/* Estilos del carrito y del checkout (comparten el resumen de la derecha) */
+/* Estilos del carrito */
 .carrito-layout {
   display: grid;
   grid-template-columns: 1fr 360px;

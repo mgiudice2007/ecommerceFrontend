@@ -5,11 +5,15 @@ import './Buscador.css'
 
 // Buscador de vuelos. Usa los filtros que acepta GET /api/vuelos:
 // origen, destino, categoriaId y claseId.
+// Con "Ida y vuelta" la pagina de resultados busca dos veces: la ida (origen -> destino)
+// y la vuelta (destino -> origen).
 // inicial: los filtros con los que arranca (por ejemplo, los que ya estan en la URL)
 function Buscador({ inicial = {} }) {
   const { aeropuertos, categorias, clases } = useCatalogo()
   const navigate = useNavigate()
 
+  const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')
+  const [error, setError] = useState('')
   const [filtros, setFiltros] = useState({
     origen: inicial.origen ?? '',
     destino: inicial.destino ?? '',
@@ -19,6 +23,7 @@ function Buscador({ inicial = {} }) {
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value })
+    setError('')
   }
 
   const invertir = () => {
@@ -27,8 +32,15 @@ function Buscador({ inicial = {} }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Pasamos a la URL solo los filtros que se completaron: /vuelos?origen=EZE&destino=MAD
+
+    if (viaje === 'idavuelta' && (!filtros.origen || !filtros.destino)) {
+      setError('Para buscar ida y vuelta elegí el origen y el destino.')
+      return
+    }
+
+    // Pasamos a la URL solo los filtros que se completaron: /vuelos?origen=AEP&destino=BRC&viaje=idavuelta
     const params = new URLSearchParams()
+    if (viaje === 'idavuelta') params.set('viaje', 'idavuelta')
     Object.entries(filtros).forEach(([clave, valor]) => {
       if (valor) params.set(clave, valor)
     })
@@ -37,6 +49,28 @@ function Buscador({ inicial = {} }) {
 
   return (
     <form className="buscador tarjeta" onSubmit={handleSubmit}>
+      <div className="buscador-viaje" role="radiogroup" aria-label="Tipo de viaje">
+        {[
+          { valor: 'idavuelta', texto: '⇄ Ida y vuelta' },
+          { valor: 'ida', texto: '→ Solo ida' },
+        ].map((opcion) => (
+          <label key={opcion.valor} className={viaje === opcion.valor ? 'activo' : ''}>
+            <input
+              type="radio"
+              name="viaje"
+              value={opcion.valor}
+              checked={viaje === opcion.valor}
+              onChange={() => {
+                setViaje(opcion.valor)
+                setError('')
+              }}
+            />
+            {opcion.texto}
+          </label>
+        ))}
+        {error && <span className="buscador-error">{error}</span>}
+      </div>
+
       <div className="buscador-ruta">
         <div className="buscador-campo">
           <label htmlFor="origen">Origen</label>

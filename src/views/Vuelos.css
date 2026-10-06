@@ -70,3 +70,40 @@
     position: static;
   }
 }
+
+/* Ida y vuelta: titulo de cada tramo */
+.vuelos-ayuda {
+  margin: 0 0 8px;
+  padding: 12px 16px;
+  border-radius: var(--radio);
+  background: var(--celeste-suave);
+  color: var(--azul);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vuelos-tramo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 24px 0 14px;
+}
+
+.vuelos-tramo h2 {
+  font-size: 22px;
+}
+
+.vuelos-tramo p {
+  margin: 2px 0 0;
+}
+
+.vuelos-tramo-numero {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--degradado-cielo);
+  color: #fff;
+  font-weight: 800;
+}

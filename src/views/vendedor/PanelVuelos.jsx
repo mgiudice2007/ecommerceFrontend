@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FotoVuelo from '../../components/FotoVuelo'
-import { useAuth } from '../../context/AuthContext'
 import { fechaCorta, hora, precio } from '../../utils/formato'
 import { ESTADOS_VUELO, textoDescuento, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
@@ -19,19 +18,17 @@ const asientosDe = (vuelo) =>
   )
 
 function PanelVuelos() {
-  const { usuario, esAdmin } = useAuth()
   const [vuelos, setVuelos] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
 
   useEffect(() => {
-    // El vendedor ve solo sus vuelos (filtro vendedorId con el id del token).
-    // El administrador ve los de todos.
-    const url = esAdmin ? '/api/vuelos' : `/api/vuelos?vendedorId=${usuario.id}`
-    api(url)
+    // El admin es el unico vendedor de la aerolinea: ve y maneja todos los vuelos
+    api('/api/vuelos')
       .then((pagina) => setVuelos(pagina.content))
       .catch((err) => setError(err.message))
-  }, [esAdmin, usuario.id])
+  }, [])
 
   // PATCH /api/vuelos/:id/estado cambia solo el estado del vuelo (activo, demorado,
   // pausado, cancelado o eliminado) y devuelve { id, estado, mensaje }.
@@ -58,6 +55,14 @@ function PanelVuelos() {
     if (seguro) cambiarEstado(vuelo, 'ELIMINADO')
   }
 
+  // Filtro de la lista por texto (solo en el navegador, no vuelve a pedir al backend)
+  const texto = busqueda.trim().toLowerCase()
+  const visibles = (vuelos ?? []).filter((v) =>
+    `${v.origenCiudad} ${v.destinoCiudad} ${v.origenIata} ${v.destinoIata} ${v.numeroVuelo}`
+      .toLowerCase()
+      .includes(texto),
+  )
+
   const resumen = (vuelos ?? []).reduce(
     (total, vuelo) => {
       const asientos = asientosDe(vuelo)
@@ -69,20 +74,14 @@ function PanelVuelos() {
   return (
     <>
       <EncabezadoPagina
-        etiqueta={esAdmin ? 'Administrador' : 'Vendedor'}
-        titulo={esAdmin ? 'Todos los vuelos' : 'Mis vuelos'}
-        subtitulo={
-          esAdmin
-            ? 'Supervisá los vuelos de todos los vendedores.'
-            : 'Publicá vuelos y manejá sus asientos, promociones y fotos.'
-        }
+        etiqueta="Administrador"
+        titulo="Vuelos de la aerolínea"
+        subtitulo="Publicá vuelos y manejá su estado, asientos, promociones y fotos."
         acciones={
           <>
-            {esAdmin && (
-              <Link to="/panel/usuarios" className="boton boton-contorno">
-                Usuarios y permisos
-              </Link>
-            )}
+            <Link to="/panel/usuarios" className="boton boton-contorno">
+              Usuarios y permisos
+            </Link>
             <Link to="/panel/vuelos/nuevo" className="boton boton-claro">
               + Publicar vuelo
             </Link>
@@ -122,8 +121,21 @@ function PanelVuelos() {
           </div>
         )}
 
+        {vuelos?.length > 0 && (
+          <div className="campo panel-buscar">
+            <label htmlFor="buscarVuelo">Buscar en el panel</label>
+            <input
+              id="buscarVuelo"
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Ciudad, código de aeropuerto o número de vuelo"
+            />
+          </div>
+        )}
+
         <div className="panel-lista">
-          {vuelos?.map((vuelo) => {
+          {visibles.map((vuelo) => {
             const asientos = asientosDe(vuelo)
             const descuento = textoDescuento(vuelo.descuentoVigente, precio)
             const sinClases = vuelo.disponibilidades.length === 0
@@ -140,7 +152,6 @@ function PanelVuelos() {
                     </strong>
                     <span className="texto-suave">
                       Vuelo {vuelo.numeroVuelo} · {fechaCorta(vuelo.fechaSalida)} {hora(vuelo.fechaSalida)} hs
-                      {esAdmin && ` · ${vuelo.vendedorUsername}`}
                     </span>
                   </div>
                   <div className="panel-vuelo-etiquetas">

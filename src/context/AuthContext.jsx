@@ -67,7 +67,6 @@ export function AuthProvider({ children }) {
     usuario,
     estaLogueado: usuario !== null,
     esComprador: usuario?.rol === 'COMPRADOR',
-    esVendedor: usuario?.rol === 'VENDEDOR',
     esAdmin: usuario?.rol === 'ADMIN',
     login,
     logout,

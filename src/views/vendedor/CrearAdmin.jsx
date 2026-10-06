@@ -44,7 +44,7 @@ function CrearAdmin() {
       <EncabezadoPagina
         etiqueta="Solo administradores"
         titulo="Crear administrador"
-        subtitulo="Un administrador puede ver y modificar los vuelos de todos los vendedores, y crear otros administradores."
+        subtitulo="Un administrador publica y gestiona los vuelos de la aerolínea, y administra las cuentas de usuario."
       >
         <Link to="/panel/usuarios">← Volver a usuarios</Link>
       </EncabezadoPagina>

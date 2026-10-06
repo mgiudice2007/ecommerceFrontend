@@ -7,11 +7,15 @@ import { fechaLarga } from '../../utils/formato'
 import './Panel.css'
 import './Usuarios.css'
 
+// Roles que el admin puede asignar. La aerolinea tiene un unico vendedor (el admin),
+// asi que VENDEDOR ya no se asigna; solo se muestra si una cuenta vieja lo tiene.
 const ROLES = [
   { valor: 'COMPRADOR', nombre: 'Comprador', plural: 'Compradores' },
-  { valor: 'VENDEDOR', nombre: 'Vendedor', plural: 'Vendedores' },
   { valor: 'ADMIN', nombre: 'Administrador', plural: 'Administradores' },
 ]
+
+const nombreDeRol = (valor) =>
+  ROLES.find((r) => r.valor === valor)?.nombre ?? (valor === 'VENDEDOR' ? 'Vendedor (sin permisos)' : valor)
 
 // Administracion de cuentas y asignacion de permisos (solo ADMIN).
 // GET /api/usuarios trae todas las cuentas; PUT /api/usuarios/:id/rol cambia el rol.
@@ -43,7 +47,7 @@ function Usuarios() {
 
   const guardar = async (usuario) => {
     const rol = cambios[usuario.id]
-    const nombreRol = ROLES.find((r) => r.valor === rol).nombre
+    const nombreRol = nombreDeRol(rol)
     if (!window.confirm(`¿Cambiar a ${usuario.username} a ${nombreRol}?`)) return
 
     setError('')
@@ -88,7 +92,7 @@ function Usuarios() {
 
       <div className="contenedor sobre-encabezado">
         {usuarios && (
-          <div className="panel-numeros">
+          <div className="panel-numeros usuarios-numeros">
             {ROLES.map((r) => (
               <div key={r.valor} className="tarjeta">
                 <small>{r.plural}</small>
@@ -169,6 +173,11 @@ function Usuarios() {
                                 {r.nombre}
                               </option>
                             ))}
+                            {u.rol === 'VENDEDOR' && (
+                              <option value="VENDEDOR" disabled>
+                                {nombreDeRol('VENDEDOR')}
+                              </option>
+                            )}
                           </select>
                           {soyYo && <small>Sos vos</small>}
                         </td>

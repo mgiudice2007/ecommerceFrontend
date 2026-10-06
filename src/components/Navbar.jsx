@@ -5,7 +5,7 @@ import Logo from './Logo'
 import './Navbar.css'
 
 function Navbar() {
-  const { usuario, estaLogueado, esComprador, esVendedor, esAdmin, logout, cantidadCarrito } = useAuth()
+  const { usuario, estaLogueado, esComprador, esAdmin, logout, cantidadCarrito } = useAuth()
   const [menuAbierto, setMenuAbierto] = useState(false)
   const navigate = useNavigate()
 
@@ -44,7 +44,7 @@ function Navbar() {
               {cantidadCarrito > 0 && <span className="navbar-contador">{cantidadCarrito}</span>}
             </NavLink>
           )}
-          {(esVendedor || esAdmin) && (
+          {esAdmin && (
             <NavLink to="/panel" end>
               Panel de vuelos
             </NavLink>

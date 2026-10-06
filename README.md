@@ -30,16 +30,16 @@ Los crea el backend la primera vez que arranca con la base vacía:
 
 | Usuario | Contraseña | Rol |
 |---|---|---|
-| `comprador` | `comprador123` | Comprador |
-| `vendedor` | `vendedor123` | Vendedor |
+| `comprador` | `comprador123` | Pasajero (comprador) |
 | `admin` | `admin123` | Administrador |
 
 ## Qué puede hacer cada rol
 
-- **Cualquier visitante:** ver el inicio, buscar vuelos (origen, destino, tipo, clase y precio) y ver el detalle de cada vuelo.
-- **Comprador:** agregar pasajes al carrito, pagar (pago simulado), ver sus compras, cancelarlas (los asientos vuelven al vuelo) y completar su perfil.
-- **Vendedor:** publicar vuelos con sus fotos, editarlos y eliminarlos; cargar clases con asientos y precio; crear, pausar y borrar descuentos; subir y borrar fotos.
-- **Administrador:** lo mismo que el vendedor pero sobre los vuelos de todos; ver todas las cuentas y cambiarles el rol (asignación de permisos); crear otros administradores.
+La aerolínea tiene **un único vendedor: el administrador**. El registro del sitio es solo para pasajeros.
+
+- **Cualquier visitante:** ver el inicio, buscar vuelos de **ida y vuelta** o solo ida (origen, destino, tipo, clase y precio) y ver el detalle de cada vuelo.
+- **Pasajero (comprador):** agregar pasajes al carrito, confirmar la compra (sin pedir datos de pago), ver sus compras, cancelarlas (los asientos vuelven al vuelo) y completar su perfil.
+- **Administrador:** publicar, editar y eliminar vuelos; cambiarles el estado (activo, demorado, pausado, cancelado); cargar clases con asientos y precio; crear, pausar y borrar descuentos; subir y borrar fotos; ver las cuentas, cambiarles el rol y crear otros administradores.
 
 ## Estructura
 

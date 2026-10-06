@@ -35,7 +35,16 @@
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  background: var(--fondo);
+  /* Fondo de "cielo": rutas aereas punteadas y avioncitos encima de un degradado
+     celeste con dos manchas de luz. Queda fijo mientras se hace scroll. */
+  background-color: var(--fondo);
+  background-image:
+    url('./assets/patron-vuelos.svg'),
+    radial-gradient(circle at 12% 18%, rgba(31, 162, 224, 0.16), transparent 38%),
+    radial-gradient(circle at 88% 70%, rgba(0, 87, 184, 0.12), transparent 42%),
+    linear-gradient(180deg, #e3f0fb 0%, #f3f7fc 45%, #eaf2fb 100%);
+  background-size: 640px 640px, auto, auto, auto;
+  background-attachment: fixed;
   color: var(--texto);
   line-height: 1.5;
 }

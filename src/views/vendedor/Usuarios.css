@@ -79,3 +79,8 @@
     gap: 0;
   }
 }
+
+/* Solo hay dos roles para asignar: comprador y administrador */
+.usuarios-numeros {
+  grid-template-columns: repeat(2, 1fr);
+}

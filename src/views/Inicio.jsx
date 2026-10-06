@@ -190,14 +190,15 @@ function Inicio() {
         <section className="contenedor inicio-seccion">
           <div className="inicio-vendedores">
             <div>
-              <span className="inicio-vendedores-chip">Para vendedores</span>
-              <h2>¿Tenés vuelos para vender? Publicalos en BCA Airlines</h2>
+              <span className="inicio-vendedores-chip">Creá tu cuenta gratis</span>
+              <h2>Viajá más fácil con tu cuenta BCA Airlines</h2>
               <p>
-                Cargá tus vuelos con fotos, definí los asientos y el precio de cada clase y creá promociones por fecha.
+                Guardá tu carrito, comprá tus pasajes de ida y vuelta en minutos y revisá o cancelá tus compras cuando
+                quieras.
               </p>
             </div>
             <Link to="/registro" className="boton inicio-vendedores-boton">
-              Crear cuenta de vendedor →
+              Crear mi cuenta →
             </Link>
           </div>
         </section>

@@ -6,6 +6,47 @@
   padding: 20px;
 }
 
+/* Selector "Ida y vuelta / Solo ida", ocupa toda la fila de arriba */
+.buscador-viaje {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.buscador-viaje label {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.buscador-viaje label.activo {
+  background: var(--azul);
+  color: #fff;
+}
+
+.buscador-viaje input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.buscador-viaje label:has(input:focus-visible) {
+  outline: 2px solid var(--celeste);
+  outline-offset: 2px;
+}
+
+.buscador-error {
+  color: var(--rojo);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .buscador-ruta {
   position: relative;
   display: grid;

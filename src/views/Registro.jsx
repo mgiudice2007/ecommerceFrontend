@@ -4,11 +4,6 @@ import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import './Auth.css'
 
-const ROLES = [
-  { valor: 'COMPRADOR', titulo: 'Quiero comprar pasajes', detalle: 'Buscá vuelos y comprá con tu carrito' },
-  { valor: 'VENDEDOR', titulo: 'Quiero vender vuelos', detalle: 'Publicá vuelos, asientos y promociones' },
-]
-
 const FORM_VACIO = {
   nombre: '',
   apellido: '',
@@ -16,7 +11,6 @@ const FORM_VACIO = {
   mail: '',
   password: '',
   confirmarPassword: '',
-  rol: 'COMPRADOR',
 }
 
 function Registro() {
@@ -42,20 +36,20 @@ function Registro() {
 
     setCargando(true)
     try {
-      // confirmarPassword es solo del formulario: al backend se manda el resto
+      // confirmarPassword es solo del formulario: al backend se manda el resto.
+      // El registro es solo para pasajeros: el backend crea siempre un COMPRADOR.
       const datos = {
         nombre: formData.nombre,
         apellido: formData.apellido,
         username: formData.username,
         mail: formData.mail,
         password: formData.password,
-        rol: formData.rol,
       }
       await api('/api/auth/registro', { method: 'POST', body: datos })
 
       // Despues de registrarse lo dejamos logueado directamente
-      const usuario = await login(datos.username, datos.password)
-      navigate(usuario.rol === 'COMPRADOR' ? '/vuelos' : '/panel', { replace: true })
+      await login(datos.username, datos.password)
+      navigate('/vuelos', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -75,26 +69,6 @@ function Registro() {
         {error && <div className="mensaje mensaje-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <fieldset className="auth-roles">
-            <legend>¿Qué querés hacer?</legend>
-            {ROLES.map((rol) => (
-              <label
-                key={rol.valor}
-                className={`auth-rol ${formData.rol === rol.valor ? 'seleccionado' : ''}`}
-              >
-                <input
-                  type="radio"
-                  name="rol"
-                  value={rol.valor}
-                  checked={formData.rol === rol.valor}
-                  onChange={handleChange}
-                />
-                <strong>{rol.titulo}</strong>
-                <small>{rol.detalle}</small>
-              </label>
-            ))}
-          </fieldset>
-
           <div className="fila-campos">
             <div className="campo">
               <label htmlFor="nombre">Nombre</label>
@@ -173,16 +147,14 @@ function Registro() {
       </section>
 
       <aside className="auth-panel">
-        <span className="auth-panel-etiqueta">Una cuenta, dos formas de usarla</span>
-        <h2>Comprá pasajes o publicá tus propios vuelos</h2>
-        <p>
-          <strong>Pasajeros:</strong> buscan vuelos, eligen la clase (Económica, Ejecutiva o Primera) y
-          compran desde su carrito.
-        </p>
-        <p>
-          <strong>Vendedores:</strong> publican vuelos, cargan los asientos de cada clase, suben fotos y
-          crean promociones con descuento.
-        </p>
+        <span className="auth-panel-etiqueta">Beneficios de tu cuenta</span>
+        <h2>Tu próximo viaje empieza acá</h2>
+        <ul>
+          <li>Comprá pasajes de ida y vuelta a Argentina, América y Europa</li>
+          <li>Elegí tu clase: Económica, Ejecutiva o Primera</li>
+          <li>Tu carrito y tus compras quedan guardados en tu cuenta</li>
+          <li>Cancelá una compra desde tu cuenta si cambian tus planes</li>
+        </ul>
       </aside>
     </div>
   )

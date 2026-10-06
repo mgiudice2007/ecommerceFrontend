@@ -39,9 +39,9 @@ function Login() {
   return (
     <div className="contenedor pagina auth">
       <section className="tarjeta auth-formulario">
-        <span className="etiqueta">Pasajeros y vendedores</span>
+        <span className="etiqueta">Pasajeros</span>
         <h1>¡Hola de nuevo! Ingresá a tu cuenta</h1>
-        <p className="texto-suave">Gestioná tus pasajes o los vuelos que publicás.</p>
+        <p className="texto-suave">Gestioná tus pasajes, tu carrito y tus próximos viajes.</p>
 
         {error && <div className="mensaje mensaje-error">{error}</div>}
 
