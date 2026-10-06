@@ -126,7 +126,8 @@ function Vuelos() {
 
                 {resultado.content.length === 0 && (
                   <div className="tarjeta vuelos-vacio">
-                    <h3>No encontramos vuelos con esos filtros</h3>
+                    {/* El backend manda el mensaje cuando no hay resultados */}
+                    <h3>{resultado.mensaje ?? 'No encontramos vuelos con esos filtros'}</h3>
                     <p className="texto-suave">Probá con otro origen o destino, o sacá algún filtro.</p>
                   </div>
                 )}

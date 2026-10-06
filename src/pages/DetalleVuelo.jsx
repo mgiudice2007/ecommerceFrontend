@@ -6,7 +6,7 @@ import OpcionClase from '../components/OpcionClase'
 import { useAuth } from '../context/AuthContext'
 import { useCatalogo } from '../hooks/useCatalogo'
 import { duracion, fechaLarga, hora, precio } from '../utils/formato'
-import { textoDescuento } from '../utils/vuelos'
+import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
@@ -51,7 +51,8 @@ function DetalleVuelo() {
   }
 
   const yaSalio = new Date(vuelo.fechaSalida) < new Date()
-  const sePuedeComprar = vuelo.estado === 'ACTIVO' && !yaSalio && vuelo.hayStock
+  // Un vuelo demorado se sigue vendiendo (igual que en el backend)
+  const sePuedeComprar = estaOperativo(vuelo) && !yaSalio && vuelo.hayStock
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
 
   const elegirClase = (disponibilidad) => {
@@ -102,6 +103,9 @@ function DetalleVuelo() {
           <div className="detalle-portada-etiquetas">
             <span>{vuelo.categoriaNombre}</span>
             {descuento && <span className="oferta">{descuento}</span>}
+            {vuelo.estado !== 'ACTIVO' && (
+              <span className={`estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
+            )}
           </div>
           <h1>
             {vuelo.origenCiudad} → {vuelo.destinoCiudad}
@@ -175,8 +179,8 @@ function DetalleVuelo() {
               <div className="mensaje mensaje-error">
                 {yaSalio
                   ? 'Este vuelo ya salió.'
-                  : vuelo.estado !== 'ACTIVO'
-                    ? 'Este vuelo ya no está a la venta.'
+                  : !estaOperativo(vuelo)
+                    ? `Este vuelo está ${textoEstado(vuelo.estado).toLowerCase()} y no está a la venta.`
                     : 'No quedan asientos en este vuelo.'}
               </div>
             ) : !elegida ? (

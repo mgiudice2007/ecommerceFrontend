@@ -239,3 +239,15 @@ h3 {
     padding-top: 24px;
   }
 }
+
+/* Etiquetas de estado del vuelo (las usa el panel, la busqueda y el detalle) */
+.estado-demorado {
+  background: #fff4e0;
+  color: #9a5b00;
+}
+
+.estado-pausado,
+.estado-cancelado {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}

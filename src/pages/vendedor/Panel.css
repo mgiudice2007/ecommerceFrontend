@@ -1,7 +1,4 @@
 /* Estilos compartidos por todas las pantallas del panel de vendedor */
-
-
-
 .panel-numeros {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -97,7 +94,21 @@
 
 .panel-vuelo-acciones {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+/* Selector de estado del vuelo (activo, demorado, pausado, cancelado) */
+.panel-vuelo-estado {
+  padding: 9px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie-2);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto);
+  cursor: pointer;
 }
 
 .panel-vuelo-acciones .boton {
@@ -179,7 +190,6 @@
     font-size: 24px;
   }
 }
-
 
 /* Vista previa de las fotos elegidas al publicar un vuelo */
 .form-fotos {

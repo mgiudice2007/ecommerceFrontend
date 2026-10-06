@@ -5,7 +5,7 @@ import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FotoVuelo from '../../components/FotoVuelo'
 import { useAuth } from '../../context/AuthContext'
 import { fechaCorta, hora, precio } from '../../utils/formato'
-import { textoDescuento } from '../../utils/vuelos'
+import { ESTADOS_VUELO, textoDescuento, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
 
 // Cuenta asientos totales y vendidos sumando todas las clases del vuelo
@@ -33,20 +33,29 @@ function PanelVuelos() {
       .catch((err) => setError(err.message))
   }, [esAdmin, usuario.id])
 
-  const eliminar = async (vuelo) => {
-    const seguro = window.confirm(
-      `¿Eliminar el vuelo ${vuelo.numeroVuelo}? Deja de mostrarse en la búsqueda. Las compras ya hechas no se modifican.`,
-    )
-    if (!seguro) return
-
+  // PATCH /api/vuelos/:id/estado cambia solo el estado del vuelo (activo, demorado,
+  // pausado, cancelado o eliminado) y devuelve { id, estado, mensaje }.
+  const cambiarEstado = async (vuelo, estado) => {
     setError('')
+    setMensaje('')
     try {
-      const respuesta = await api(`/api/vuelos/${vuelo.id}`, { method: 'DELETE' })
-      setVuelos(vuelos.filter((v) => v.id !== vuelo.id))
-      setMensaje(respuesta.mensaje) // "Vuelo eliminado correctamente"
+      const respuesta = await api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
+      setVuelos(
+        estado === 'ELIMINADO'
+          ? vuelos.filter((v) => v.id !== vuelo.id) // la baja logica lo saca del listado
+          : vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)),
+      )
+      setMensaje(respuesta.mensaje) // por ejemplo "El vuelo BC1402 fue marcado como demorado"
     } catch (err) {
       setError(err.message)
     }
+  }
+
+  const eliminar = (vuelo) => {
+    const seguro = window.confirm(
+      `¿Eliminar el vuelo ${vuelo.numeroVuelo}? Deja de mostrarse en la búsqueda. Las compras ya hechas no se modifican.`,
+    )
+    if (seguro) cambiarEstado(vuelo, 'ELIMINADO')
   }
 
   const resumen = (vuelos ?? []).reduce(
@@ -138,6 +147,9 @@ function PanelVuelos() {
                     <span className="etiqueta">{vuelo.categoriaNombre}</span>
                     {descuento && <span className="etiqueta etiqueta-exito">{descuento}</span>}
                     {sinClases && <span className="etiqueta etiqueta-aviso">Sin clases cargadas</span>}
+                    {vuelo.estado !== 'ACTIVO' && (
+                      <span className={`etiqueta estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
+                    )}
                   </div>
                 </div>
 
@@ -149,6 +161,18 @@ function PanelVuelos() {
                 </div>
 
                 <div className="panel-vuelo-acciones">
+                  <select
+                    className="panel-vuelo-estado"
+                    value={vuelo.estado}
+                    onChange={(e) => cambiarEstado(vuelo, e.target.value)}
+                    aria-label={`Estado del vuelo ${vuelo.numeroVuelo}`}
+                  >
+                    {ESTADOS_VUELO.map((e) => (
+                      <option key={e.valor} value={e.valor}>
+                        {e.texto}
+                      </option>
+                    ))}
+                  </select>
                   <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-primario">
                     Gestionar
                   </Link>

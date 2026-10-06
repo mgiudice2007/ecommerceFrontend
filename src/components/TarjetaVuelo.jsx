@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { duracion, fechaCorta, hora, precio } from '../utils/formato'
-import { precioDesde, textoDescuento } from '../utils/vuelos'
+import { estaOperativo, precioDesde, textoDescuento, textoEstado } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
 
@@ -28,6 +28,9 @@ function TarjetaVuelo({ vuelo }) {
             </small>
           </div>
           {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}
+          {vuelo.estado !== 'ACTIVO' && (
+            <span className={`etiqueta estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
+          )}
         </div>
 
         <div className="tarjeta-vuelo-horarios">
@@ -68,7 +71,7 @@ function TarjetaVuelo({ vuelo }) {
             <small>por pasajero</small>
           </>
         ) : (
-          <strong className="sin-stock">Sin asientos</strong>
+          <strong className="sin-stock">{estaOperativo(vuelo) ? 'Sin asientos' : 'No disponible'}</strong>
         )}
         <Link to={`/vuelos/${vuelo.id}`} className="boton boton-primario">
           Ver vuelo

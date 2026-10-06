@@ -13,6 +13,20 @@ export const precioDesde = (vuelo) => {
   )
 }
 
+// Estados que el vendedor puede elegir (ELIMINADO es la baja y va aparte).
+// Mismo enum que EstadoVuelo en el backend.
+export const ESTADOS_VUELO = [
+  { valor: 'ACTIVO', texto: 'Activo' },
+  { valor: 'DEMORADO', texto: 'Demorado' },
+  { valor: 'PAUSADO', texto: 'Pausado' },
+  { valor: 'CANCELADO', texto: 'Cancelado' },
+]
+
+export const textoEstado = (estado) => ESTADOS_VUELO.find((e) => e.valor === estado)?.texto ?? estado
+
+// Igual que Vuelo.estaOperativo() en el backend: un vuelo demorado se sigue vendiendo
+export const estaOperativo = (vuelo) => vuelo.estado === 'ACTIVO' || vuelo.estado === 'DEMORADO'
+
 // "20% OFF" o "$ 5.000 OFF" segun el tipo de descuento vigente
 export const textoDescuento = (descuento, formatearPrecio) => {
   if (!descuento) return null

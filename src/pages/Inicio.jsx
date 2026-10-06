@@ -6,6 +6,7 @@ import Buscador from '../components/Buscador'
 import TarjetaDestino from '../components/TarjetaDestino'
 import { useAuth } from '../context/AuthContext'
 import { useCatalogo } from '../hooks/useCatalogo'
+import { estaOperativo } from '../utils/vuelos'
 import './Inicio.css'
 
 // Las dos solapas de "El mundo" usan las categorias del backend
@@ -57,7 +58,8 @@ function Inicio() {
   // Una sola llamada trae todos los vuelos publicados; las secciones se arman filtrando
   useEffect(() => {
     api('/api/vuelos?page=0&size=60')
-      .then((pagina) => setVuelos(pagina.content))
+      // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados)
+      .then((pagina) => setVuelos(pagina.content.filter(estaOperativo)))
       .catch((err) => setError(err.message))
       .finally(() => setCargando(false))
   }, [])
