@@ -5,9 +5,11 @@ import EncabezadoPagina from '../components/EncabezadoPagina'
 import FotoVuelo from '../components/FotoVuelo'
 import { fechaLarga, hora, precio } from '../utils/formato'
 import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
+import { useAuth } from '../context/AuthContext'
 import './MisCompras.css'
 
 function MisCompras() {
+  const { recargarPerfil } = useAuth() // al cancelar cambian las millas
   const [ordenes, setOrdenes] = useState(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
@@ -29,6 +31,7 @@ function MisCompras() {
       .then((actualizada) => {
         // Reemplazamos solo la orden que cambio, el resto queda igual
         setOrdenes(ordenes.map((o) => (o.id === actualizada.id ? actualizada : o)))
+        recargarPerfil()
         setMensaje(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
       })
       .catch((err) => setError(err.message))

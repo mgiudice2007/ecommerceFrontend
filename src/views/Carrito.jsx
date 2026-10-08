@@ -4,17 +4,19 @@ import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
 import { useAuth } from '../context/AuthContext'
-import { precio } from '../utils/formato'
+import { millas, precio } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import './Carrito.css'
 
 function Carrito() {
-  const { actualizarCarrito } = useAuth()
+  const { actualizarCarrito, recargarPerfil } = useAuth()
   const navigate = useNavigate()
   const [carrito, setCarrito] = useState(null)
   const [comprando, setComprando] = useState(false)
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
+  const [usarMillas, setUsarMillas] = useState(false) // casilla "Usar millas + dinero"
+  const [millasElegidas, setMillasElegidas] = useState('')
 
   useEffect(() => {
     api('/api/carrito')
@@ -53,9 +55,12 @@ function Carrito() {
   const confirmarCompra = () => {
     setComprando(true)
     setError('')
-    api('/api/carrito/checkout', { method: 'POST' })
+    // Si eligio usar millas, se mandan en el body; si no, se paga todo con plata
+    const opciones = usarMillas ? { method: 'POST', body: { millas: millasAUsar } } : { method: 'POST' }
+    api('/api/carrito/checkout', opciones)
       .then((orden) => {
         actualizarCarrito({ items: [] })
+        recargarPerfil() // el saldo de millas cambio
         navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
       })
       .catch((err) => {
@@ -74,6 +79,14 @@ function Carrito() {
   }
 
   const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
+
+  // Millas: no se pueden usar mas de las que tiene ni pagar mas que el total
+  const maximoMillas = Math.min(carrito.millasDisponibles, Math.floor(carrito.total / carrito.valorMilla))
+  const millasAUsar = usarMillas ? Math.min(Number(millasElegidas) || 0, maximoMillas) : 0
+  const descuentoMillas = millasAUsar * carrito.valorMilla
+  const aPagar = carrito.total - descuentoMillas
+  // Lo pagado con millas no suma millas (el backend hace la misma cuenta)
+  const millasQueSuma = carrito.total > 0 ? Math.floor((carrito.millasAGanar * aPagar) / carrito.total) : 0
 
   return (
     <>
@@ -121,10 +134,52 @@ function Carrito() {
                   <span>{precio(item.subtotal)}</span>
                 </div>
               ))}
+
+              {/* Como en LATAM: se puede pagar una parte con millas y el resto con plata */}
+              <div className="carrito-millas">
+                <label className="carrito-millas-casilla">
+                  <input
+                    type="checkbox"
+                    checked={usarMillas}
+                    disabled={carrito.millasDisponibles === 0}
+                    onChange={(e) => {
+                      setUsarMillas(e.target.checked)
+                      setMillasElegidas(String(maximoMillas))
+                    }}
+                  />
+                  <span>
+                    Usar <strong>millas + dinero</strong>
+                    <small>Tenés {millas(carrito.millasDisponibles)} millas · cada milla vale {precio(carrito.valorMilla)}</small>
+                  </span>
+                </label>
+
+                {usarMillas && (
+                  <div className="campo">
+                    <label htmlFor="millas">Millas a usar (máximo {millas(maximoMillas)})</label>
+                    <input
+                      id="millas"
+                      type="number"
+                      min="0"
+                      max={maximoMillas}
+                      value={millasElegidas}
+                      onChange={(e) => setMillasElegidas(e.target.value)}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {millasAUsar > 0 && (
+                <div className="carrito-resumen-fila carrito-resumen-ahorro">
+                  <span>Pagás con {millas(millasAUsar)} millas</span>
+                  <span>− {precio(descuentoMillas)}</span>
+                </div>
+              )}
+
               <div className="carrito-resumen-total">
                 <span>Total a pagar</span>
-                <strong>{precio(carrito.total)}</strong>
+                <strong>{precio(aPagar)}</strong>
               </div>
+              <p className="carrito-millas-gana">✈ Con esta compra sumás {millas(millasQueSuma)} millas</p>
               <p className="texto-suave carrito-aclaracion">
                 Los precios ya incluyen los descuentos vigentes. Al confirmar, tus asientos quedan reservados.
               </p>
@@ -133,7 +188,7 @@ function Carrito() {
                 onClick={confirmarCompra}
                 disabled={comprando || ocupado}
               >
-                {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(carrito.total)}`}
+                {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(aPagar)}`}
               </button>
               <Link to="/vuelos" className="carrito-seguir">
                 Seguir buscando vuelos

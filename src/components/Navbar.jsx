@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { millas } from '../utils/formato'
 import Logo from './Logo'
 import './Navbar.css'
 
@@ -84,6 +85,9 @@ function Navbar() {
                       <div>
                         <strong>{nombreCompleto}</strong>
                         <small>{esAdmin ? 'Administrador' : 'Pasajero BCA'}</small>
+                        {esComprador && perfil && (
+                          <span className="navbar-millas">✈ {millas(perfil.millas)} millas</span>
+                        )}
                       </div>
                     </div>
                     <NavLink to="/perfil">

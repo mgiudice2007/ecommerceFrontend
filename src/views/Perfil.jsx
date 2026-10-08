@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import EncabezadoPagina from '../components/EncabezadoPagina'
-import { fechaLarga } from '../utils/formato'
+import { fechaLarga, millas } from '../utils/formato'
 import './Perfil.css'
 
 const NOMBRES_DE_ROL = {
@@ -98,6 +98,12 @@ function Perfil() {
               <dd>{usuario.mail}</dd>
               <dt>Miembro desde</dt>
               <dd>{fechaLarga(usuario.fechaRegistro)}</dd>
+              {usuario.rol === 'COMPRADOR' && (
+                <>
+                  <dt>Millas</dt>
+                  <dd className="perfil-millas">✈ {millas(usuario.millas)}</dd>
+                </>
+              )}
             </dl>
           </aside>
 

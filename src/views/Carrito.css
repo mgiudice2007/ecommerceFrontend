@@ -88,3 +88,44 @@
     position: static;
   }
 }
+
+/* Usar millas + dinero */
+.carrito-millas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 4px;
+  padding: 14px;
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+}
+
+.carrito-millas-casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.carrito-millas-casilla input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.carrito-millas-casilla small {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.carrito-millas .campo {
+  margin: 0;
+}
+
+.carrito-millas-gana {
+  margin: 6px 0 0;
+  color: var(--azul);
+  font-size: 14px;
+  font-weight: 700;
+}

@@ -53,3 +53,6 @@ export const sumarDias = (fecha, dias) => {
   const dosDigitos = (n) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${dosDigitos(d.getMonth() + 1)}-${dosDigitos(d.getDate())}`
 }
+
+// Cantidad de millas con separador de miles: 150000 -> "150.000"
+export const millas = (cantidad) => Number(cantidad ?? 0).toLocaleString('es-AR')

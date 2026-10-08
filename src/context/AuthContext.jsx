@@ -35,12 +35,17 @@ export function AuthProvider({ children }) {
     setCantidadCarrito(carrito.items.reduce((total, item) => total + item.cantidad, 0))
   }
 
-  // Cada vez que alguien inicia sesion, traemos su perfil (GET /api/auth/me)
+  // Trae los datos de la cuenta (GET /api/auth/me), incluido el saldo de millas
+  const recargarPerfil = () => {
+    api('/api/auth/me')
+      .then((data) => setPerfil(data))
+      .catch(() => setPerfil(null))
+  }
+
+  // Cada vez que alguien inicia sesion, traemos su perfil
   useEffect(() => {
     if (usuario) {
-      api('/api/auth/me')
-        .then((data) => setPerfil(data))
-        .catch(() => setPerfil(null))
+      recargarPerfil()
     }
   }, [usuario])
 
@@ -81,6 +86,7 @@ export function AuthProvider({ children }) {
     logout,
     perfil,
     setPerfil, // la usa Mi perfil al guardar, para que la Navbar muestre el nombre nuevo
+    recargarPerfil, // despues de comprar o cancelar, para actualizar las millas
     cantidadCarrito,
     actualizarCarrito,
   }

@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
-import { fechaLarga, hora, precio } from '../utils/formato'
+import { fechaLarga, hora, millas, precio } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
+import { useAuth } from '../context/AuthContext'
 import './DetalleOrden.css'
 
 // Detalle de una compra (GET /api/ordenes/:id).
 // Si venimos recien de confirmar la compra, muestra el encabezado de "Compra confirmada".
 function DetalleOrden() {
+  const { recargarPerfil } = useAuth() // al cancelar cambian las millas
   const { id } = useParams()
   const location = useLocation()
   const recienComprada = location.state?.recienComprada === true
@@ -43,7 +45,10 @@ function DetalleOrden() {
 
     setCancelando(true)
     cancelarOrden(orden)
-      .then((actualizada) => setOrden(actualizada))
+      .then((actualizada) => {
+        setOrden(actualizada)
+        recargarPerfil()
+      })
       .catch((err) => setError(err.message))
       .finally(() => setCancelando(false))
   }
@@ -111,10 +116,23 @@ function DetalleOrden() {
               <span>− {precio(orden.descuentoTotal)}</span>
             </div>
           )}
+          {orden.millasUsadas > 0 && (
+            <div className="orden-ahorro">
+              <span>Pagaste con {millas(orden.millasUsadas)} millas</span>
+              <span>− {precio(orden.descuentoMillas)}</span>
+            </div>
+          )}
           <div className="orden-total">
             <span>Total abonado</span>
             <strong>{precio(orden.total)}</strong>
           </div>
+          {orden.millasGanadas > 0 && (
+            <p className="orden-millas">
+              {cancelada
+                ? `Al cancelar se descontaron las ${millas(orden.millasGanadas)} millas que habías sumado.`
+                : `✈ Sumaste ${millas(orden.millasGanadas)} millas con esta compra.`}
+            </p>
+          )}
         </div>
       </section>
 

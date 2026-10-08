@@ -72,3 +72,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+.perfil-millas {
+  color: var(--azul);
+  font-size: 20px;
+  font-weight: 800;
+}
