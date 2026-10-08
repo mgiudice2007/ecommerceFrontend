@@ -111,13 +111,6 @@
   transform: rotate(180deg);
 }
 
-/* Fondo invisible que cubre la pantalla: tocarlo cierra el menu */
-.navbar-fondo {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-}
-
 .navbar-desplegable {
   position: absolute;
   top: calc(100% + 10px);
@@ -249,10 +242,7 @@
     box-shadow: none;
   }
 
-  .navbar-fondo {
-    display: none;
   }
-}
 
 .navbar-millas {
   display: inline-block;

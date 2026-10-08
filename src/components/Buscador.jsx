@@ -178,16 +178,13 @@ function Buscador({ inicial = {} }) {
             <span aria-hidden="true">{verPasajeros ? '▴' : '▾'}</span>
           </button>
           {verPasajeros && (
-            <>
-              {/* Fondo invisible: al tocar afuera se cierra */}
-              <div className="buscador-fondo" onClick={() => setVerPasajeros(false)} />
-              <div className="buscador-desplegable">
-                <SelectorPasajeros pasajeros={pasajeros} onChange={setPasajeros} />
-                <button type="button" className="boton boton-primario boton-ancho" onClick={() => setVerPasajeros(false)}>
-                  Listo
-                </button>
-              </div>
-            </>
+            // Se cierra con "Listo" o tocando de nuevo el campo Pasajeros
+            <div className="buscador-desplegable">
+              <SelectorPasajeros pasajeros={pasajeros} onChange={setPasajeros} />
+              <button type="button" className="boton boton-primario boton-ancho" onClick={() => setVerPasajeros(false)}>
+                Listo
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -174,12 +174,6 @@
   outline: none;
 }
 
-.buscador-fondo {
-  position: fixed;
-  inset: 0;
-  z-index: 4;
-}
-
 .buscador-desplegable {
   position: absolute;
   top: calc(100% + 8px);

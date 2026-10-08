@@ -74,40 +74,37 @@ function Navbar() {
               </button>
 
               {cuentaAbierta && (
-                <>
-                  {/* Fondo invisible: al tocar afuera se cierra el menu */}
-                  <div className="navbar-fondo" onClick={() => setCuentaAbierta(false)} />
-                  <div className="navbar-desplegable" onClick={cerrarMenu}>
-                    <div className="navbar-desplegable-titular">
-                      <span className="navbar-inicial grande" aria-hidden="true">
-                        {nombre[0]?.toUpperCase()}
-                      </span>
-                      <div>
-                        <strong>{nombreCompleto}</strong>
-                        <small>{esAdmin ? 'Administrador' : 'Pasajero BCA'}</small>
-                        {esComprador && perfil && (
-                          <span className="navbar-millas">✈ {millas(perfil.millas)} millas</span>
-                        )}
-                      </div>
+                // Se cierra al elegir una opcion o al tocar de nuevo el boton con el nombre
+                <div className="navbar-desplegable" onClick={cerrarMenu}>
+                  <div className="navbar-desplegable-titular">
+                    <span className="navbar-inicial grande" aria-hidden="true">
+                      {nombre[0]?.toUpperCase()}
+                    </span>
+                    <div>
+                      <strong>{nombreCompleto}</strong>
+                      <small>{esAdmin ? 'Administrador' : 'Pasajero BCA'}</small>
+                      {esComprador && perfil && (
+                        <span className="navbar-millas">✈ {millas(perfil.millas)} millas</span>
+                      )}
                     </div>
-                    <NavLink to="/perfil">
-                      <span aria-hidden="true">👤</span> Tu cuenta
-                    </NavLink>
-                    {esComprador && (
-                      <NavLink to="/mis-compras">
-                        <span aria-hidden="true">🧾</span> Mis viajes
-                      </NavLink>
-                    )}
-                    {esAdmin && (
-                      <NavLink to="/panel" end>
-                        <span aria-hidden="true">✈</span> Panel de vuelos
-                      </NavLink>
-                    )}
-                    <button onClick={cerrarSesion}>
-                      <span aria-hidden="true">↪</span> Cerrar sesión
-                    </button>
                   </div>
-                </>
+                  <NavLink to="/perfil">
+                    <span aria-hidden="true">👤</span> Tu cuenta
+                  </NavLink>
+                  {esComprador && (
+                    <NavLink to="/mis-compras">
+                      <span aria-hidden="true">🧾</span> Mis viajes
+                    </NavLink>
+                  )}
+                  {esAdmin && (
+                    <NavLink to="/panel" end>
+                      <span aria-hidden="true">✈</span> Panel de vuelos
+                    </NavLink>
+                  )}
+                  <button onClick={cerrarSesion}>
+                    <span aria-hidden="true">↪</span> Cerrar sesión
+                  </button>
+                </div>
               )}
             </div>
           ) : (

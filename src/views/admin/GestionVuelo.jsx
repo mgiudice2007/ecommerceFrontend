@@ -78,13 +78,8 @@ function GestionVuelo() {
       <div className="contenedor sobre-encabezado">
         {location.state?.recienCreado && (
           <div className="mensaje mensaje-exito">
-            ¡Vuelo publicado! Ahora cargale al menos una clase con asientos para que se pueda comprar.
-          </div>
-        )}
-        {location.state?.fotosConError?.length > 0 && (
-          <div className="mensaje mensaje-error">
-            No se pudieron subir estas fotos: {location.state.fotosConError.join(', ')}. Probá de nuevo desde la
-            pestaña Fotos.
+            ¡Vuelo publicado! Ahora cargale al menos una clase con asientos para que se pueda comprar, y sus
+            fotos desde la pestaña Fotos.
           </div>
         )}
 
