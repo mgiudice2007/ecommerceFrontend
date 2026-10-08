@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/api'
+import { useAuth } from '../context/AuthContext'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import { fechaLarga } from '../utils/formato'
 import './Perfil.css'
@@ -13,6 +14,7 @@ const NOMBRES_DE_ROL = {
 // GET /api/auth/me trae los datos; PUT /api/auth/me guarda los datos de pasajero.
 // Username, mail y rol no se pueden cambiar (el backend no lo permite).
 function Perfil() {
+  const { setPerfil } = useAuth()
   const [usuario, setUsuario] = useState(null)
   const [formData, setFormData] = useState(null)
   const [error, setError] = useState('')
@@ -57,6 +59,7 @@ function Perfil() {
     api('/api/auth/me', { method: 'PUT', body: datosAEnviar })
       .then((actualizado) => {
         cargarFormulario(actualizado)
+        setPerfil(actualizado) // asi la Navbar muestra el nombre nuevo
         setExito('Tus datos se guardaron correctamente.')
       })
       .catch((err) => setError(err.message))

@@ -26,12 +26,23 @@ export function AuthProvider({ children }) {
   // Al abrir la pagina, si habia un token guardado, el usuario sigue logueado
   const [usuario, setUsuario] = useState(leerToken(obtenerToken()))
   const [cantidadCarrito, setCantidadCarrito] = useState(0)
+  // Datos de la cuenta (nombre, apellido, mail...) para mostrar el nombre en la Navbar
+  const [perfil, setPerfil] = useState(null)
 
   // Recibe el carrito que devuelve el backend (CarritoResponse) y cuenta los pasajes.
   // Las paginas la llaman despues de agregar, cambiar o borrar items.
   const actualizarCarrito = (carrito) => {
     setCantidadCarrito(carrito.items.reduce((total, item) => total + item.cantidad, 0))
   }
+
+  // Cada vez que alguien inicia sesion, traemos su perfil (GET /api/auth/me)
+  useEffect(() => {
+    if (usuario) {
+      api('/api/auth/me')
+        .then((data) => setPerfil(data))
+        .catch(() => setPerfil(null))
+    }
+  }, [usuario])
 
   // Cuando entra un comprador, traemos su carrito para mostrar la cantidad en la Navbar
   useEffect(() => {
@@ -57,6 +68,7 @@ export function AuthProvider({ children }) {
       .then(() => {
         borrarToken()
         setUsuario(null)
+        setPerfil(null)
         setCantidadCarrito(0)
       })
 
@@ -67,6 +79,8 @@ export function AuthProvider({ children }) {
     esAdmin: usuario?.rol === 'ADMIN',
     login,
     logout,
+    perfil,
+    setPerfil, // la usa Mi perfil al guardar, para que la Navbar muestre el nombre nuevo
     cantidadCarrito,
     actualizarCarrito,
   }

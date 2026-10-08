@@ -5,11 +5,15 @@ import Logo from './Logo'
 import './Navbar.css'
 
 function Navbar() {
-  const { usuario, estaLogueado, esComprador, esAdmin, logout, cantidadCarrito } = useAuth()
-  const [menuAbierto, setMenuAbierto] = useState(false)
+  const { usuario, perfil, estaLogueado, esComprador, esAdmin, logout, cantidadCarrito } = useAuth()
+  const [menuAbierto, setMenuAbierto] = useState(false) // menu hamburguesa (celular)
+  const [cuentaAbierta, setCuentaAbierta] = useState(false) // menu desplegable de la cuenta
   const navigate = useNavigate()
 
-  const cerrarMenu = () => setMenuAbierto(false)
+  const cerrarMenu = () => {
+    setMenuAbierto(false)
+    setCuentaAbierta(false)
+  }
 
   const cerrarSesion = () => {
     logout().then(() => {
@@ -17,6 +21,10 @@ function Navbar() {
       navigate('/')
     })
   }
+
+  // Arriba se muestra el nombre de la persona; mientras carga el perfil, el usuario
+  const nombre = perfil?.nombre || usuario?.username || ''
+  const nombreCompleto = perfil?.nombre ? `${perfil.nombre} ${perfil.apellido ?? ''}` : nombre
 
   return (
     <header className="navbar">
@@ -54,13 +62,49 @@ function Navbar() {
 
           {estaLogueado ? (
             <div className="navbar-usuario" onClick={(e) => e.stopPropagation()}>
-              <NavLink to="/perfil" onClick={cerrarMenu} className="navbar-avatar">
-                <span aria-hidden="true">{usuario.username[0].toUpperCase()}</span>
-                {usuario.username}
-              </NavLink>
-              <button className="boton boton-secundario navbar-salir" onClick={cerrarSesion}>
-                Salir
+              <button className="navbar-cuenta" onClick={() => setCuentaAbierta(!cuentaAbierta)} aria-expanded={cuentaAbierta}>
+                <span className="navbar-inicial" aria-hidden="true">
+                  {nombre[0]?.toUpperCase()}
+                </span>
+                {nombre}
+                <span className={`navbar-flecha ${cuentaAbierta ? 'abierta' : ''}`} aria-hidden="true">
+                  ▾
+                </span>
               </button>
+
+              {cuentaAbierta && (
+                <>
+                  {/* Fondo invisible: al tocar afuera se cierra el menu */}
+                  <div className="navbar-fondo" onClick={() => setCuentaAbierta(false)} />
+                  <div className="navbar-desplegable" onClick={cerrarMenu}>
+                    <div className="navbar-desplegable-titular">
+                      <span className="navbar-inicial grande" aria-hidden="true">
+                        {nombre[0]?.toUpperCase()}
+                      </span>
+                      <div>
+                        <strong>{nombreCompleto}</strong>
+                        <small>{esAdmin ? 'Administrador' : 'Pasajero BCA'}</small>
+                      </div>
+                    </div>
+                    <NavLink to="/perfil">
+                      <span aria-hidden="true">👤</span> Tu cuenta
+                    </NavLink>
+                    {esComprador && (
+                      <NavLink to="/mis-compras">
+                        <span aria-hidden="true">🧾</span> Mis viajes
+                      </NavLink>
+                    )}
+                    {esAdmin && (
+                      <NavLink to="/panel" end>
+                        <span aria-hidden="true">✈</span> Panel de vuelos
+                      </NavLink>
+                    )}
+                    <button onClick={cerrarSesion}>
+                      <span aria-hidden="true">↪</span> Cerrar sesión
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="navbar-usuario">

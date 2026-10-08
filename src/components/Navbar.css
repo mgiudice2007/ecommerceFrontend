@@ -62,27 +62,125 @@
   color: #fff;
 }
 
-.navbar-avatar {
+/* Boton con la inicial y el nombre: abre el menu de la cuenta */
+.navbar-usuario {
+  position: relative;
+}
+
+.navbar-cuenta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 4px 14px 4px 4px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie-2);
   color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-.navbar-avatar span {
+.navbar-cuenta:hover {
+  border-color: var(--azul);
+}
+
+.navbar-inicial {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--azul);
   color: #fff;
   font-size: 14px;
 }
 
-.navbar-salir {
-  padding: 8px 14px;
-  font-size: 14px;
+.navbar-inicial.grande {
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+}
+
+.navbar-flecha {
+  transition: transform 0.2s;
+}
+
+.navbar-flecha.abierta {
+  transform: rotate(180deg);
+}
+
+/* Fondo invisible que cubre la pantalla: tocarlo cierra el menu */
+.navbar-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.navbar-desplegable {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+  padding: 8px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+
+.navbar-desplegable-titular {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 16px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.navbar-desplegable-titular strong,
+.navbar-desplegable-titular small {
+  display: block;
+}
+
+.navbar-desplegable-titular small {
+  color: var(--texto-suave);
+}
+
+.navbar-desplegable a,
+.navbar-desplegable button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.navbar-desplegable a:hover,
+.navbar-desplegable button:hover {
+  background: var(--superficie-2);
+}
+
+.navbar-desplegable a span,
+.navbar-desplegable button span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--superficie-2);
+  font-size: 15px;
 }
 
 .navbar-hamburguesa {
@@ -136,5 +234,22 @@
     border-left: none;
     border-top: 1px solid var(--borde);
     justify-content: space-between;
+  }
+}
+
+/* En el celular el menu de la cuenta se abre debajo, dentro del menu hamburguesa */
+@media (max-width: 860px) {
+  .navbar-usuario:has(.navbar-desplegable) {
+    flex-wrap: wrap;
+  }
+
+  .navbar-desplegable {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  .navbar-fondo {
+    display: none;
   }
 }
