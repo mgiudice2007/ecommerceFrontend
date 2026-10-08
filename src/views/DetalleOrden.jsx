@@ -110,12 +110,11 @@ function DetalleOrden() {
         </ul>
 
         <div className="orden-totales">
-          {orden.descuentoTotal > 0 && (
-            <div className="orden-ahorro">
-              <span>Ahorraste con descuentos</span>
-              <span>− {precio(orden.descuentoTotal)}</span>
-            </div>
-          )}
+          {/* Los precios de los pasajes ya vienen con las promociones aplicadas */}
+          <div className="orden-subtotal">
+            <span>Pasajes</span>
+            <span>{precio(orden.total + orden.descuentoMillas)}</span>
+          </div>
           {orden.millasUsadas > 0 && (
             <div className="orden-ahorro">
               <span>Pagaste con {millas(orden.millasUsadas)} millas</span>
@@ -126,6 +125,11 @@ function DetalleOrden() {
             <span>Total abonado</span>
             <strong>{precio(orden.total)}</strong>
           </div>
+          {orden.descuentoTotal > 0 && (
+            <p className="orden-nota-descuento">
+              Los precios ya incluyen {precio(orden.descuentoTotal)} de descuento por promociones.
+            </p>
+          )}
           {orden.millasGanadas > 0 && (
             <p className="orden-millas">
               {cancelada

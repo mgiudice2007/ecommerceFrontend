@@ -110,6 +110,19 @@
   padding-top: 16px;
 }
 
+.orden-subtotal {
+  display: flex;
+  justify-content: space-between;
+  color: var(--texto-suave);
+}
+
+.orden-nota-descuento {
+  margin: 4px 0 0;
+  color: var(--verde);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .orden-ahorro {
   display: flex;
   justify-content: space-between;
