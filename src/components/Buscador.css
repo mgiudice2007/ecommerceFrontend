@@ -37,7 +37,7 @@
 
 .buscador-viaje label.activo {
   border-color: var(--azul);
-  background: color-mix(in srgb, var(--azul) 10%, transparent);
+  background: rgba(0, 87, 184, 0.1); /* el --azul, bien clarito */
   color: var(--azul);
 }
 
@@ -45,11 +45,6 @@
   position: absolute;
   opacity: 0;
   pointer-events: none;
-}
-
-.buscador-viaje label:has(input:focus-visible) {
-  outline: 2px solid var(--celeste);
-  outline-offset: 2px;
 }
 
 /* Desde / Hacia, con el boton para invertir en el medio */

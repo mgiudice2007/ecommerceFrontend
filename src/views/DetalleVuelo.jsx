@@ -73,21 +73,10 @@ function DetalleVuelo() {
 
   // Cada tipo de pasajero paga un porcentaje del precio de un adulto (igual que en el backend)
   const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
-  const total = elegida
-    ? TIPOS_PASAJERO.reduce((suma, t) => suma + precioPara(t) * pasajeros[t.clave], 0)
-    : 0
-
-  // Agrega al carrito un tipo de pasajero por vez (adultos, despues ninos, despues bebes).
-  // Cuando termina uno, sigue con el resto de la lista.
-  const agregarTipos = (tipos) => {
-    if (tipos.length === 0) return Promise.resolve()
-    const [primero, ...resto] = tipos
-    return api('/api/carrito/items', {
-      method: 'POST',
-      body: { disponibilidadId: elegida.id, cantidad: pasajeros[primero.clave], tipoPasajero: primero.tipo },
-    }).then((carrito) => {
-      actualizarCarrito(carrito)
-      return agregarTipos(resto)
+  let total = 0
+  if (elegida) {
+    TIPOS_PASAJERO.forEach((t) => {
+      total = total + precioPara(t) * pasajeros[t.clave]
     })
   }
 
@@ -100,8 +89,13 @@ function DetalleVuelo() {
 
     setAgregando(true)
     setMensaje(null)
-    agregarTipos(TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0))
-      .then(() => {
+    // Un solo pedido con los adultos, ninos y bebes elegidos
+    api('/api/carrito/pasajes', {
+      method: 'POST',
+      body: { disponibilidadId: elegida.id, ...pasajeros },
+    })
+      .then((carrito) => {
+        actualizarCarrito(carrito)
         setMensaje({
           tipo: 'exito',
           texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito.`,

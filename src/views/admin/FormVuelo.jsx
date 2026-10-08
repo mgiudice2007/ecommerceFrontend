@@ -84,18 +84,32 @@ function FormVuelo() {
     setFotos(fotos.filter((_, i) => i !== indice))
   }
 
-  // Sube las fotos al vuelo recien creado (POST /api/fotos, multipart).
-  // Promise.all espera a que terminen todas; devuelve los nombres de las que
-  // fallaron, para avisar sin perder el vuelo creado.
-  const subirFotos = (vueloId) => {
+  // Sube las fotos al vuelo recien creado: un POST /api/fotos (multipart) por cada una.
+  // Cuando terminaron todas, pasa a la pagina del vuelo avisando cuales fallaron.
+  const subirFotosYSeguir = (vueloId) => {
+    const irAlVuelo = (fotosConError) => {
+      // Un vuelo nuevo nace sin asientos: lo mandamos a cargarle las clases
+      navigate(`/panel/vuelos/${vueloId}`, { state: { recienCreado: true, fotosConError } })
+    }
+
+    if (fotos.length === 0) {
+      irAlVuelo([])
+      return
+    }
+
     const fallidas = []
-    const pedidos = fotos.map(({ archivo }) => {
+    let terminadas = 0
+    fotos.forEach(({ archivo }) => {
       const datos = new FormData()
       datos.append('vueloId', vueloId)
       datos.append('file', archivo)
-      return api('/api/fotos', { method: 'POST', body: datos }).catch(() => fallidas.push(archivo.name))
+      api('/api/fotos', { method: 'POST', body: datos })
+        .catch(() => fallidas.push(archivo.name))
+        .finally(() => {
+          terminadas = terminadas + 1
+          if (terminadas === fotos.length) irAlVuelo(fallidas)
+        })
     })
-    return Promise.all(pedidos).then(() => fallidas)
   }
 
   const handleSubmit = (e) => {
@@ -125,12 +139,7 @@ function FormVuelo() {
     }
 
     api('/api/vuelos', { method: 'POST', body })
-      .then((vuelo) =>
-        subirFotos(vuelo.id).then((fotosConError) =>
-          // Un vuelo nuevo nace sin asientos: lo mandamos a cargarle las clases
-          navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: true, fotosConError } }),
-        ),
-      )
+      .then((vuelo) => subirFotosYSeguir(vuelo.id))
       .catch((err) => {
         setError(err.message)
         setGuardando(false)

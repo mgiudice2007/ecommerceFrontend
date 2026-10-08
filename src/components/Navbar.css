@@ -239,7 +239,7 @@
 
 /* En el celular el menu de la cuenta se abre debajo, dentro del menu hamburguesa */
 @media (max-width: 860px) {
-  .navbar-usuario:has(.navbar-desplegable) {
+  .navbar-usuario {
     flex-wrap: wrap;
   }
 
@@ -259,7 +259,7 @@
   margin-top: 6px;
   padding: 2px 10px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--azul) 10%, transparent);
+  background: rgba(0, 87, 184, 0.1); /* el --azul, bien clarito */
   color: var(--azul);
   font-size: 13px;
   font-weight: 700;
