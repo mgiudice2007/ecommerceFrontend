@@ -89,7 +89,7 @@ function DetalleVuelo() {
 
     setAgregando(true)
     setMensaje(null)
-    // Un solo pedido con los adultos, ninos y bebes elegidos
+    // Un solo pedido con los adultos, niños y bebés elegidos
     api('/api/carrito/pasajes', {
       method: 'POST',
       body: { disponibilidadId: elegida.id, ...pasajeros },

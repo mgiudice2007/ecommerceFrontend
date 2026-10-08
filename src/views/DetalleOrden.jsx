@@ -127,7 +127,7 @@ function DetalleOrden() {
           </div>
           {orden.descuentoTotal > 0 && (
             <p className="orden-nota-descuento">
-              Los precios ya incluyen {precio(orden.descuentoTotal)} de descuento por promociones.
+              🏷 Ahorraste {precio(orden.descuentoTotal)} con la promoción del vuelo (ya está descontado en el precio de cada pasaje).
             </p>
           )}
           {orden.millasGanadas > 0 && (
