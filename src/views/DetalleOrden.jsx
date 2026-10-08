@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, precio } from '../utils/formato'
+import { nombreTipo } from '../utils/pasajeros'
 import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
@@ -94,8 +95,8 @@ function DetalleOrden() {
                   {item.origen} → {item.destino}
                 </strong>
                 <small>
-                  Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad}{' '}
-                  {item.cantidad === 1 ? 'pasaje' : 'pasajes'} × {precio(item.precioUnitario)}
+                  Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad} ×{' '}
+                  {nombreTipo(item.tipoPasajero).toLowerCase()} × {precio(item.precioUnitario)}
                 </small>
               </div>
               <span>{precio(item.subtotal)}</span>

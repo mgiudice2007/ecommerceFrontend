@@ -1,0 +1,32 @@
+.selector-pasajeros {
+  display: flex;
+  flex-direction: column;
+}
+
+.selector-pasajeros-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.selector-pasajeros-fila + .selector-pasajeros-fila {
+  border-top: 1px solid var(--borde);
+}
+
+.selector-pasajeros-fila strong,
+.selector-pasajeros-fila small {
+  display: block;
+}
+
+.selector-pasajeros-fila small {
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.selector-pasajeros-aviso {
+  margin: 4px 0 0;
+  color: var(--texto-suave);
+  font-size: 13px;
+}

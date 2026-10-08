@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, precio } from '../utils/formato'
+import { nombreTipo } from '../utils/pasajeros'
 import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
 
@@ -41,7 +42,8 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
           </p>
         )}
         <p className="item-carrito-clase">
-          Clase <strong>{item.claseNombre}</strong> · {precio(item.precioUnitario)} por pasajero
+          Clase <strong>{item.claseNombre}</strong> · <strong>{nombreTipo(item.tipoPasajero)}</strong> ·{' '}
+          {precio(item.precioUnitario)} por pasajero
         </p>
       </div>
 

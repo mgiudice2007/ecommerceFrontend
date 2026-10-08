@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api, urlFoto } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import OpcionClase from '../components/OpcionClase'
+import SelectorPasajeros from '../components/SelectorPasajeros'
 import { useAuth } from '../context/AuthContext'
 import { useCatalogo } from '../hooks/useCatalogo'
 import { duracion, fechaLarga, hora, precio } from '../utils/formato'
+import { leerPasajeros, TIPOS_PASAJERO, textoPasajeros, totalPasajeros } from '../utils/pasajeros'
 import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
 import './DetalleVuelo.css'
 
@@ -13,6 +15,7 @@ function DetalleVuelo() {
   const { id } = useParams() // el :id de la ruta /vuelos/:id
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams] = useSearchParams() // trae los pasajeros elegidos en el buscador
   const { estaLogueado, esComprador, actualizarCarrito } = useAuth()
   const { clases } = useCatalogo()
 
@@ -21,7 +24,7 @@ function DetalleVuelo() {
   const [error, setError] = useState('')
 
   const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
-  const [cantidad, setCantidad] = useState(1)
+  const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams)) // { adultos, ninos, bebes }
   const [agregando, setAgregando] = useState(false)
   const [mensaje, setMensaje] = useState(null) // { tipo: 'exito' | 'error', texto }
 
@@ -60,14 +63,32 @@ function DetalleVuelo() {
 
   const elegirClase = (disponibilidad) => {
     setElegida(disponibilidad)
-    setCantidad(1)
     setMensaje(null)
   }
 
-  const cambiarCantidad = (nueva) => {
-    if (nueva >= 1 && nueva <= elegida.asientosDisponibles) {
-      setCantidad(nueva)
-    }
+  const cambiarPasajeros = (nuevos) => {
+    setPasajeros(nuevos)
+    setMensaje(null)
+  }
+
+  // Cada tipo de pasajero paga un porcentaje del precio de un adulto (igual que en el backend)
+  const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
+  const total = elegida
+    ? TIPOS_PASAJERO.reduce((suma, t) => suma + precioPara(t) * pasajeros[t.clave], 0)
+    : 0
+
+  // Agrega al carrito un tipo de pasajero por vez (adultos, despues ninos, despues bebes).
+  // Cuando termina uno, sigue con el resto de la lista.
+  const agregarTipos = (tipos) => {
+    if (tipos.length === 0) return Promise.resolve()
+    const [primero, ...resto] = tipos
+    return api('/api/carrito/items', {
+      method: 'POST',
+      body: { disponibilidadId: elegida.id, cantidad: pasajeros[primero.clave], tipoPasajero: primero.tipo },
+    }).then((carrito) => {
+      actualizarCarrito(carrito)
+      return agregarTipos(resto)
+    })
   }
 
   const agregarAlCarrito = () => {
@@ -79,13 +100,12 @@ function DetalleVuelo() {
 
     setAgregando(true)
     setMensaje(null)
-    api('/api/carrito/items', {
-      method: 'POST',
-      body: { disponibilidadId: elegida.id, cantidad },
-    })
-      .then((carrito) => {
-        actualizarCarrito(carrito)
-        setMensaje({ tipo: 'exito', texto: `Agregaste ${cantidad} pasaje(s) en ${elegida.claseNombre} al carrito.` })
+    agregarTipos(TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0))
+      .then(() => {
+        setMensaje({
+          tipo: 'exito',
+          texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito.`,
+        })
       })
       .catch((err) => setMensaje({ tipo: 'error', texto: err.message }))
       .finally(() => setAgregando(false))
@@ -197,26 +217,27 @@ function DetalleVuelo() {
                   <strong>{precio(elegida.precioConDescuento)}</strong>
                 </div>
 
-                <div className="detalle-resumen">
-                  <span>Pasajes</span>
-                  <div className="contador">
-                    <button onClick={() => cambiarCantidad(cantidad - 1)} disabled={cantidad <= 1} aria-label="Restar">
-                      −
-                    </button>
-                    <span>{cantidad}</span>
-                    <button
-                      onClick={() => cambiarCantidad(cantidad + 1)}
-                      disabled={cantidad >= elegida.asientosDisponibles}
-                      aria-label="Sumar"
-                    >
-                      +
-                    </button>
+                <h3 className="detalle-pasajeros-titulo">Pasajeros</h3>
+                <SelectorPasajeros
+                  pasajeros={pasajeros}
+                  onChange={cambiarPasajeros}
+                  maximo={elegida.asientosDisponibles}
+                />
+
+                {/* Detalle del precio: una linea por cada tipo de pasajero */}
+                {TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0).map((t) => (
+                  <div key={t.clave} className="detalle-resumen">
+                    <span>
+                      {pasajeros[t.clave]} {pasajeros[t.clave] === 1 ? t.singular : t.titulo.toLowerCase()} ×{' '}
+                      {precio(precioPara(t))}
+                    </span>
+                    <strong>{precio(precioPara(t) * pasajeros[t.clave])}</strong>
                   </div>
-                </div>
+                ))}
 
                 <div className="detalle-total">
-                  <span>Total</span>
-                  <strong>{precio(elegida.precioConDescuento * cantidad)}</strong>
+                  <span>Total · {totalPasajeros(pasajeros)} pasajes</span>
+                  <strong>{precio(total)}</strong>
                 </div>
 
                 {mensaje && <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>}

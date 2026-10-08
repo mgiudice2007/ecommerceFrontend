@@ -197,38 +197,6 @@
 }
 
 /* Botones - 1 + (tambien se usan en el carrito) */
-.contador {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--borde);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.contador button {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: var(--superficie-2);
-  font: inherit;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--azul);
-  cursor: pointer;
-}
-
-.contador button:disabled {
-  color: var(--texto-suave);
-  cursor: not-allowed;
-}
-
-.contador span {
-  min-width: 40px;
-  color: var(--texto);
-  font-weight: 700;
-  text-align: center;
-}
-
 @media (max-width: 960px) {
   .detalle-layout {
     grid-template-columns: 1fr;
@@ -251,4 +219,9 @@
   .detalle-duracion {
     justify-self: start;
   }
+}
+
+.detalle-pasajeros-titulo {
+  margin: 8px 0 0;
+  font-size: 15px;
 }

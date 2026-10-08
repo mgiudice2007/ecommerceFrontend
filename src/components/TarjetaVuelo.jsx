@@ -5,14 +5,15 @@ import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
 
 // Una fila del listado de resultados. Recibe el vuelo completo por props.
-function TarjetaVuelo({ vuelo }) {
+// pasajeros: texto como "?adultos=2&ninos=1" para que el detalle arranque con esos pasajeros
+function TarjetaVuelo({ vuelo, pasajeros = '' }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)
   const diasDespues = diasHastaLlegada(vuelo.fechaSalida, vuelo.fechaLlegada)
 
   return (
     <article className="tarjeta tarjeta-vuelo">
-      <Link to={`/vuelos/${vuelo.id}`} className="tarjeta-vuelo-foto" tabIndex={-1} aria-hidden="true">
+      <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="tarjeta-vuelo-foto" tabIndex={-1} aria-hidden="true">
         <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
       </Link>
 
@@ -81,7 +82,7 @@ function TarjetaVuelo({ vuelo }) {
         ) : (
           <strong className="sin-stock">{estaOperativo(vuelo) ? 'Sin asientos' : 'No disponible'}</strong>
         )}
-        <Link to={`/vuelos/${vuelo.id}`} className="boton boton-primario">
+        <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="boton boton-primario">
           Ver vuelo
         </Link>
       </div>

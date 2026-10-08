@@ -260,3 +260,36 @@ h3 {
   background: var(--rojo-suave);
   color: var(--rojo);
 }
+
+/* Contador con botones - y + (pasajes, pasajeros, carrito) */
+.contador {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.contador button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--superficie-2);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--azul);
+  cursor: pointer;
+}
+
+.contador button:disabled {
+  color: var(--texto-suave);
+  cursor: not-allowed;
+}
+
+.contador span {
+  min-width: 40px;
+  color: var(--texto);
+  font-weight: 700;
+  text-align: center;
+}

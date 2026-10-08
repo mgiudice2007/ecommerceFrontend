@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCatalogo } from '../hooks/useCatalogo'
 import { hoy } from '../utils/formato'
+import { SIN_PASAJEROS_EXTRA, textoPasajeros } from '../utils/pasajeros'
+import SelectorPasajeros from './SelectorPasajeros'
 import './Buscador.css'
 
 // Buscador de vuelos. Usa los filtros que acepta GET /api/vuelos:
@@ -14,6 +16,8 @@ function Buscador({ inicial = {} }) {
   const navigate = useNavigate()
 
   const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')
+  const [pasajeros, setPasajeros] = useState(inicial.pasajeros ?? SIN_PASAJEROS_EXTRA)
+  const [verPasajeros, setVerPasajeros] = useState(false) // desplegable de pasajeros abierto
   const [error, setError] = useState('')
   const [filtros, setFiltros] = useState({
     origen: inicial.origen ?? '',
@@ -53,6 +57,12 @@ function Buscador({ inicial = {} }) {
       if (clave === 'vuelta' && viaje !== 'idavuelta') return
       if (valor) params.set(clave, valor)
     })
+    // Los pasajeros van a la URL solo si no es el caso comun (1 adulto)
+    if (textoPasajeros(pasajeros) !== textoPasajeros(SIN_PASAJEROS_EXTRA)) {
+      params.set('adultos', pasajeros.adultos)
+      params.set('ninos', pasajeros.ninos)
+      params.set('bebes', pasajeros.bebes)
+    }
     navigate(`/vuelos?${params.toString()}`)
   }
 
@@ -157,6 +167,28 @@ function Buscador({ inicial = {} }) {
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      <div className="buscador-fila-pasajeros">
+        <div className="buscador-campo buscador-pasajeros">
+          <label htmlFor="pasajeros">Pasajeros</label>
+          <button id="pasajeros" type="button" onClick={() => setVerPasajeros(!verPasajeros)} aria-expanded={verPasajeros}>
+            {textoPasajeros(pasajeros)}
+            <span aria-hidden="true">{verPasajeros ? '▴' : '▾'}</span>
+          </button>
+          {verPasajeros && (
+            <>
+              {/* Fondo invisible: al tocar afuera se cierra */}
+              <div className="buscador-fondo" onClick={() => setVerPasajeros(false)} />
+              <div className="buscador-desplegable">
+                <SelectorPasajeros pasajeros={pasajeros} onChange={setPasajeros} />
+                <button type="button" className="boton boton-primario boton-ancho" onClick={() => setVerPasajeros(false)}>
+                  Listo
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

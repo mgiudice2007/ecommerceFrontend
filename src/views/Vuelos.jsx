@@ -5,6 +5,7 @@ import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import TarjetaVuelo from '../components/TarjetaVuelo'
 import { sumarDias } from '../utils/formato'
+import { leerPasajeros } from '../utils/pasajeros'
 import './Vuelos.css'
 
 const POR_PAGINA = 10
@@ -54,6 +55,10 @@ function Vuelos() {
     const fechaVuelta = params.get('vuelta')
     params.delete('ida')
     params.delete('vuelta')
+    // Los pasajeros tampoco son un filtro del backend: se usan al comprar
+    params.delete('adultos')
+    params.delete('ninos')
+    params.delete('bebes')
 
     if (!esIdaYVuelta) {
       if (fechaIda) filtrarPorFecha(params, fechaIda)
@@ -111,7 +116,13 @@ function Vuelos() {
     viaje: searchParams.get('viaje') ?? 'ida',
     ida: searchParams.get('ida') ?? '',
     vuelta: searchParams.get('vuelta') ?? '',
+    pasajeros: leerPasajeros(searchParams),
   }
+
+  // Si se eligieron pasajeros, el detalle del vuelo los recibe por la URL
+  const consultaPasajeros = searchParams.get('adultos')
+    ? `?adultos=${searchParams.get('adultos')}&ninos=${searchParams.get('ninos') ?? 0}&bebes=${searchParams.get('bebes') ?? 0}`
+    : ''
 
   const hayFecha = searchParams.get('ida') || searchParams.get('vuelta')
 
@@ -127,7 +138,7 @@ function Vuelos() {
       )}
       <div className="vuelos-lista">
         {pagina.content.map((vuelo) => (
-          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} />
+          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consultaPasajeros} />
         ))}
       </div>
     </>

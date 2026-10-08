@@ -5,6 +5,7 @@ import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
 import { useAuth } from '../context/AuthContext'
 import { precio } from '../utils/formato'
+import { nombreTipo } from '../utils/pasajeros'
 import './Carrito.css'
 
 function Carrito() {
@@ -115,7 +116,7 @@ function Carrito() {
               {carrito.items.map((item) => (
                 <div key={item.id} className="carrito-resumen-fila">
                   <span>
-                    {item.origen} → {item.destino} × {item.cantidad}
+                    {item.origen} → {item.destino} · {item.cantidad} × {nombreTipo(item.tipoPasajero).toLowerCase()}
                   </span>
                   <span>{precio(item.subtotal)}</span>
                 </div>
