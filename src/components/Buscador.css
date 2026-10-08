@@ -1,24 +1,34 @@
 .buscador {
-  display: grid;
-  grid-template-columns: 2.2fr 1fr 1fr auto;
-  gap: 12px;
-  align-items: end;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px;
 }
 
-/* Selector "Ida y vuelta / Solo ida", ocupa toda la fila de arriba */
-.buscador-viaje {
-  grid-column: 1 / -1;
+/* "¿A donde queres ir?" a la izquierda y "Ida y vuelta / Solo ida" a la derecha */
+.buscador-cabecera {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.buscador-cabecera h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.buscador-viaje {
+  display: flex;
   gap: 8px;
 }
 
 .buscador-viaje label {
-  padding: 8px 16px;
+  padding: 7px 16px;
+  border: 1px solid var(--borde);
   border-radius: 999px;
-  background: var(--superficie-2);
   font-size: 14px;
   font-weight: 700;
   color: var(--texto-suave);
@@ -26,8 +36,9 @@
 }
 
 .buscador-viaje label.activo {
-  background: var(--azul);
-  color: #fff;
+  border-color: var(--azul);
+  background: color-mix(in srgb, var(--azul) 10%, transparent);
+  color: var(--azul);
 }
 
 .buscador-viaje input {
@@ -41,17 +52,42 @@
   outline-offset: 2px;
 }
 
-.buscador-error {
-  color: var(--rojo);
-  font-size: 13px;
-  font-weight: 600;
-}
-
+/* Desde / Hacia, con el boton para invertir en el medio */
 .buscador-ruta {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+
+.buscador-ruta .buscador-campo:first-child {
+  border-radius: var(--radio) 0 0 var(--radio);
+}
+
+.buscador-ruta .buscador-campo:last-child {
+  border-left: none;
+  border-radius: 0 var(--radio) var(--radio) 0;
+  padding-left: 32px;
+}
+
+.buscador-fila {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 1fr;
   gap: 12px;
+}
+
+/* Ida y Vuelta pegadas, como un solo campo */
+.buscador-fechas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.buscador-fechas .buscador-campo:first-child:not(:last-child) {
+  border-radius: var(--radio) 0 0 var(--radio);
+}
+
+.buscador-fechas .buscador-campo + .buscador-campo {
+  border-left: none;
+  border-radius: 0 var(--radio) var(--radio) 0;
 }
 
 .buscador-campo {
@@ -59,36 +95,37 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  padding: 10px 14px;
+  padding: 10px 16px;
+  border: 1px solid var(--borde);
   border-radius: var(--radio);
-  background: var(--superficie-2);
+  background: var(--superficie);
 }
 
 .buscador-campo label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--texto-suave);
+  color: var(--texto);
 }
 
-.buscador-campo select {
+.buscador-campo select,
+.buscador-campo input {
   width: 100%;
   padding: 0;
   border: none;
   background: transparent;
   font: inherit;
-  font-weight: 700;
   font-size: 16px;
   color: var(--texto);
   cursor: pointer;
 }
 
 .buscador-campo:focus-within {
-  outline: 2px solid var(--celeste);
+  border-color: var(--azul);
+  box-shadow: inset 0 0 0 1px var(--azul);
 }
 
-.buscador-campo select:focus {
+.buscador-campo select:focus,
+.buscador-campo input:focus {
   outline: none;
 }
 
@@ -99,10 +136,10 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   transform: translate(-50%, -50%);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--azul);
   border-radius: 50%;
   background: var(--superficie);
   color: var(--azul);
@@ -111,38 +148,65 @@
 }
 
 .buscador-invertir:hover {
-  border-color: var(--azul);
+  background: var(--superficie-2);
+}
+
+/* Abajo: el error (si hay) y el boton de buscar a la derecha */
+.buscador-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borde);
+}
+
+.buscador-error {
+  color: var(--rojo);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .buscador-boton {
-  height: 100%;
-  min-height: 58px;
-  padding: 0 24px;
+  min-height: 52px;
+  padding: 0 32px;
+  font-size: 16px;
 }
 
-@media (max-width: 960px) {
-  .buscador {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .buscador-ruta,
-  .buscador-boton {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 480px) {
-  .buscador {
+@media (max-width: 860px) {
+  .buscador-fila {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .buscador {
+    padding: 18px 16px;
   }
 
   .buscador-ruta {
     grid-template-columns: 1fr;
   }
 
+  .buscador-ruta .buscador-campo:first-child {
+    border-radius: var(--radio) var(--radio) 0 0;
+  }
+
+  .buscador-ruta .buscador-campo:last-child {
+    border-left: 1px solid var(--borde);
+    border-top: none;
+    border-radius: 0 0 var(--radio) var(--radio);
+    padding-left: 16px;
+  }
+
   .buscador-invertir {
     left: auto;
-    right: 12px;
+    right: 16px;
     transform: translateY(-50%) rotate(90deg);
+  }
+
+  .buscador-boton {
+    width: 100%;
   }
 }

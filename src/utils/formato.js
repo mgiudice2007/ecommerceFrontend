@@ -41,3 +41,15 @@ export const duracion = (minutos) => {
 
 // Para los <input type="datetime-local"> hace falta "2026-12-15T10:00"
 export const paraInputFechaHora = (fecha) => (fecha ? fecha.slice(0, 16) : '')
+
+// Fecha de hoy como "2026-10-01" en horario local (toISOString usaria UTC
+// y a la noche en Argentina ya daria el dia siguiente)
+export const hoy = () => sumarDias(null, 0)
+
+// Suma (o resta) dias a una fecha "2026-10-01" y la devuelve en el mismo formato
+export const sumarDias = (fecha, dias) => {
+  const d = fecha ? new Date(`${fecha}T12:00:00`) : new Date()
+  d.setDate(d.getDate() + dias)
+  const dosDigitos = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${dosDigitos(d.getMonth() + 1)}-${dosDigitos(d.getDate())}`
+}

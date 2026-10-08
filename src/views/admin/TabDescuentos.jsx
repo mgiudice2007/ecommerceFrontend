@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
-import { precio } from '../../utils/formato'
-
-// Fecha de hoy como "2026-10-01" en horario local (toISOString usaria UTC
-// y a la noche en Argentina ya daria el dia siguiente)
-const hoy = () => {
-  const d = new Date()
-  const dosDigitos = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${dosDigitos(d.getMonth() + 1)}-${dosDigitos(d.getDate())}`
-}
+import { hoy, precio } from '../../utils/formato'
 
 const fechaCorta = (fecha) => new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR')
 

@@ -4,9 +4,17 @@ import { api } from '../api/api'
 import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import TarjetaVuelo from '../components/TarjetaVuelo'
+import { sumarDias } from '../utils/formato'
 import './Vuelos.css'
 
 const POR_PAGINA = 10
+const DIAS_FLEXIBLES = 3 // se muestran vuelos 3 dias antes y despues de la fecha elegida
+
+// Pasa la fecha elegida en el calendario a los filtros fechaDesde / fechaHasta del backend
+const filtrarPorFecha = (params, fecha) => {
+  params.set('fechaDesde', sumarDias(fecha, -DIAS_FLEXIBLES))
+  params.set('fechaHasta', sumarDias(fecha, DIAS_FLEXIBLES))
+}
 
 // Pide una pagina de vuelos al backend con los filtros dados
 const buscarVuelos = (params) => api(`/api/vuelos?${params.toString()}`)
@@ -41,8 +49,14 @@ function Vuelos() {
     const params = new URLSearchParams(busqueda)
     const esIdaYVuelta = params.get('viaje') === 'idavuelta' && params.get('origen') && params.get('destino')
     params.delete('viaje') // es solo del frontend, el backend no lo conoce
+    // Las fechas del calendario se pasan a fechaDesde / fechaHasta mas abajo
+    const fechaIda = params.get('ida')
+    const fechaVuelta = params.get('vuelta')
+    params.delete('ida')
+    params.delete('vuelta')
 
     if (!esIdaYVuelta) {
+      if (fechaIda) filtrarPorFecha(params, fechaIda)
       params.set('page', params.get('page') ?? 0)
       params.set('size', POR_PAGINA)
       buscarVuelos(params)
@@ -56,6 +70,12 @@ function Vuelos() {
     const vuelta = new URLSearchParams(params)
     vuelta.set('origen', params.get('destino'))
     vuelta.set('destino', params.get('origen'))
+    if (fechaIda) filtrarPorFecha(params, fechaIda)
+    if (fechaVuelta) {
+      filtrarPorFecha(vuelta, fechaVuelta)
+    } else if (fechaIda) {
+      vuelta.set('fechaDesde', fechaIda) // sin fecha de vuelta: cualquier vuelo despues de la ida
+    }
 
     buscarVuelos(params)
       .then((ida) =>
@@ -89,7 +109,11 @@ function Vuelos() {
     categoriaId: searchParams.get('categoriaId') ?? '',
     claseId: searchParams.get('claseId') ?? '',
     viaje: searchParams.get('viaje') ?? 'ida',
+    ida: searchParams.get('ida') ?? '',
+    vuelta: searchParams.get('vuelta') ?? '',
   }
+
+  const hayFecha = searchParams.get('ida') || searchParams.get('vuelta')
 
   // Una lista de resultados (se usa una vez para solo ida y dos veces para ida y vuelta)
   const listaDeVuelos = (pagina) => (
@@ -158,6 +182,13 @@ function Vuelos() {
             {error && <div className="mensaje mensaje-error">{error}</div>}
 
             {cargando && <p className="texto-suave">Buscando vuelos…</p>}
+
+            {hayFecha && (
+              <p className="vuelos-ayuda">
+                📅 Fechas flexibles: te mostramos los vuelos que salen hasta {DIAS_FLEXIBLES} días antes o después
+                de la fecha que elegiste.
+              </p>
+            )}
 
             {!cargando && resultado && idaYVuelta && (
               <>
