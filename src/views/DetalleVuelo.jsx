@@ -89,8 +89,7 @@ function DetalleVuelo() {
   const agregarAlCarrito = () => {
     if (!estaLogueado) {
       // Lo mandamos a loguearse y despues vuelve a este vuelo
-      // Con location.search se guardan tambien los pasajeros elegidos (?adultos=2&ninos=1...)
-      navigate('/login', { state: { desde: location.pathname + location.search } })
+      navigate('/login', { state: { desde: location.pathname } })
       return
     }
 
