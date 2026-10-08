@@ -5,7 +5,6 @@ import portada from '../assets/portada.jpg'
 import Buscador from '../components/Buscador'
 import TarjetaDestino from '../components/TarjetaDestino'
 import { useAuth } from '../context/AuthContext'
-import { useCatalogo } from '../hooks/useCatalogo'
 import { estaOperativo } from '../utils/vuelos'
 import './Inicio.css'
 
@@ -48,7 +47,18 @@ const BENEFICIOS = [
 
 function Inicio() {
   const { estaLogueado } = useAuth()
-  const { aeropuertos, categorias } = useCatalogo()
+  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  const [aeropuertos, setAeropuertos] = useState([])
+  const [categorias, setCategorias] = useState([])
+
+  useEffect(() => {
+    api('/api/aeropuertos')
+      .then((data) => setAeropuertos(data))
+      .catch(() => setAeropuertos([]))
+    api('/api/categorias')
+      .then((data) => setCategorias(data))
+      .catch(() => setCategorias([]))
+  }, [])
 
   const [vuelos, setVuelos] = useState([])
   const [cargando, setCargando] = useState(true)

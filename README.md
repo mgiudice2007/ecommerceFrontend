@@ -47,7 +47,6 @@ La aerolínea tiene **un único vendedor: el administrador**. El registro del si
 src/
 ├── api/api.js            función api() para llamar al backend con el token JWT
 ├── context/AuthContext   sesión: usuario logueado (leído del JWT) y cantidad del carrito
-├── hooks/useCatalogo     aeropuertos, categorías y clases para los selects
 ├── utils/                formato de precios y fechas, cálculos de vuelos y órdenes
 ├── components/           piezas reutilizables (Navbar, TarjetaVuelo, Buscador, ...)
 └── views/                una vista (pantalla) por ruta

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
-import { useCatalogo } from '../../hooks/useCatalogo'
 import { paraInputFechaHora } from '../../utils/formato'
 import './Panel.css'
 
@@ -23,7 +22,18 @@ function FormVuelo() {
   const { id } = useParams()
   const esEdicion = Boolean(id)
   const navigate = useNavigate()
-  const { aeropuertos, categorias } = useCatalogo()
+  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  const [aeropuertos, setAeropuertos] = useState([])
+  const [categorias, setCategorias] = useState([])
+
+  useEffect(() => {
+    api('/api/aeropuertos')
+      .then((data) => setAeropuertos(data))
+      .catch(() => setAeropuertos([]))
+    api('/api/categorias')
+      .then((data) => setCategorias(data))
+      .catch(() => setCategorias([]))
+  }, [])
 
   const [formData, setFormData] = useState(FORM_VACIO)
   const [cargando, setCargando] = useState(esEdicion)

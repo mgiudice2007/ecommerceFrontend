@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { api } from '../api/api'
 import { useNavigate } from 'react-router-dom'
-import { useCatalogo } from '../hooks/useCatalogo'
 import { hoy } from '../utils/formato'
 import { SIN_PASAJEROS_EXTRA, textoPasajeros } from '../utils/pasajeros'
 import SelectorPasajeros from './SelectorPasajeros'
@@ -12,7 +12,23 @@ import './Buscador.css'
 // y la vuelta (destino -> origen).
 // inicial: los filtros con los que arranca (por ejemplo, los que ya estan en la URL)
 function Buscador({ inicial = {} }) {
-  const { aeropuertos, categorias, clases } = useCatalogo()
+  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  const [aeropuertos, setAeropuertos] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [clases, setClases] = useState([])
+
+  useEffect(() => {
+    api('/api/aeropuertos')
+      .then((data) => setAeropuertos(data))
+      .catch(() => setAeropuertos([]))
+    api('/api/categorias')
+      .then((data) => setCategorias(data))
+      .catch(() => setCategorias([]))
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
+  }, [])
+
   const navigate = useNavigate()
 
   const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')

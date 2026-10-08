@@ -5,7 +5,6 @@ import GaleriaFotos from '../components/GaleriaFotos'
 import OpcionClase from '../components/OpcionClase'
 import SelectorPasajeros from '../components/SelectorPasajeros'
 import { useAuth } from '../context/AuthContext'
-import { useCatalogo } from '../hooks/useCatalogo'
 import { duracion, fechaLarga, hora, precio } from '../utils/formato'
 import { leerPasajeros, TIPOS_PASAJERO, textoPasajeros, totalPasajeros } from '../utils/pasajeros'
 import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
@@ -17,7 +16,14 @@ function DetalleVuelo() {
   const location = useLocation()
   const [searchParams] = useSearchParams() // trae los pasajeros elegidos en el buscador
   const { estaLogueado, esComprador, actualizarCarrito } = useAuth()
-  const { clases } = useCatalogo()
+  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  const [clases, setClases] = useState([])
+
+  useEffect(() => {
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
+  }, [])
 
   const [vuelo, setVuelo] = useState(null)
   const [fotos, setFotos] = useState([])

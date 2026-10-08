@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
-import { useCatalogo } from '../../hooks/useCatalogo'
 import { precio } from '../../utils/formato'
 
 // Pestaña "Clases y asientos": cada fila es una Disponibilidad del vuelo
 // (una clase con su cantidad de asientos y su precio).
 function TabClases({ vuelo, onCambio }) {
-  const { clases } = useCatalogo()
+  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  const [clases, setClases] = useState([])
+
+  useEffect(() => {
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
+  }, [])
 
   const [nueva, setNueva] = useState({ claseId: '', asientosTotales: '', precio: '' })
   const [editando, setEditando] = useState(null) // { id, asientosTotales, precio }
