@@ -9,7 +9,7 @@ function RutaProtegida({ roles, children }) {
 
   if (!usuario) {
     // Lo mandamos al login y guardamos a donde queria ir, para volver despues
-    return <Navigate to="/login" state={{ desde: location.pathname }} replace />
+    return <Navigate to="/login" state={{ desde: location.pathname + location.search }} replace />
   }
 
   if (roles && !roles.includes(usuario.rol)) {

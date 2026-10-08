@@ -96,4 +96,9 @@ export function AuthProvider({ children }) {
 
 // Hook propio para usar la sesion: const { usuario, login } = useAuth()
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => {
+  const contexto = useContext(AuthContext)
+  // Si un componente se usa fuera del <AuthProvider>, avisamos con un error claro
+  if (!contexto) throw new Error('useAuth tiene que usarse dentro de <AuthProvider>')
+  return contexto
+}

@@ -17,6 +17,9 @@ const filtrarPorFecha = (params, fecha) => {
   params.set('fechaHasta', sumarDias(fecha, DIAS_FLEXIBLES))
 }
 
+// El numero de pagina de la URL: si no es un numero (?page=abc) o es negativo, usamos la 0
+const paginaValida = (texto) => Math.max(0, Math.floor(Number(texto)) || 0)
+
 // Pide una pagina de vuelos al backend con los filtros dados
 const buscarVuelos = (params) => api(`/api/vuelos?${params.toString()}`)
 
@@ -24,7 +27,7 @@ function Vuelos() {
   // Los filtros viven en la URL (/vuelos?origen=EZE&destino=MAD) asi se pueden
   // compartir o volver atras con el navegador y la busqueda se mantiene.
   const [searchParams, setSearchParams] = useSearchParams()
-  const pagina = Number(searchParams.get('page') ?? 0)
+  const pagina = paginaValida(searchParams.get('page'))
 
   // La busqueda actual en texto (por ejemplo "destino=MAD&page=1")
   const busqueda = searchParams.toString()
@@ -60,33 +63,40 @@ function Vuelos() {
     params.delete('ninos')
     params.delete('bebes')
 
+    let pedido
     if (!esIdaYVuelta) {
       if (fechaIda) filtrarPorFecha(params, fechaIda)
-      params.set('page', params.get('page') ?? 0)
+      params.set('page', paginaValida(params.get('page')))
       params.set('size', POR_PAGINA)
-      buscarVuelos(params)
-        .then((ida) => setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' }))
-        .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
-      return
+      pedido = buscarVuelos(params).then((ida) => ({ ida, vuelta: null }))
+    } else {
+      // Dos busquedas: primero la ida (origen -> destino) y despues la vuelta (destino -> origen)
+      params.delete('page')
+      const vuelta = new URLSearchParams(params)
+      vuelta.set('origen', params.get('destino'))
+      vuelta.set('destino', params.get('origen'))
+      if (fechaIda) filtrarPorFecha(params, fechaIda)
+      if (fechaVuelta) {
+        filtrarPorFecha(vuelta, fechaVuelta)
+      } else if (fechaIda) {
+        vuelta.set('fechaDesde', fechaIda) // sin fecha de vuelta: cualquier vuelo despues de la ida
+      }
+      pedido = buscarVuelos(params).then((ida) => buscarVuelos(vuelta).then((regreso) => ({ ida, vuelta: regreso })))
     }
 
-    // Dos busquedas: primero la ida (origen -> destino) y despues la vuelta (destino -> origen)
-    params.delete('page')
-    const vuelta = new URLSearchParams(params)
-    vuelta.set('origen', params.get('destino'))
-    vuelta.set('destino', params.get('origen'))
-    if (fechaIda) filtrarPorFecha(params, fechaIda)
-    if (fechaVuelta) {
-      filtrarPorFecha(vuelta, fechaVuelta)
-    } else if (fechaIda) {
-      vuelta.set('fechaDesde', fechaIda) // sin fecha de vuelta: cualquier vuelo despues de la ida
+    // Si el usuario cambia de busqueda antes de que llegue esta respuesta, ya es vieja:
+    // el return de abajo (la limpieza del useEffect) la marca como inactiva y se ignora.
+    let activo = true
+    pedido
+      .then((datos) => {
+        if (activo) setRespuesta({ busqueda, datos, error: '' })
+      })
+      .catch((err) => {
+        if (activo) setRespuesta({ busqueda, datos: null, error: err.message })
+      })
+    return () => {
+      activo = false
     }
-
-    buscarVuelos(params)
-      .then((ida) =>
-        buscarVuelos(vuelta).then((regreso) => setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })),
-      )
-      .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
   }, [busqueda])
 
   const cambiarFiltro = (cambios) => {
