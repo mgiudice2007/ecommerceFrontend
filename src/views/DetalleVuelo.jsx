@@ -33,7 +33,9 @@ function DetalleVuelo() {
 
   const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
   const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams)) // { adultos, ninos, bebes }
-  const [asientos, setAsientos] = useState([]) // asientos elegidos: primero los de los adultos y despues los de los niños
+  // Si viene de iniciar sesion, la URL trae la clase y los asientos que habia elegido (?clase=127&asientos=7A,7B)
+  const [claseInicial] = useState(searchParams.get('clase'))
+  const [asientos, setAsientos] = useState(searchParams.get('asientos') ? searchParams.get('asientos').split(',') : []) // asientos elegidos: primero los de los adultos y despues los de los niños
   const [agregando, setAgregando] = useState(false)
   const [mensaje, setMensaje] = useState(null) // { tipo: 'exito' | 'error', texto }
 
@@ -41,8 +43,9 @@ function DetalleVuelo() {
     api(`/api/vuelos/${id}`)
       .then((data) => {
         setVuelo(data)
-        // Arranca elegida la primera clase que tenga asientos
-        setElegida(data.disponibilidades.find((d) => d.hayStock) ?? null)
+        // Arranca elegida la clase que venia en la URL, o si no la primera que tenga asientos
+        const deLaUrl = data.disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
+        setElegida(deLaUrl ?? data.disponibilidades.find((d) => d.hayStock) ?? null)
       })
       .catch((err) => setError(err.message))
 
@@ -55,7 +58,7 @@ function DetalleVuelo() {
       })
       .then((imagen) => setPortada(imagen))
       .catch(() => setFotos([]))
-  }, [id])
+  }, [id, claseInicial])
 
   if (error) {
     return (
@@ -108,8 +111,15 @@ function DetalleVuelo() {
 
   const agregarAlCarrito = () => {
     if (!estaLogueado) {
-      // Lo mandamos a loguearse y despues vuelve a este vuelo
-      navigate('/login', { state: { desde: location.pathname } })
+      // Lo mandamos a loguearse y despues vuelve a este vuelo con lo que ya habia elegido:
+      // los pasajeros, la clase y los asientos van en la URL de vuelta
+      const params = new URLSearchParams()
+      params.set('adultos', pasajeros.adultos)
+      params.set('ninos', pasajeros.ninos)
+      params.set('bebes', pasajeros.bebes)
+      if (elegida) params.set('clase', elegida.id)
+      if (asientos.length > 0) params.set('asientos', asientos.join(','))
+      navigate('/login', { state: { desde: `${location.pathname}?${params.toString()}` } })
       return
     }
 
