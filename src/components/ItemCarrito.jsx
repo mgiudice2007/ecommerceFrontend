@@ -48,11 +48,15 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
         {item.tipoPasajero === 'BEBE' ? (
           <p className="texto-suave">Viaja a upa, sin asiento propio</p>
         ) : (
-          item.asientos.length > 0 && (
-            <p className="texto-suave">
-              {item.asientos.length === 1 ? 'Asiento' : 'Asientos'}: <strong>{item.asientos.join(', ')}</strong>
-            </p>
-          )
+          <p className="texto-suave">
+            {item.asientos.length > 0 && (
+              <>
+                {item.asientos.length === 1 ? 'Asiento' : 'Asientos'}: <strong>{item.asientos.join(', ')}</strong>
+              </>
+            )}
+            {item.asientos.length < item.cantidad &&
+              `${item.asientos.length > 0 ? ' · ' : ''}${item.cantidad - item.asientos.length === 1 ? 'Un asiento se asigna' : 'Los asientos que faltan se asignan'} al confirmar`}
+          </p>
         )}
       </div>
 

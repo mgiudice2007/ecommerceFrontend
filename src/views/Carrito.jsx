@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
-import SelectorAsientos from '../components/SelectorAsientos'
 import { useAuth } from '../context/AuthContext'
 import { millas, precio } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
@@ -36,16 +35,6 @@ function Carrito() {
     setOcupado(true)
     setError('')
     api(`/api/carrito/items/${item.id}`, { method: 'PUT', body: { cantidad } })
-      .then(mostrarCarrito)
-      .catch((err) => setError(err.message))
-      .finally(() => setOcupado(false))
-  }
-
-  // Guarda los asientos elegidos para un vuelo y clase (PUT /api/carrito/asientos)
-  const elegirAsientos = (disponibilidadId, asientos) => {
-    setOcupado(true)
-    setError('')
-    api('/api/carrito/asientos', { method: 'PUT', body: { disponibilidadId, asientos } })
       .then(mostrarCarrito)
       .catch((err) => setError(err.message))
       .finally(() => setOcupado(false))
@@ -102,35 +91,6 @@ function Carrito() {
     }
   })
 
-  // Un mapa de asientos por cada vuelo y clase del carrito. Los adultos y los niños del
-  // mismo vuelo lo comparten; los bebés no aparecen porque viajan a upa.
-  const grupos = []
-  carrito.items.forEach((item) => {
-    if (item.tipoPasajero === 'BEBE') return
-    let grupo = grupos.find((g) => g.disponibilidadId === item.disponibilidadId)
-    if (!grupo) {
-      grupo = {
-        disponibilidadId: item.disponibilidadId,
-        titulo: `${item.origen} → ${item.destino} · Vuelo ${item.numeroVuelo} · ${item.claseNombre}`,
-        adultos: 0,
-        ninos: 0,
-        asientosAdultos: [],
-        asientosNinos: [],
-      }
-      grupos.push(grupo)
-    }
-    if (item.tipoPasajero === 'NINO') {
-      grupo.ninos = grupo.ninos + item.cantidad
-      grupo.asientosNinos = [...grupo.asientosNinos, ...item.asientos]
-    } else {
-      grupo.adultos = grupo.adultos + item.cantidad
-      grupo.asientosAdultos = [...grupo.asientosAdultos, ...item.asientos]
-    }
-  })
-  // Mismo orden que usa el backend: primero los asientos de los adultos y despues los de los niños
-  grupos.forEach((grupo) => {
-    grupo.asientos = [...grupo.asientosAdultos, ...grupo.asientosNinos]
-  })
 
   // Millas: no se pueden usar mas de las que tiene ni pagar mas que el total
   const maximoMillas = Math.min(carrito.millasDisponibles, Math.floor(carrito.total / carrito.valorMilla))
@@ -175,25 +135,6 @@ function Carrito() {
                 />
               ))}
 
-              {grupos.length > 0 && (
-                <div className="carrito-asientos">
-                  <div>
-                    <h2>Elegí tus asientos</h2>
-                    <p className="texto-suave">
-                      Es gratis. Tocá un asiento libre o usá "Asiento aleatorio". Si no elegís, al confirmar te
-                      asignamos asientos libres.
-                    </p>
-                  </div>
-                  {grupos.map((grupo) => (
-                    <SelectorAsientos
-                      key={grupo.disponibilidadId}
-                      grupo={grupo}
-                      ocupado={ocupado}
-                      onCambio={(asientos) => elegirAsientos(grupo.disponibilidadId, asientos)}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
 
             <aside className="tarjeta carrito-resumen">

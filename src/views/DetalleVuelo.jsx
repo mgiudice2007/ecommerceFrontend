@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'reac
 import { api, pedirImagen } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import OpcionClase from '../components/OpcionClase'
+import SelectorAsientos from '../components/SelectorAsientos'
 import SelectorPasajeros from '../components/SelectorPasajeros'
 import { useAuth } from '../context/AuthContext'
 import { duracion, fechaLarga, hora, precio } from '../utils/formato'
@@ -32,6 +33,7 @@ function DetalleVuelo() {
 
   const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
   const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams)) // { adultos, ninos, bebes }
+  const [asientos, setAsientos] = useState([]) // asientos elegidos: primero los de los adultos y despues los de los niños
   const [agregando, setAgregando] = useState(false)
   const [mensaje, setMensaje] = useState(null) // { tipo: 'exito' | 'error', texto }
 
@@ -75,13 +77,25 @@ function DetalleVuelo() {
 
   const elegirClase = (disponibilidad) => {
     setElegida(disponibilidad)
+    setAsientos([]) // cada clase tiene su propio mapa de asientos
     setMensaje(null)
   }
 
   const cambiarPasajeros = (nuevos) => {
     setPasajeros(nuevos)
+    // Si ahora viajan menos personas, sobran asientos elegidos: se quedan los primeros
+    setAsientos(asientos.slice(0, nuevos.adultos + nuevos.ninos))
     setMensaje(null)
   }
+
+  const cambiarAsientos = (nuevos) => {
+    setAsientos(nuevos)
+    setMensaje(null)
+  }
+
+  // Los bebés viajan a upa: solo eligen asiento los adultos y los niños
+  const necesitanAsiento = pasajeros.adultos + pasajeros.ninos
+  const faltanAsientos = necesitanAsiento - asientos.length
 
   // Cada tipo de pasajero paga un porcentaje del precio de un adulto (igual que en el backend)
   const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
@@ -104,14 +118,15 @@ function DetalleVuelo() {
     // Un solo pedido con los adultos, niños y bebés elegidos
     api('/api/carrito/pasajes', {
       method: 'POST',
-      body: { disponibilidadId: elegida.id, ...pasajeros },
+      body: { disponibilidadId: elegida.id, ...pasajeros, asientos },
     })
       .then((carrito) => {
         actualizarCarrito(carrito)
         setMensaje({
           tipo: 'exito',
-          texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito.`,
+          texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito (asientos ${asientos.join(', ')}).`,
         })
+        setAsientos([])
       })
       .catch((err) => setMensaje({ tipo: 'error', texto: err.message }))
       .finally(() => setAgregando(false))
@@ -191,6 +206,27 @@ function DetalleVuelo() {
               )}
             </section>
 
+            {sePuedeComprar && elegida && (
+              <section>
+                <h2 className="detalle-subtitulo">Elegí tus asientos</h2>
+                <p className="texto-suave detalle-asientos-ayuda">
+                  Es gratis. Tocá un asiento libre o usá "Asiento aleatorio".
+                  {pasajeros.bebes > 0 && ' Los bebés viajan a upa, sin asiento propio.'}
+                </p>
+                <SelectorAsientos
+                  grupo={{
+                    disponibilidadId: elegida.id,
+                    titulo: `Clase ${elegida.claseNombre}`,
+                    adultos: pasajeros.adultos,
+                    ninos: pasajeros.ninos,
+                    asientos,
+                  }}
+                  onCambio={cambiarAsientos}
+                  ocupado={agregando}
+                />
+              </section>
+            )}
+
             {fotos.length > 1 && (
               <section>
                 <h2 className="detalle-subtitulo">Conocé {vuelo.destinoCiudad}</h2>
@@ -251,8 +287,18 @@ function DetalleVuelo() {
                 {estaLogueado && !esComprador ? (
                   <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
                 ) : (
-                  <button className="boton boton-primario boton-ancho" onClick={agregarAlCarrito} disabled={agregando}>
-                    {agregando ? 'Agregando…' : estaLogueado ? 'Agregar al carrito' : 'Iniciá sesión para comprar'}
+                  <button
+                    className="boton boton-primario boton-ancho"
+                    onClick={agregarAlCarrito}
+                    disabled={agregando || (estaLogueado && faltanAsientos > 0)}
+                  >
+                    {agregando
+                      ? 'Agregando…'
+                      : !estaLogueado
+                        ? 'Iniciá sesión para comprar'
+                        : faltanAsientos > 0
+                          ? `Elegí ${faltanAsientos === 1 ? '1 asiento más' : `${faltanAsientos} asientos más`}`
+                          : 'Agregar al carrito'}
                   </button>
                 )}
 
