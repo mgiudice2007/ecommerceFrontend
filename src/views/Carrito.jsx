@@ -91,6 +91,17 @@ function Carrito() {
 
   const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
 
+  // Los menores no viajan solos: cada vuelo con niños o bebés necesita al menos un adulto
+  const vuelosSinAdulto = []
+  carrito.items.forEach((item) => {
+    const hayAdulto = carrito.items.some(
+      (otro) => otro.disponibilidadId === item.disponibilidadId && otro.tipoPasajero === 'ADULTO',
+    )
+    if (!hayAdulto && !vuelosSinAdulto.includes(item.numeroVuelo)) {
+      vuelosSinAdulto.push(item.numeroVuelo)
+    }
+  })
+
   // Un mapa de asientos por cada vuelo y clase del carrito. Los adultos y los niños del
   // mismo vuelo lo comparten; los bebés no aparecen porque viajan a upa.
   const grupos = []
@@ -244,10 +255,16 @@ function Carrito() {
               <p className="texto-suave carrito-aclaracion">
                 Los precios ya incluyen los descuentos vigentes. Al confirmar, tus asientos quedan reservados.
               </p>
+              {vuelosSinAdulto.length > 0 && (
+                <div className="mensaje mensaje-error">
+                  Tiene que viajar al menos un adulto en {vuelosSinAdulto.length === 1 ? 'el vuelo' : 'los vuelos'}{' '}
+                  {vuelosSinAdulto.join(', ')}. Agregá un adulto o sacá a los menores del carrito.
+                </div>
+              )}
               <button
                 className="boton boton-primario boton-ancho"
                 onClick={confirmarCompra}
-                disabled={comprando || ocupado}
+                disabled={comprando || ocupado || vuelosSinAdulto.length > 0}
               >
                 {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(aPagar)}`}
               </button>
