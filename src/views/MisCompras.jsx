@@ -4,7 +4,7 @@ import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FotoVuelo from '../components/FotoVuelo'
 import { fechaLarga, hora, precio } from '../utils/formato'
-import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
+import { cancelarOrden, confirmarCancelacion, numerosDeVuelo } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
 import './MisCompras.css'
 
@@ -76,7 +76,10 @@ function MisCompras() {
                 <div className="compra-contenido">
                   <div className="compra-encabezado">
                     <div>
-                      <strong>Compra #{orden.id}</strong>
+                      <strong>
+                        Compra #{orden.id} · {numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°'}{' '}
+                        {numerosDeVuelo(orden).join(' · ')}
+                      </strong>
                       <small>
                         {fechaLarga(orden.fecha)} · {hora(orden.fecha)} hs · {pasajes}{' '}
                         {pasajes === 1 ? 'pasaje' : 'pasajes'}

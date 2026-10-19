@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
-import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
+import { cancelarOrden, confirmarCancelacion, numerosDeVuelo } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
 import './DetalleOrden.css'
 
@@ -80,6 +80,11 @@ function DetalleOrden() {
           <div>
             <small>Número de compra</small>
             <strong>#{orden.id}</strong>
+          </div>
+          <div>
+            {/* Los vuelos de la compra, sin repetir (por ejemplo la ida y la vuelta) */}
+            <small>{numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°'}</small>
+            <strong>{numerosDeVuelo(orden).join(' · ')}</strong>
           </div>
           <div>
             <small>Fecha</small>
