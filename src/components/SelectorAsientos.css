@@ -1,0 +1,147 @@
+.selector-asientos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.selector-asientos-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.selector-asientos-encabezado h3 {
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+
+.selector-asientos-encabezado p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Qué asiento le tocó a cada pasajero */
+.selector-asientos-pasajeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.selector-asientos-pasajeros li {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  font-size: 14px;
+}
+
+.selector-asientos-pasajeros span {
+  color: var(--texto-suave);
+}
+
+.selector-asientos-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.selector-asientos-leyenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selector-asientos-leyenda .asiento {
+  width: 18px;
+  height: 18px;
+  cursor: default;
+}
+
+/* El avion: una columna centrada con scroll si hay muchas filas */
+.selector-asientos-avion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 14px 8px;
+  border: 1px solid var(--borde);
+  border-radius: 40px 40px var(--radio) var(--radio);
+  background: var(--superficie-2);
+}
+
+.fila-asientos {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fila-asientos.letras span,
+.numero-fila {
+  width: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+/* El pasillo: un espacio antes de la segunda mitad de la fila */
+.despues-del-pasillo {
+  margin-left: 22px;
+}
+
+.asiento {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--azul);
+  border-radius: 8px 8px 4px 4px;
+  background: var(--superficie);
+  cursor: pointer;
+}
+
+.asiento:hover:not(:disabled) {
+  background: var(--celeste-suave);
+}
+
+.asiento:focus-visible {
+  outline: 2px solid var(--celeste);
+  outline-offset: 2px;
+}
+
+.asiento.elegido {
+  border-color: var(--azul);
+  background: var(--azul);
+}
+
+.asiento.ocupado {
+  border-color: var(--borde);
+  background: var(--borde);
+  cursor: not-allowed;
+}
+
+@media (max-width: 420px) {
+  .asiento,
+  .fila-asientos.letras span,
+  .numero-fila {
+    width: 26px;
+  }
+
+  .asiento {
+    height: 26px;
+  }
+
+  .despues-del-pasillo {
+    margin-left: 14px;
+  }
+}

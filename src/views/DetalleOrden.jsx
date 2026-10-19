@@ -103,6 +103,11 @@ function DetalleOrden() {
                   Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad} ×{' '}
                   {nombreTipo(item.tipoPasajero).toLowerCase()} × {precio(item.precioUnitario)}
                 </small>
+                {item.asientos?.length > 0 && (
+                  <small>
+                    {item.asientos.length === 1 ? 'Asiento' : 'Asientos'}: <strong>{item.asientos.join(', ')}</strong>
+                  </small>
+                )}
               </div>
               <span>{precio(item.subtotal)}</span>
             </li>

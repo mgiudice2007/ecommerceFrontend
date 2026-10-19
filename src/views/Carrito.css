@@ -129,3 +129,20 @@
   font-size: 14px;
   font-weight: 700;
 }
+
+/* Elegí tus asientos */
+.carrito-asientos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.carrito-asientos h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.carrito-asientos p {
+  margin: 0;
+}

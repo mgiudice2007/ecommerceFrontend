@@ -45,6 +45,15 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
           Clase <strong>{item.claseNombre}</strong> · <strong>{nombreTipo(item.tipoPasajero)}</strong> ·{' '}
           {precio(item.precioUnitario)} por pasajero
         </p>
+        {item.tipoPasajero === 'BEBE' ? (
+          <p className="texto-suave">Viaja a upa, sin asiento propio</p>
+        ) : (
+          item.asientos.length > 0 && (
+            <p className="texto-suave">
+              {item.asientos.length === 1 ? 'Asiento' : 'Asientos'}: <strong>{item.asientos.join(', ')}</strong>
+            </p>
+          )
+        )}
       </div>
 
       <div className="item-carrito-acciones">
