@@ -6,6 +6,27 @@ import { SIN_PASAJEROS_EXTRA, textoPasajeros } from '../utils/pasajeros'
 import SelectorPasajeros from './SelectorPasajeros'
 import './Buscador.css'
 
+// La aerolinea vende vuelos que salen de Buenos Aires: Aeroparque (cabotaje) y Ezeiza
+// (internacionales). La vuelta se busca sola con "Ida y vuelta".
+const ORIGENES = ['AEP', 'EZE']
+const NOMBRE_ORIGEN = { AEP: 'Aeroparque', EZE: 'Ezeiza' }
+
+// Lo que se ve en el campo, por ejemplo "Madrid (MAD)" o "Buenos Aires · Ezeiza (EZE)"
+const etiqueta = (aeropuerto) => {
+  const nombre = NOMBRE_ORIGEN[aeropuerto.codigoIata]
+  return nombre
+    ? `${aeropuerto.ciudad} · ${nombre} (${aeropuerto.codigoIata})`
+    : `${aeropuerto.ciudad} (${aeropuerto.codigoIata})`
+}
+
+// Busca el aeropuerto que corresponde a lo que escribio el usuario ("Madrid (MAD)" o "MAD")
+const buscarAeropuerto = (lista, texto) =>
+  lista.find(
+    (a) =>
+      etiqueta(a).toLowerCase() === texto.trim().toLowerCase() ||
+      a.codigoIata.toLowerCase() === texto.trim().toLowerCase(),
+  )
+
 // Buscador de vuelos. Usa los filtros que acepta GET /api/vuelos:
 // origen, destino, categoriaId, claseId y las fechas.
 // Con "Ida y vuelta" la pagina de resultados busca dos veces: la ida (origen -> destino)
@@ -44,17 +65,66 @@ function Buscador({ inicial = {} }) {
     vuelta: inicial.vuelta ?? '',
   })
 
+  // Lo que esta escrito en "Desde" y "Hacia". null = todavia no escribio nada y se
+  // muestra el aeropuerto que venia en los filtros (por ejemplo desde la URL)
+  const [textos, setTextos] = useState({ origen: null, destino: null })
+
+  // Los destinos a los que hay vuelos desde el origen elegido (sale de los vuelos publicados)
+  const [rutas, setRutas] = useState({ origen: null, destinos: [] })
+
+  useEffect(() => {
+    if (!filtros.origen) return
+    api(`/api/vuelos?origen=${filtros.origen}`)
+      .then((pagina) => {
+        const destinos = []
+        pagina.content.forEach((vuelo) => {
+          if (!destinos.includes(vuelo.destinoIata)) destinos.push(vuelo.destinoIata)
+        })
+        setRutas({ origen: filtros.origen, destinos })
+      })
+      .catch(() => setRutas({ origen: filtros.origen, destinos: [] }))
+  }, [filtros.origen])
+
+  const origenes = aeropuertos.filter((a) => ORIGENES.includes(a.codigoIata))
+  // Sin origen elegido se ofrecen todos los destinos; con origen, solo los que tienen vuelos desde ahi
+  const destinos = aeropuertos.filter((a) => {
+    if (ORIGENES.includes(a.codigoIata)) return false
+    if (filtros.origen && rutas.origen === filtros.origen) return rutas.destinos.includes(a.codigoIata)
+    return true
+  })
+
+  const textoDe = (campo, lista) => {
+    if (textos[campo] !== null) return textos[campo]
+    const aeropuerto = lista.find((a) => a.codigoIata === filtros[campo])
+    return aeropuerto ? etiqueta(aeropuerto) : ''
+  }
+
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value })
     setError('')
   }
 
-  const invertir = () => {
-    setFiltros({ ...filtros, origen: filtros.destino, destino: filtros.origen })
+  // Al escribir en "Desde" o "Hacia": si lo escrito coincide con un aeropuerto, queda elegido
+  const escribir = (campo, lista, texto) => {
+    const aeropuerto = buscarAeropuerto(lista, texto)
+    const nuevos = { ...filtros, [campo]: aeropuerto ? aeropuerto.codigoIata : '' }
+    if (campo === 'origen') nuevos.destino = '' // cambia el origen: hay que volver a elegir el destino
+    setFiltros(nuevos)
+    setTextos(campo === 'origen' ? { origen: texto, destino: '' } : { ...textos, destino: texto })
+    setError('')
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (textoDe('origen', origenes) && !filtros.origen) {
+      setError('Elegí un origen de la lista: Aeroparque (AEP) o Ezeiza (EZE).')
+      return
+    }
+    if (textoDe('destino', destinos) && !filtros.destino) {
+      setError('Elegí un destino de la lista.')
+      return
+    }
 
     if (viaje === 'idavuelta' && (!filtros.origen || !filtros.destino)) {
       setError('Para buscar ida y vuelta elegí el origen y el destino.')
@@ -109,33 +179,44 @@ function Buscador({ inicial = {} }) {
         </div>
       </div>
 
+      {/* Se puede escribir (por ejemplo "mad") y el navegador sugiere las opciones de la lista (datalist) */}
       <div className="buscador-ruta">
         <div className="buscador-campo">
           <label htmlFor="origen">Desde</label>
-          <select id="origen" name="origen" value={filtros.origen} onChange={handleChange}>
-            <option value="">Ingresá un origen</option>
-            {aeropuertos.map((a) => (
-              <option key={a.codigoIata} value={a.codigoIata}>
-                {a.ciudad} ({a.codigoIata})
+          <input
+            id="origen"
+            list="lista-origenes"
+            value={textoDe('origen', origenes)}
+            onChange={(e) => escribir('origen', origenes, e.target.value)}
+            placeholder="Aeroparque o Ezeiza"
+            autoComplete="off"
+          />
+          <datalist id="lista-origenes">
+            {origenes.map((a) => (
+              <option key={a.codigoIata} value={etiqueta(a)}>
+                {a.codigoIata === 'AEP' ? 'Vuelos de cabotaje' : 'Vuelos internacionales'}
               </option>
             ))}
-          </select>
+          </datalist>
         </div>
-
-        <button type="button" className="buscador-invertir" onClick={invertir} aria-label="Invertir origen y destino">
-          ⇄
-        </button>
 
         <div className="buscador-campo">
           <label htmlFor="destino">Hacia</label>
-          <select id="destino" name="destino" value={filtros.destino} onChange={handleChange}>
-            <option value="">Ingresá un destino</option>
-            {aeropuertos.map((a) => (
-              <option key={a.codigoIata} value={a.codigoIata}>
-                {a.ciudad} ({a.codigoIata})
+          <input
+            id="destino"
+            list="lista-destinos"
+            value={textoDe('destino', destinos)}
+            onChange={(e) => escribir('destino', destinos, e.target.value)}
+            placeholder="Escribí un destino"
+            autoComplete="off"
+          />
+          <datalist id="lista-destinos">
+            {destinos.map((a) => (
+              <option key={a.codigoIata} value={etiqueta(a)}>
+                {a.pais}
               </option>
             ))}
-          </select>
+          </datalist>
         </div>
       </div>
 

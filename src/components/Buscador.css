@@ -47,7 +47,7 @@
   pointer-events: none;
 }
 
-/* Desde / Hacia, con el boton para invertir en el medio */
+/* Desde / Hacia, pegados como un solo campo */
 .buscador-ruta {
   position: relative;
   display: grid;
@@ -61,7 +61,6 @@
 .buscador-ruta .buscador-campo:last-child {
   border-left: none;
   border-radius: 0 var(--radio) var(--radio) 0;
-  padding-left: 32px;
 }
 
 .buscador-fila {
@@ -122,28 +121,6 @@
 .buscador-campo select:focus,
 .buscador-campo input:focus {
   outline: none;
-}
-
-.buscador-invertir {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  transform: translate(-50%, -50%);
-  border: 1px solid var(--azul);
-  border-radius: 50%;
-  background: var(--superficie);
-  color: var(--azul);
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.buscador-invertir:hover {
-  background: var(--superficie-2);
 }
 
 /* Pasajeros: un boton que abre el desplegable con adultos, ninos y bebes */
@@ -237,16 +214,9 @@
     border-left: 1px solid var(--borde);
     border-top: none;
     border-radius: 0 0 var(--radio) var(--radio);
-    padding-left: 16px;
   }
 
-  .buscador-invertir {
-    left: auto;
-    right: 16px;
-    transform: translateY(-50%) rotate(90deg);
-  }
-
-  .buscador-boton {
+    .buscador-boton {
     width: 100%;
   }
 }
