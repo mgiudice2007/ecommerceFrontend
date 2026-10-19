@@ -6,7 +6,7 @@ import './EncabezadoPagina.css'
 // - imagen: URL de una foto de fondo (opcional)
 // - children: lo que va antes del titulo (por ejemplo, un link para volver)
 function EncabezadoPagina({ etiqueta, titulo, subtitulo, acciones, imagen, children }) {
-  const fondo = imagen ? { backgroundImage: `url(${imagen})` } : undefined
+  const fondo = imagen ? { backgroundImage: `url("${imagen}")` } : undefined
 
   return (
     <section className={`encabezado-pagina ${imagen ? 'con-imagen' : ''}`} style={fondo}>

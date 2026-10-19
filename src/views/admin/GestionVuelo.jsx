@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { api, urlFoto } from '../../api/api'
+import { api, pedirImagen } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { fechaLarga, hora } from '../../utils/formato'
 import TabClases from './TabClases'
@@ -20,7 +20,7 @@ function GestionVuelo() {
   const location = useLocation()
 
   const [vuelo, setVuelo] = useState(null)
-  const [portadaId, setPortadaId] = useState(null) // primera foto del vuelo, para el encabezado
+  const [portada, setPortada] = useState(null) // imagen de la primera foto, para el encabezado
   const [error, setError] = useState('')
   const [pestania, setPestania] = useState('clases')
 
@@ -31,9 +31,11 @@ function GestionVuelo() {
     api(`/api/vuelos/${id}`)
       .then((data) => setVuelo(data))
       .catch((err) => setError(err.message))
+    // La primera foto es la portada del encabezado (su imagen llega en Base64)
     api(`/api/fotos?vueloId=${id}`)
-      .then((fotos) => setPortadaId(fotos.length > 0 ? fotos[0].id : null))
-      .catch(() => setPortadaId(null))
+      .then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
+      .then((imagen) => setPortada(imagen))
+      .catch(() => setPortada(null))
   }, [id, recargar])
 
   // Las pestañas la llaman cuando cambian algo (por ejemplo un descuento
@@ -57,7 +59,7 @@ function GestionVuelo() {
   return (
     <>
       <EncabezadoPagina
-        imagen={portadaId ? urlFoto(portadaId) : undefined}
+        imagen={portada ?? undefined}
         etiqueta={`Vuelo ${vuelo.numeroVuelo} · ${vuelo.categoriaNombre}`}
         titulo={`${vuelo.origenCiudad} → ${vuelo.destinoCiudad}`}
         subtitulo={`${vuelo.origenIata} → ${vuelo.destinoIata} · Sale el ${fechaLarga(vuelo.fechaSalida)} a las ${hora(vuelo.fechaSalida)} hs`}

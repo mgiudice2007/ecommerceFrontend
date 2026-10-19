@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { api, urlFoto } from '../api/api'
+import { api, pedirImagen } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import OpcionClase from '../components/OpcionClase'
 import SelectorPasajeros from '../components/SelectorPasajeros'
@@ -27,6 +27,7 @@ function DetalleVuelo() {
 
   const [vuelo, setVuelo] = useState(null)
   const [fotos, setFotos] = useState([])
+  const [portada, setPortada] = useState(null) // imagen de la primera foto (data URL)
   const [error, setError] = useState('')
 
   const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
@@ -43,9 +44,14 @@ function DetalleVuelo() {
       })
       .catch((err) => setError(err.message))
 
-    // Las fotos van aparte: si fallan, el vuelo se muestra igual
+    // Las fotos van aparte: si fallan, el vuelo se muestra igual.
+    // La primera es el fondo de la portada (su imagen llega en Base64).
     api(`/api/fotos?vueloId=${id}`)
-      .then((data) => setFotos(data))
+      .then((data) => {
+        setFotos(data)
+        return data.length > 0 ? pedirImagen(data[0].id) : null
+      })
+      .then((imagen) => setPortada(imagen))
       .catch(() => setFotos([]))
   }, [id])
 
@@ -112,7 +118,7 @@ function DetalleVuelo() {
   }
 
   // La primera foto del vuelo es el fondo de la portada (si no tiene, queda el azul)
-  const fondoPortada = fotos.length > 0 ? { backgroundImage: `url(${urlFoto(fotos[0].id)})` } : undefined
+  const fondoPortada = portada ? { backgroundImage: `url("${portada}")` } : undefined
 
   return (
     <>

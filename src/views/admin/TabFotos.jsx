@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { api, urlFoto } from '../../api/api'
+import { api } from '../../api/api'
+import ImagenFoto from '../../components/ImagenFoto'
 
 const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
 const MAXIMO_MB = 5
@@ -90,7 +91,7 @@ function TabFotos({ vuelo, onCambio }) {
           <div className="gestion-fotos">
             {fotos.map((foto, indice) => (
               <figure key={foto.id} className="gestion-foto">
-                <img src={urlFoto(foto.id)} alt={foto.nombreArchivo} />
+                <ImagenFoto fotoId={foto.id} alt={foto.nombreArchivo} />
                 {indice === 0 && <span className="etiqueta">Portada</span>}
                 <div>
                   <span className="texto-suave">{Math.round(foto.tamano / 1024)} KB</span>

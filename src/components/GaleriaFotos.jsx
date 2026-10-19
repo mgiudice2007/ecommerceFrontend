@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { urlFoto } from '../api/api'
+import ImagenFoto from './ImagenFoto'
 import './GaleriaFotos.css'
 
 // Foto grande + miniaturas. Al tocar una miniatura pasa a ser la grande.
@@ -18,9 +18,9 @@ function GaleriaFotos({ fotos, destinoIata, destinoCiudad }) {
 
   return (
     <div className="galeria">
-      <img
+      <ImagenFoto
         className="galeria-principal"
-        src={urlFoto(fotos[seleccionada].id)}
+        fotoId={fotos[seleccionada].id}
         alt={`Foto ${seleccionada + 1} de ${destinoCiudad}`}
       />
 
@@ -33,7 +33,7 @@ function GaleriaFotos({ fotos, destinoIata, destinoCiudad }) {
               onClick={() => setSeleccionada(indice)}
               aria-label={`Ver foto ${indice + 1}`}
             >
-              <img src={urlFoto(foto.id)} alt="" />
+              <ImagenFoto fotoId={foto.id} alt="" />
             </button>
           ))}
         </div>

@@ -68,5 +68,8 @@ export const api = (url, opciones = {}) => {
     )
 }
 
-// URL de la imagen de una foto (el backend devuelve el binario directo).
-export const urlFoto = (fotoId) => `${BASE_URL}/api/fotos/${fotoId}`
+// Pide la imagen de una foto. Como en el ejemplo de clase de subida de imagenes,
+// llega en Base64 dentro de un JSON ({ id, file, tipo }) y se arma un "data URL"
+// que se puede poner en el src de un <img> o en un background-image.
+export const pedirImagen = (fotoId) =>
+  api(`/api/fotos/${fotoId}`).then((imagen) => `data:${imagen.tipo};base64,${imagen.file}`)
