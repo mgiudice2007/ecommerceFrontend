@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
-import { fechaLarga, hora, millas, precio } from '../utils/formato'
+import { fechaLarga, hora, millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import { cancelarOrden, confirmarCancelacion } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
@@ -101,7 +101,7 @@ function DetalleOrden() {
                 </strong>
                 <small>
                   Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad} ×{' '}
-                  {nombreTipo(item.tipoPasajero).toLowerCase()} × {precio(item.precioUnitario)}
+                  {nombreTipo(item.tipoPasajero).toLowerCase()} × {precioOGratis(item.precioUnitario)}
                 </small>
                 {item.asientos?.length > 0 && (
                   <small>
@@ -109,7 +109,7 @@ function DetalleOrden() {
                   </small>
                 )}
               </div>
-              <span>{precio(item.subtotal)}</span>
+              <span>{precioOGratis(item.subtotal)}</span>
             </li>
           ))}
         </ul>

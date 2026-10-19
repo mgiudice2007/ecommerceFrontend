@@ -8,6 +8,9 @@ const formatoPrecio = new Intl.NumberFormat('es-AR', {
 
 export const precio = (valor) => formatoPrecio.format(Number(valor ?? 0))
 
+// Igual que precio, pero si vale 0 dice "Gratis" (por ejemplo, el pasaje de un bebé)
+export const precioOGratis = (valor) => (Number(valor) === 0 ? 'Gratis' : precio(valor))
+
 // El backend manda fechas como "2026-12-15T10:00:00"
 export const hora = (fecha) =>
   new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })

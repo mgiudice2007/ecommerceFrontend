@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/api'
-import { fechaLarga, hora, precio } from '../utils/formato'
+import { fechaLarga, hora, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
@@ -43,7 +43,7 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
         )}
         <p className="item-carrito-clase">
           Clase <strong>{item.claseNombre}</strong> · <strong>{nombreTipo(item.tipoPasajero)}</strong> ·{' '}
-          {precio(item.precioUnitario)} por pasajero
+          {precioOGratis(item.precioUnitario)} por pasajero
         </p>
         {item.tipoPasajero === 'BEBE' ? (
           <p className="texto-suave">Viaja a upa, sin asiento propio</p>
@@ -79,7 +79,7 @@ function ItemCarrito({ item, onCambiarCantidad, onEliminar, ocupado }) {
           </button>
         </div>
 
-        <strong className="item-carrito-subtotal">{precio(item.subtotal)}</strong>
+        <strong className="item-carrito-subtotal">{precioOGratis(item.subtotal)}</strong>
 
         <button className="item-carrito-eliminar" onClick={() => onEliminar(item)} disabled={ocupado}>
           Eliminar

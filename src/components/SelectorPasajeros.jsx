@@ -28,11 +28,11 @@ function SelectorPasajeros({ pasajeros, onChange, maximo = MAXIMO_PASAJEROS }) {
     <div className="selector-pasajeros">
       {TIPOS_PASAJERO.map((t) => (
         <div key={t.clave} className="selector-pasajeros-fila">
-          <div>
-            <strong>{t.titulo}</strong>
+          <div className="selector-pasajeros-tipo">
+            <span>{t.titulo}</span>
             <small>{t.detalle}</small>
           </div>
-          <div className="contador">
+          <div className="selector-pasajeros-contador">
             <button
               type="button"
               onClick={() => cambiar(t.clave, pasajeros[t.clave] - 1)}
@@ -41,7 +41,7 @@ function SelectorPasajeros({ pasajeros, onChange, maximo = MAXIMO_PASAJEROS }) {
             >
               −
             </button>
-            <span>{pasajeros[t.clave]}</span>
+            <strong>{pasajeros[t.clave]}</strong>
             <button
               type="button"
               onClick={() => cambiar(t.clave, pasajeros[t.clave] + 1)}

@@ -6,7 +6,7 @@ import OpcionClase from '../components/OpcionClase'
 import SelectorAsientos from '../components/SelectorAsientos'
 import SelectorPasajeros from '../components/SelectorPasajeros'
 import { useAuth } from '../context/AuthContext'
-import { duracion, fechaLarga, hora, precio } from '../utils/formato'
+import { duracion, fechaLarga, hora, precio, precioOGratis } from '../utils/formato'
 import { leerPasajeros, TIPOS_PASAJERO, textoPasajeros, totalPasajeros } from '../utils/pasajeros'
 import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
 import './DetalleVuelo.css'
@@ -270,10 +270,10 @@ function DetalleVuelo() {
                 {TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0).map((t) => (
                   <div key={t.clave} className="detalle-resumen">
                     <span>
-                      {pasajeros[t.clave]} {pasajeros[t.clave] === 1 ? t.singular : t.titulo.toLowerCase()} ×{' '}
-                      {precio(precioPara(t))}
+                      {pasajeros[t.clave]} {pasajeros[t.clave] === 1 ? t.singular : t.titulo.toLowerCase()}
+                      {precioPara(t) > 0 && ` × ${precioOGratis(precioPara(t))}`}
                     </span>
-                    <strong>{precio(precioPara(t) * pasajeros[t.clave])}</strong>
+                    <strong>{precioOGratis(precioPara(t) * pasajeros[t.clave])}</strong>
                   </div>
                 ))}
 

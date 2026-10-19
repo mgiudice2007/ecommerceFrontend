@@ -1,3 +1,5 @@
+/* Como el de Aerolineas Argentinas: una linea por tipo, la edad al lado
+   y los botones - y + sueltos, sin recuadro (con la tipografia de la pagina) */
 .selector-pasajeros {
   display: flex;
   flex-direction: column;
@@ -8,21 +10,65 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
-.selector-pasajeros-fila + .selector-pasajeros-fila {
-  border-top: 1px solid var(--borde);
+.selector-pasajeros-tipo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
 }
 
-.selector-pasajeros-fila strong,
-.selector-pasajeros-fila small {
-  display: block;
+.selector-pasajeros-tipo span {
+  font-weight: 700;
+  color: var(--texto);
 }
 
-.selector-pasajeros-fila small {
-  color: var(--texto-suave);
+.selector-pasajeros-tipo small {
   font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.selector-pasajeros-contador {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.selector-pasajeros-contador strong {
+  min-width: 14px;
+  text-align: center;
+}
+
+.selector-pasajeros-contador button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--azul);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.selector-pasajeros-contador button:hover:not(:disabled) {
+  background: var(--superficie-2);
+}
+
+.selector-pasajeros-contador button:disabled {
+  color: var(--borde);
+  cursor: not-allowed;
+}
+
+.selector-pasajeros-contador button:focus-visible {
+  outline: 2px solid var(--celeste);
+  outline-offset: 2px;
 }
 
 .selector-pasajeros-aviso {

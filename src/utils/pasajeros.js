@@ -1,9 +1,9 @@
 // Tipos de pasajero, iguales a los del backend (TipoPasajero).
 // porcentaje: cuanto paga sobre el precio de un adulto.
 export const TIPOS_PASAJERO = [
-  { tipo: 'ADULTO', clave: 'adultos', titulo: 'Adultos', detalle: '12 o más años', porcentaje: 100, singular: 'adulto' },
-  { tipo: 'NINO', clave: 'ninos', titulo: 'Niños', detalle: 'De 2 a 11 años · 25% menos que un adulto', porcentaje: 75, singular: 'niño' },
-  { tipo: 'BEBE', clave: 'bebes', titulo: 'Bebés', detalle: 'Menores de 2 años · a upa, pagan el 10%', porcentaje: 10, singular: 'bebé' },
+  { tipo: 'ADULTO', clave: 'adultos', titulo: 'Adultos', detalle: '+ 12 años', porcentaje: 100, singular: 'adulto' },
+  { tipo: 'NINO', clave: 'ninos', titulo: 'Niños', detalle: '2 a 11 años', porcentaje: 100, singular: 'niño' },
+  { tipo: 'BEBE', clave: 'bebes', titulo: 'Bebés', detalle: '0 a 23 meses · gratis', porcentaje: 0, singular: 'bebé' },
 ]
 
 export const MAXIMO_PASAJEROS = 9 // como en las aerolineas, hasta 9 por reserva

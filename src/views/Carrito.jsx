@@ -4,7 +4,7 @@ import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
 import { useAuth } from '../context/AuthContext'
-import { millas, precio } from '../utils/formato'
+import { millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import './Carrito.css'
 
@@ -144,7 +144,7 @@ function Carrito() {
                   <span>
                     {item.origen} → {item.destino} · {item.cantidad} × {nombreTipo(item.tipoPasajero).toLowerCase()}
                   </span>
-                  <span>{precio(item.subtotal)}</span>
+                  <span>{precioOGratis(item.subtotal)}</span>
                 </div>
               ))}
 
