@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api/api'
 import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
@@ -50,6 +50,7 @@ function Vuelos() {
     const params = new URLSearchParams(busqueda)
     const esIdaYVuelta = params.get('viaje') === 'idavuelta' && params.get('origen') && params.get('destino')
     params.delete('viaje') // es solo del frontend, el backend no lo conoce
+    params.delete('tramo') // tambien es solo del frontend (indica si se esta eligiendo la vuelta)
     // Las fechas del calendario se pasan a fechaDesde / fechaHasta mas abajo
     const fechaIda = params.get('ida')
     const fechaVuelta = params.get('vuelta')
@@ -126,8 +127,24 @@ function Vuelos() {
 
   const hayFecha = searchParams.get('ida') || searchParams.get('vuelta')
 
+  // Ya se agrego la ida al carrito: solo se muestran los vuelos de vuelta
+  const soloVuelta = idaYVuelta && searchParams.get('tramo') === 'vuelta'
+
+  // Los vuelos de ida llevan los datos del viaje en la URL del detalle, para que despues
+  // de agregarlos se pueda seguir con la vuelta
+  const consultaIda = (() => {
+    const p = new URLSearchParams(consultaPasajeros)
+    p.set('viaje', 'idavuelta')
+    p.set('tramo', 'ida')
+    p.set('origen', searchParams.get('origen') ?? '')
+    p.set('destino', searchParams.get('destino') ?? '')
+    if (searchParams.get('ida')) p.set('ida', searchParams.get('ida'))
+    if (searchParams.get('vuelta')) p.set('vuelta', searchParams.get('vuelta'))
+    return `?${p.toString()}`
+  })()
+
   // Una lista de resultados (se usa una vez para solo ida y dos veces para ida y vuelta)
-  const listaDeVuelos = (pagina) => (
+  const listaDeVuelos = (pagina, consulta = consultaPasajeros) => (
     <>
       {pagina.content.length === 0 && (
         <div className="tarjeta vuelos-vacio">
@@ -138,7 +155,7 @@ function Vuelos() {
       )}
       <div className="vuelos-lista">
         {pagina.content.map((vuelo) => (
-          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consultaPasajeros} />
+          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consulta} />
         ))}
       </div>
     </>
@@ -203,23 +220,32 @@ function Vuelos() {
 
             {!cargando && resultado && idaYVuelta && (
               <>
-                <p className="vuelos-ayuda">
-                  Elegí un vuelo de ida y uno de vuelta y agregalos al carrito para comprarlos juntos.
-                </p>
-
-                <div className="vuelos-tramo">
-                  <span className="vuelos-tramo-numero">1</span>
-                  <div>
-                    <h2>Vuelos de ida</h2>
-                    <p className="texto-suave">
-                      {resultado.ida.content[0]
-                        ? `${resultado.ida.content[0].origenCiudad} → ${resultado.ida.content[0].destinoCiudad}`
-                        : 'Sin vuelos para esta ruta'}{' '}
-                      · {resultado.ida.totalElements} opciones
-                    </p>
+                {soloVuelta ? (
+                  <div className="mensaje mensaje-exito">
+                    ✓ Tu vuelo de ida ya está en el carrito. Ahora elegí el vuelo de vuelta.{' '}
+                    <Link to="/carrito">Ir al carrito</Link>
                   </div>
-                </div>
-                {listaDeVuelos(resultado.ida)}
+                ) : (
+                  <>
+                    <p className="vuelos-ayuda">
+                      Elegí un vuelo de ida, agregalo al carrito y seguí con el de vuelta.
+                    </p>
+
+                    <div className="vuelos-tramo">
+                      <span className="vuelos-tramo-numero">1</span>
+                      <div>
+                        <h2>Vuelos de ida</h2>
+                        <p className="texto-suave">
+                          {resultado.ida.content[0]
+                            ? `${resultado.ida.content[0].origenCiudad} → ${resultado.ida.content[0].destinoCiudad}`
+                            : 'Sin vuelos para esta ruta'}{' '}
+                          · {resultado.ida.totalElements} opciones
+                        </p>
+                      </div>
+                    </div>
+                    {listaDeVuelos(resultado.ida, consultaIda)}
+                  </>
+                )}
 
                 <div className="vuelos-tramo">
                   <span className="vuelos-tramo-numero">2</span>

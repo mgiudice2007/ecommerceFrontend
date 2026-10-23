@@ -109,7 +109,23 @@ function DetalleVuelo() {
     })
   }
 
-  const agregarAlCarrito = () => {
+  // Ida y vuelta: si este es el vuelo de ida, despues de agregarlo se sigue con el de vuelta
+  const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
+
+  // Vuelve a la lista de resultados mostrando solo los vuelos de vuelta
+  const irAElegirVuelta = (pasajerosActuales) => {
+    const params = new URLSearchParams()
+    for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta']) {
+      if (searchParams.get(clave)) params.set(clave, searchParams.get(clave))
+    }
+    params.set('adultos', pasajerosActuales.adultos)
+    params.set('ninos', pasajerosActuales.ninos)
+    params.set('bebes', pasajerosActuales.bebes)
+    params.set('tramo', 'vuelta')
+    navigate(`/vuelos?${params.toString()}`)
+  }
+
+  const agregarAlCarrito = (seguirConVuelta = false) => {
     if (!estaLogueado) {
       // Lo mandamos a loguearse y despues vuelve a este vuelo con lo que ya habia elegido:
       // los pasajeros, la clase y los asientos van en la URL de vuelta
@@ -119,6 +135,10 @@ function DetalleVuelo() {
       params.set('bebes', pasajeros.bebes)
       if (elegida) params.set('clase', elegida.id)
       if (asientos.length > 0) params.set('asientos', asientos.join(','))
+      // Si es un viaje de ida y vuelta, se conserva para poder seguir con el vuelo de vuelta
+      for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta', 'tramo']) {
+        if (searchParams.get(clave)) params.set(clave, searchParams.get(clave))
+      }
       navigate('/login', { state: { desde: `${location.pathname}?${params.toString()}` } })
       return
     }
@@ -132,6 +152,11 @@ function DetalleVuelo() {
     })
       .then((carrito) => {
         actualizarCarrito(carrito)
+        if (seguirConVuelta) {
+          // La ida ya quedo en el carrito: se pasa directo a elegir la vuelta
+          irAElegirVuelta(pasajeros)
+          return
+        }
         setMensaje({
           tipo: 'exito',
           texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito (asientos ${asientos.join(', ')}).`,
@@ -297,19 +322,33 @@ function DetalleVuelo() {
                 {estaLogueado && !esComprador ? (
                   <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
                 ) : (
-                  <button
-                    className="boton boton-primario boton-ancho"
-                    onClick={agregarAlCarrito}
-                    disabled={agregando || (estaLogueado && faltanAsientos > 0)}
-                  >
-                    {agregando
-                      ? 'Agregando…'
-                      : !estaLogueado
-                        ? 'Iniciá sesión para comprar'
-                        : faltanAsientos > 0
-                          ? `Elegí ${faltanAsientos === 1 ? '1 asiento más' : `${faltanAsientos} asientos más`}`
-                          : 'Agregar al carrito'}
-                  </button>
+                  <>
+                    <button
+                      className="boton boton-primario boton-ancho"
+                      onClick={() => agregarAlCarrito(eligiendoIda)}
+                      disabled={agregando || (estaLogueado && faltanAsientos > 0)}
+                    >
+                      {agregando
+                        ? 'Agregando…'
+                        : !estaLogueado
+                          ? 'Iniciá sesión para comprar'
+                          : faltanAsientos > 0
+                            ? `Elegí ${faltanAsientos === 1 ? '1 asiento más' : `${faltanAsientos} asientos más`}`
+                            : eligiendoIda
+                              ? 'Agregar y elegir vuelo de vuelta →'
+                              : 'Agregar al carrito'}
+                    </button>
+                    {eligiendoIda && estaLogueado && faltanAsientos <= 0 && (
+                      <button
+                        type="button"
+                        className="boton boton-secundario boton-ancho"
+                        onClick={() => agregarAlCarrito(false)}
+                        disabled={agregando}
+                      >
+                        Agregar solo este vuelo
+                      </button>
+                    )}
+                  </>
                 )}
 
                 {mensaje?.tipo === 'exito' && (
