@@ -39,16 +39,12 @@ function Vuelos() {
   // Datos del catalogo para el buscador (si falla un pedido, ese campo queda vacio).
   // Los pide esta pantalla y se los pasa al Buscador por props.
   const [aeropuertos, setAeropuertos] = useState([])
-  const [categorias, setCategorias] = useState([])
   const [clases, setClases] = useState([])
 
   useEffect(() => {
     api('/api/aeropuertos')
       .then((data) => setAeropuertos(data))
       .catch(() => setAeropuertos([]))
-    api('/api/categorias')
-      .then((data) => setCategorias(data))
-      .catch(() => setCategorias([]))
     api('/api/clases')
       .then((data) => setClases(data))
       .catch(() => setClases([]))
@@ -136,7 +132,6 @@ function Vuelos() {
   const filtrosIniciales = {
     origen: searchParams.get('origen') ?? '',
     destino: searchParams.get('destino') ?? '',
-    categoriaId: searchParams.get('categoriaId') ?? '',
     claseId: searchParams.get('claseId') ?? '',
     viaje: searchParams.get('viaje') ?? 'ida',
     ida: searchParams.get('ida') ?? '',
@@ -198,7 +193,6 @@ function Vuelos() {
           key={searchParams.toString()}
           inicial={filtrosIniciales}
           aeropuertos={aeropuertos}
-          categorias={categorias}
           clases={clases}
         />
 
