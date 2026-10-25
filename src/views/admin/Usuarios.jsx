@@ -9,14 +9,14 @@ import './Panel.css'
 import './Usuarios.css'
 
 // Roles que el admin puede asignar. La aerolinea tiene un unico vendedor (el admin),
-// asi que VENDEDOR ya no se asigna; solo se muestra si una cuenta vieja lo tiene.
+// asi que no hay rol de vendedor.
 const ROLES = [
   { valor: 'COMPRADOR', nombre: 'Comprador', plural: 'Compradores' },
   { valor: 'ADMIN', nombre: 'Administrador', plural: 'Administradores' },
 ]
 
 const nombreDeRol = (valor) =>
-  ROLES.find((r) => r.valor === valor)?.nombre ?? (valor === 'VENDEDOR' ? 'Vendedor (sin permisos)' : valor)
+  ROLES.find((r) => r.valor === valor)?.nombre ?? valor
 
 // Administracion de cuentas y asignacion de permisos (solo ADMIN).
 // GET /api/usuarios trae todas las cuentas; PUT /api/usuarios/:id/rol cambia el rol.
@@ -174,11 +174,6 @@ function Usuarios() {
                                 {r.nombre}
                               </option>
                             ))}
-                            {u.rol === 'VENDEDOR' && (
-                              <option value="VENDEDOR" disabled>
-                                {nombreDeRol('VENDEDOR')}
-                              </option>
-                            )}
                           </select>
                           {soyYo && <small>Sos vos</small>}
                         </td>

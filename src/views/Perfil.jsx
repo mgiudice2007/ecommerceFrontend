@@ -7,7 +7,6 @@ import './Perfil.css'
 
 const NOMBRES_DE_ROL = {
   COMPRADOR: 'Comprador',
-  VENDEDOR: 'Vendedor',
   ADMIN: 'Administrador',
 }
 
