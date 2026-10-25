@@ -27,7 +27,9 @@
   font-size: 15px;
 }
 
-.navbar-links a.active {
+/* El link de la pagina en la que estas se pinta de azul. Los botones (como
+   "Registrarse") no, porque ya tienen fondo azul y el texto desapareceria */
+.navbar-links a.active:not(.boton) {
   color: var(--azul);
 }
 
