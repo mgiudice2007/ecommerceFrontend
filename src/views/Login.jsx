@@ -25,7 +25,7 @@ function Login() {
     login(formData.username, formData.password)
       .then((usuario) => {
         // Si venia de una pagina protegida vuelve ahi; si no, segun su rol
-        const destino = location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/vuelos' : '/panel')
+        const destino = location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/' : '/panel')
         navigate(destino, { replace: true })
       })
       .catch((err) => {

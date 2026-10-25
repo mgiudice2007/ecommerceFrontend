@@ -127,7 +127,7 @@ function Carrito() {
           <div className="tarjeta carrito-vacio">
             <h2>Tu carrito está vacío</h2>
             <p className="texto-suave">Buscá un vuelo, elegí la clase y agregalo para comprarlo.</p>
-            <Link to="/vuelos" className="boton boton-primario">
+            <Link to="/" className="boton boton-primario">
               Buscar vuelos
             </Link>
           </div>
@@ -220,7 +220,7 @@ function Carrito() {
               >
                 {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(aPagar)}`}
               </button>
-              <Link to="/vuelos" className="carrito-seguir">
+              <Link to="/" className="carrito-seguir">
                 Seguir buscando vuelos
               </Link>
             </aside>

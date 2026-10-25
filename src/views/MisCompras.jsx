@@ -58,7 +58,7 @@ function MisCompras() {
           <div className="tarjeta compras-vacio">
             <h2>Todavía no compraste pasajes</h2>
             <p className="texto-suave">Cuando confirmes una compra, la vas a ver acá.</p>
-            <Link to="/vuelos" className="boton boton-primario">
+            <Link to="/" className="boton boton-primario">
               Buscar vuelos
             </Link>
           </div>

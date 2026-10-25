@@ -96,8 +96,8 @@ function Buscador({ inicial = {}, aeropuertos = [], categorias = [], clases = []
       return
     }
 
-    if (viaje === 'idavuelta' && (!filtros.origen || !filtros.destino)) {
-      setError('Para buscar ida y vuelta elegí el origen y el destino.')
+    if (!filtros.origen || !filtros.destino) {
+      setError('Elegí el origen y el destino para buscar vuelos.')
       return
     }
     if (viaje === 'idavuelta' && filtros.ida && filtros.vuelta && filtros.vuelta < filtros.ida) {

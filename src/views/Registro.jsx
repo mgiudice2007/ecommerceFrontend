@@ -49,7 +49,7 @@ function Registro() {
     api('/api/auth/registro', { method: 'POST', body: datosAEnviar })
       // Despues de registrarse lo dejamos logueado directamente
       .then(() => login(datosAEnviar.username, datosAEnviar.password))
-      .then(() => navigate('/vuelos', { replace: true }))
+      .then(() => navigate('/', { replace: true }))
       .catch((err) => {
         setError(err.message)
         setCargando(false)

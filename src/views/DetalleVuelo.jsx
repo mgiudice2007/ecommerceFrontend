@@ -74,7 +74,7 @@ function DetalleVuelo() {
     return (
       <div className="contenedor pagina">
         <div className="mensaje mensaje-error">{error}</div>
-        <Link to="/vuelos">← Volver a la búsqueda</Link>
+        <Link to="/">← Volver al inicio</Link>
       </div>
     )
   }
@@ -185,7 +185,9 @@ function DetalleVuelo() {
       <section className="detalle-portada" style={fondoPortada}>
         <div className="contenedor">
           <nav className="detalle-migas">
-            <Link to="/vuelos">Vuelos</Link> / {vuelo.origenCiudad} → {vuelo.destinoCiudad}
+            {/* "Vuelos" vuelve a la busqueda de esta misma ruta */}
+            <Link to={`/vuelos?origen=${vuelo.origenIata}&destino=${vuelo.destinoIata}`}>Vuelos</Link> /{' '}
+            {vuelo.origenCiudad} → {vuelo.destinoCiudad}
           </nav>
           <div className="detalle-portada-etiquetas">
             <span>{vuelo.categoriaNombre}</span>

@@ -63,6 +63,10 @@ function Vuelos() {
     precioMax: searchParams.get('precioMax') ?? '',
   })
 
+  // Como en las aerolineas, la busqueda necesita origen y destino: sin ellos no se
+  // piden vuelos al backend (serian miles) y se muestra un aviso
+  const faltaRuta = !searchParams.get('origen') || !searchParams.get('destino')
+
   // Ida y vuelta: hace falta saber origen y destino para buscar el regreso
   const idaYVuelta =
     searchParams.get('viaje') === 'idavuelta' && searchParams.get('origen') && searchParams.get('destino')
@@ -70,6 +74,8 @@ function Vuelos() {
   // Cada vez que cambian los filtros de la URL, se vuelve a pedir al backend
   useEffect(() => {
     const params = new URLSearchParams(busqueda)
+    if (!params.get('origen') || !params.get('destino')) return
+
     const esIdaYVuelta = params.get('viaje') === 'idavuelta' && params.get('origen') && params.get('destino')
     params.delete('viaje') // es solo del frontend, el backend no lo conoce
     params.delete('tramo') // tambien es solo del frontend (indica si se esta eligiendo la vuelta)
@@ -207,132 +213,141 @@ function Vuelos() {
           clases={clases}
         />
 
-        <div className="vuelos-layout">
-          <aside className="tarjeta vuelos-filtros">
-            <h2>Filtrar por precio</h2>
-            <form onSubmit={aplicarPrecios}>
-              <div className="campo">
-                <label htmlFor="precioMin">Precio mínimo</label>
-                <input
-                  id="precioMin"
-                  type="number"
-                  min="0"
-                  value={precios.precioMin}
-                  onChange={(e) => setPrecios({ ...precios, precioMin: e.target.value })}
-                  placeholder="$ 0"
-                />
-              </div>
-              <div className="campo">
-                <label htmlFor="precioMax">Precio máximo</label>
-                <input
-                  id="precioMax"
-                  type="number"
-                  min="0"
-                  value={precios.precioMax}
-                  onChange={(e) => setPrecios({ ...precios, precioMax: e.target.value })}
-                  placeholder="Sin límite"
-                />
-              </div>
-              <p className="vuelos-aclaracion">Se compara con el precio base del vuelo, sin descuentos.</p>
-              <button className="boton boton-primario boton-ancho">Aplicar</button>
-              <button type="button" className="boton boton-secundario boton-ancho" onClick={limpiarPrecios}>
-                Limpiar
-              </button>
-            </form>
-          </aside>
+        {faltaRuta && (
+          <div className="tarjeta vuelos-vacio">
+            <h3>¿A dónde querés viajar?</h3>
+            <p className="texto-suave">Elegí el origen y el destino en el buscador para ver los vuelos disponibles.</p>
+          </div>
+        )}
 
-          <section>
-            {error && <div className="mensaje mensaje-error">{error}</div>}
-
-            {cargando && <p className="texto-suave">Buscando vuelos…</p>}
-
-            {hayFecha && (
-              <p className="vuelos-ayuda">
-                📅 Fechas flexibles: te mostramos los vuelos que salen hasta {DIAS_FLEXIBLES} días antes o después
-                de la fecha que elegiste.
-              </p>
-            )}
-
-            {!cargando && resultado && idaYVuelta && (
-              <>
-                {soloVuelta ? (
-                  <div className="mensaje mensaje-exito">
-                    ✓ Tu vuelo de ida ya está en el carrito. Ahora elegí el vuelo de vuelta.{' '}
-                    <Link to="/carrito">Ir al carrito</Link>
-                  </div>
-                ) : (
-                  <>
-                    <p className="vuelos-ayuda">
-                      Elegí un vuelo de ida, agregalo al carrito y seguí con el de vuelta.
-                    </p>
-
-                    <div className="vuelos-tramo">
-                      <span className="vuelos-tramo-numero">1</span>
-                      <div>
-                        <h2>Vuelos de ida</h2>
-                        <p className="texto-suave">
-                          {resultado.ida.content[0]
-                            ? `${resultado.ida.content[0].origenCiudad} → ${resultado.ida.content[0].destinoCiudad}`
-                            : 'Sin vuelos para esta ruta'}{' '}
-                          · {resultado.ida.totalElements} opciones
-                        </p>
-                      </div>
-                    </div>
-                    {listaDeVuelos(resultado.ida, consultaIda)}
-                  </>
-                )}
-
-                <div className="vuelos-tramo">
-                  <span className="vuelos-tramo-numero">2</span>
-                  <div>
-                    <h2>Vuelos de vuelta</h2>
-                    <p className="texto-suave">
-                      {resultado.vuelta.content[0]
-                        ? `${resultado.vuelta.content[0].origenCiudad} → ${resultado.vuelta.content[0].destinoCiudad}`
-                        : 'Sin vuelos de regreso para esta ruta'}{' '}
-                      · {resultado.vuelta.totalElements} opciones
-                    </p>
-                  </div>
+        {!faltaRuta && (
+          <div className="vuelos-layout">
+            <aside className="tarjeta vuelos-filtros">
+              <h2>Filtrar por precio</h2>
+              <form onSubmit={aplicarPrecios}>
+                <div className="campo">
+                  <label htmlFor="precioMin">Precio mínimo</label>
+                  <input
+                    id="precioMin"
+                    type="number"
+                    min="0"
+                    value={precios.precioMin}
+                    onChange={(e) => setPrecios({ ...precios, precioMin: e.target.value })}
+                    placeholder="$ 0"
+                  />
                 </div>
-                {listaDeVuelos(resultado.vuelta)}
-              </>
-            )}
+                <div className="campo">
+                  <label htmlFor="precioMax">Precio máximo</label>
+                  <input
+                    id="precioMax"
+                    type="number"
+                    min="0"
+                    value={precios.precioMax}
+                    onChange={(e) => setPrecios({ ...precios, precioMax: e.target.value })}
+                    placeholder="Sin límite"
+                  />
+                </div>
+                <p className="vuelos-aclaracion">Se compara con el precio base del vuelo, sin descuentos.</p>
+                <button className="boton boton-primario boton-ancho">Aplicar</button>
+                <button type="button" className="boton boton-secundario boton-ancho" onClick={limpiarPrecios}>
+                  Limpiar
+                </button>
+              </form>
+            </aside>
 
-            {!cargando && resultado && !idaYVuelta && (
-              <>
-                <p className="vuelos-cantidad">
-                  {resultado.ida.totalElements === 1
-                    ? '1 vuelo encontrado'
-                    : `${resultado.ida.totalElements} vuelos encontrados`}
+            <section>
+              {error && <div className="mensaje mensaje-error">{error}</div>}
+
+              {cargando && <p className="texto-suave">Buscando vuelos…</p>}
+
+              {hayFecha && (
+                <p className="vuelos-ayuda">
+                  📅 Fechas flexibles: te mostramos los vuelos que salen hasta {DIAS_FLEXIBLES} días antes o después de
+                  la fecha que elegiste.
                 </p>
+              )}
 
-                {listaDeVuelos(resultado.ida)}
+              {!cargando && resultado && idaYVuelta && (
+                <>
+                  {soloVuelta ? (
+                    <div className="mensaje mensaje-exito">
+                      ✓ Tu vuelo de ida ya está en el carrito. Ahora elegí el vuelo de vuelta.{' '}
+                      <Link to="/carrito">Ir al carrito</Link>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="vuelos-ayuda">
+                        Elegí un vuelo de ida, agregalo al carrito y seguí con el de vuelta.
+                      </p>
 
-                {resultado.ida.totalPages > 1 && (
-                  <nav className="vuelos-paginas" aria-label="Páginas de resultados">
-                    <button
-                      className="boton boton-secundario"
-                      disabled={resultado.ida.first}
-                      onClick={() => cambiarFiltro({ page: pagina - 1 })}
-                    >
-                      ← Anterior
-                    </button>
-                    <span>
-                      Página {pagina + 1} de {resultado.ida.totalPages}
-                    </span>
-                    <button
-                      className="boton boton-secundario"
-                      disabled={resultado.ida.last}
-                      onClick={() => cambiarFiltro({ page: pagina + 1 })}
-                    >
-                      Siguiente →
-                    </button>
-                  </nav>
-                )}
-              </>
-            )}
-          </section>
-        </div>
+                      <div className="vuelos-tramo">
+                        <span className="vuelos-tramo-numero">1</span>
+                        <div>
+                          <h2>Vuelos de ida</h2>
+                          <p className="texto-suave">
+                            {resultado.ida.content[0]
+                              ? `${resultado.ida.content[0].origenCiudad} → ${resultado.ida.content[0].destinoCiudad}`
+                              : 'Sin vuelos para esta ruta'}{' '}
+                            · {resultado.ida.totalElements} opciones
+                          </p>
+                        </div>
+                      </div>
+                      {listaDeVuelos(resultado.ida, consultaIda)}
+                    </>
+                  )}
+
+                  <div className="vuelos-tramo">
+                    <span className="vuelos-tramo-numero">2</span>
+                    <div>
+                      <h2>Vuelos de vuelta</h2>
+                      <p className="texto-suave">
+                        {resultado.vuelta.content[0]
+                          ? `${resultado.vuelta.content[0].origenCiudad} → ${resultado.vuelta.content[0].destinoCiudad}`
+                          : 'Sin vuelos de regreso para esta ruta'}{' '}
+                        · {resultado.vuelta.totalElements} opciones
+                      </p>
+                    </div>
+                  </div>
+                  {listaDeVuelos(resultado.vuelta)}
+                </>
+              )}
+
+              {!cargando && resultado && !idaYVuelta && (
+                <>
+                  <p className="vuelos-cantidad">
+                    {resultado.ida.totalElements === 1
+                      ? '1 vuelo encontrado'
+                      : `${resultado.ida.totalElements} vuelos encontrados`}
+                  </p>
+
+                  {listaDeVuelos(resultado.ida)}
+
+                  {resultado.ida.totalPages > 1 && (
+                    <nav className="vuelos-paginas" aria-label="Páginas de resultados">
+                      <button
+                        className="boton boton-secundario"
+                        disabled={resultado.ida.first}
+                        onClick={() => cambiarFiltro({ page: pagina - 1 })}
+                      >
+                        ← Anterior
+                      </button>
+                      <span>
+                        Página {pagina + 1} de {resultado.ida.totalPages}
+                      </span>
+                      <button
+                        className="boton boton-secundario"
+                        disabled={resultado.ida.last}
+                        onClick={() => cambiarFiltro({ page: pagina + 1 })}
+                      >
+                        Siguiente →
+                      </button>
+                    </nav>
+                  )}
+                </>
+              )}
+            </section>
+          </div>
+        )}
       </div>
     </>
   )

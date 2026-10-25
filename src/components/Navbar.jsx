@@ -44,7 +44,6 @@ function Navbar() {
         </button>
 
         <nav className={`navbar-links ${menuAbierto ? 'abierto' : ''}`} onClick={cerrarMenu}>
-          <NavLink to="/vuelos">Vuelos</NavLink>
 
           {/* Cada rol ve solo los links que le sirven */}
           {esComprador && <NavLink to="/mis-compras">Mis compras</NavLink>}

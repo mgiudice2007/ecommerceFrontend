@@ -14,12 +14,12 @@ const REGIONES = [
   { categoria: 'Internacional', titulo: 'Europa' },
 ]
 
-// Accesos rapidos debajo del buscador: llevan a la busqueda ya filtrada
+// Accesos rapidos debajo del buscador: llevan a la busqueda ya filtrada por la ruta
 const ATAJOS = [
-  { destino: 'BRC', texto: 'Bariloche' },
-  { destino: 'IGR', texto: 'Iguazú' },
-  { destino: 'MIA', texto: 'Miami' },
-  { destino: 'MAD', texto: 'Madrid' },
+  { origen: 'AEP', destino: 'BRC', texto: 'Bariloche' },
+  { origen: 'AEP', destino: 'IGR', texto: 'Iguazú' },
+  { origen: 'EZE', destino: 'MIA', texto: 'Miami' },
+  { origen: 'EZE', destino: 'MAD', texto: 'Madrid' },
 ]
 
 const BENEFICIOS = [
@@ -139,7 +139,7 @@ function Inicio() {
         <div className="inicio-atajos">
           <span>Búsquedas frecuentes:</span>
           {ATAJOS.map((a) => (
-            <Link key={a.destino} to={`/vuelos?destino=${a.destino}`}>
+            <Link key={a.destino} to={`/vuelos?origen=${a.origen}&destino=${a.destino}`}>
               {a.texto}
             </Link>
           ))}
@@ -176,7 +176,6 @@ function Inicio() {
               <span className="inicio-sobretitulo">Ofertas por tiempo limitado</span>
               <h2>Promociones imperdibles</h2>
             </div>
-            <Link to="/vuelos">Ver todos los vuelos →</Link>
           </div>
           {grilla(ofertas)}
         </section>
@@ -189,9 +188,6 @@ function Inicio() {
               <span className="inicio-sobretitulo">Viajá por el país</span>
               <h2>Destinos en Argentina</h2>
             </div>
-            <Link to={`/vuelos?categoriaId=${categorias.find((c) => c.nombre === 'Cabotaje')?.id ?? ''}`}>
-              Ver vuelos de cabotaje →
-            </Link>
           </div>
           {grilla(argentina)}
         </section>
