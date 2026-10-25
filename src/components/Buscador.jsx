@@ -100,6 +100,15 @@ function Buscador({ inicial = {}, aeropuertos = [], categorias = [], clases = []
       setError('Elegí el origen y el destino para buscar vuelos.')
       return
     }
+    // Las fechas son obligatorias: la de ida siempre y la de vuelta si es ida y vuelta
+    if (!filtros.ida || (viaje === 'idavuelta' && !filtros.vuelta)) {
+      setError(
+        viaje === 'idavuelta'
+          ? 'Elegí la fecha de ida y la de vuelta para buscar vuelos.'
+          : 'Elegí la fecha de ida para buscar vuelos.',
+      )
+      return
+    }
     if (viaje === 'idavuelta' && filtros.ida && filtros.vuelta && filtros.vuelta < filtros.ida) {
       setError('La fecha de vuelta tiene que ser después de la ida.')
       return
