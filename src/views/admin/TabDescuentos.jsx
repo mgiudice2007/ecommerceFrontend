@@ -48,6 +48,10 @@ function TabDescuentos({ vuelo, onCambio }) {
   // Cada accion pide confirmacion antes de mandarse al backend
   const crear = (e) => {
     e.preventDefault()
+    if (!nuevo.fechaDesde || !nuevo.fechaHasta) {
+      setError('Completá las fechas del descuento')
+      return
+    }
     setPregunta({
       titulo: '¿Crear este descuento?',
       detalle: [

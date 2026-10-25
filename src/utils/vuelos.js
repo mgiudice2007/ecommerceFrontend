@@ -38,6 +38,7 @@ export const textoDescuento = (descuento, formatearPrecio) => {
 // Controles del formulario de un vuelo antes de mandarlo al backend.
 // Devuelve el problema como texto, o '' si esta todo bien.
 export const problemaEnVuelo = (datos) => {
+  if (!datos.fechaSalida || !datos.fechaLlegada) return 'Completá la fecha de salida y la de llegada'
   if (datos.origenIata === datos.destinoIata) return 'El origen y el destino tienen que ser distintos'
   if (datos.fechaLlegada <= datos.fechaSalida) return 'La llegada tiene que ser después de la salida'
   return ''

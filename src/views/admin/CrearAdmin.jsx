@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
+import { REGLA_NOMBRE, REGLA_USUARIO } from '../../utils/validaciones'
 import './Panel.css'
 
 const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password: '' }
@@ -26,7 +27,14 @@ function CrearAdmin() {
     setGuardando(true)
 
     // El backend fuerza el rol ADMIN en este endpoint
-    api('/api/auth/registro/administrador', { method: 'POST', body: { ...formData, rol: 'ADMIN' } })
+    const datosAEnviar = {
+      ...formData,
+      nombre: formData.nombre.trim(),
+      apellido: formData.apellido.trim(),
+      username: formData.username.trim(),
+      rol: 'ADMIN',
+    }
+    api('/api/auth/registro/administrador', { method: 'POST', body: datosAEnviar })
       .then((creado) => {
         setExito(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
         setFormData(FORM_VACIO)
@@ -54,18 +62,33 @@ function CrearAdmin() {
             <div className="fila-campos">
               <div className="campo">
                 <label htmlFor="nombre">Nombre</label>
-                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} {...REGLA_NOMBRE} required />
               </div>
               <div className="campo">
                 <label htmlFor="apellido">Apellido</label>
-                <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
+                <input
+                  id="apellido"
+                  name="apellido"
+                  value={formData.apellido}
+                  onChange={handleChange}
+                  {...REGLA_NOMBRE}
+                  required
+                />
               </div>
             </div>
 
             <div className="fila-campos">
               <div className="campo">
                 <label htmlFor="username">Usuario</label>
-                <input id="username" name="username" value={formData.username} onChange={handleChange} required />
+                <input
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  {...REGLA_USUARIO}
+                  required
+                />
+                <small className="texto-suave">4 a 20 caracteres, empieza con letra, sin espacios ni tildes.</small>
               </div>
               <div className="campo">
                 <label htmlFor="mail">Correo electrónico</label>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
+import { REGLA_NOMBRE, REGLA_USUARIO } from '../utils/validaciones'
 import './Auth.css'
 
 const FORM_VACIO = {
@@ -36,12 +37,13 @@ function Registro() {
 
     setCargando(true)
 
-    // confirmarPassword es solo del formulario: al backend se manda el resto.
+    // confirmarPassword es solo del formulario: al backend se manda el resto
+    // (sin espacios de mas al principio o al final).
     // El registro es solo para pasajeros: el backend crea siempre un COMPRADOR.
     const datosAEnviar = {
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      username: formData.username,
+      nombre: formData.nombre.trim(),
+      apellido: formData.apellido.trim(),
+      username: formData.username.trim(),
       mail: formData.mail,
       password: formData.password,
     }
@@ -71,11 +73,18 @@ function Registro() {
           <div className="fila-campos">
             <div className="campo">
               <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+              <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} {...REGLA_NOMBRE} required />
             </div>
             <div className="campo">
               <label htmlFor="apellido">Apellido</label>
-              <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
+              <input
+                id="apellido"
+                name="apellido"
+                value={formData.apellido}
+                onChange={handleChange}
+                {...REGLA_NOMBRE}
+                required
+              />
             </div>
           </div>
 
@@ -88,8 +97,10 @@ function Registro() {
                 value={formData.username}
                 onChange={handleChange}
                 autoComplete="username"
+                {...REGLA_USUARIO}
                 required
               />
+              <small className="texto-suave">4 a 20 caracteres, empieza con letra, sin espacios ni tildes.</small>
             </div>
             <div className="campo">
               <label htmlFor="mail">Correo electrónico</label>

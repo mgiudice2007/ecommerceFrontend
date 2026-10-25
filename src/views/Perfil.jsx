@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import { fechaLarga, hoy, millas } from '../utils/formato'
 import CampoFecha from '../components/CampoFecha'
+import { REGLA_NOMBRE } from '../utils/validaciones'
 import './Perfil.css'
 
 const NOMBRES_DE_ROL = {
@@ -52,6 +53,8 @@ function Perfil() {
 
     const datosAEnviar = {
       ...formData,
+      nombre: formData.nombre.trim(),
+      apellido: formData.apellido.trim(),
       // El backend espera null (no "") si no hay fecha
       fechaNacimiento: formData.fechaNacimiento || null,
     }
@@ -125,11 +128,18 @@ function Perfil() {
               <div className="fila-campos">
                 <div className="campo">
                   <label htmlFor="nombre">Nombre</label>
-                  <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+                  <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} {...REGLA_NOMBRE} required />
                 </div>
                 <div className="campo">
                   <label htmlFor="apellido">Apellido</label>
-                  <input id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} required />
+                  <input
+                    id="apellido"
+                    name="apellido"
+                    value={formData.apellido}
+                    onChange={handleChange}
+                    {...REGLA_NOMBRE}
+                    required
+                  />
                 </div>
               </div>
 

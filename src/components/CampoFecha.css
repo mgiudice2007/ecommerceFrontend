@@ -1,8 +1,18 @@
 /* Fecha (dd/mm/aaaa + boton del calendario) y, si hace falta, la hora en 24 hs */
 .campo-fecha {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+}
+
+/* El aviso en rojo ocupa su propia linea, debajo de la fecha */
+.campo-fecha-error {
+  flex-basis: 100%;
+  margin-top: -4px;
+  color: var(--rojo);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .campo-fecha-dia {

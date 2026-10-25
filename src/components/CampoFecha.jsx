@@ -6,7 +6,7 @@ import './CampoFecha.css'
 // dd/mm/aaaa y la hora en 24 hs, y con el boton del calendario abre el del navegador.
 //
 // value: "2026-12-15" (o "2026-12-15T10:00" con conHora), igual que los inputs nativos
-// onChange: recibe el valor nuevo en ese mismo formato ('' si se borra)
+// onChange: recibe el valor nuevo en ese mismo formato ('' si se borra o si lo escrito no sirve)
 // min / max: "2026-10-25" (opcionales)
 
 const dosDigitos = (n) => String(n).padStart(2, '0')
@@ -39,7 +39,11 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
 
   // Lo que el usuario esta escribiendo. null = mostrar la fecha que viene en value
   const [escrito, setEscrito] = useState(null)
+  // El problema con la fecha escrita: se muestra en rojo debajo del campo
+  const [problema, setProblema] = useState('')
 
+  // Le avisa al padre el valor nuevo. Si la fecha no sirve le manda '' (sin fecha),
+  // asi el formulario del padre la toma como que falta
   const avisar = (nuevaFecha, nuevaHora, nuevosMinutos) => {
     if (!nuevaFecha) onChange('')
     else onChange(conHora ? `${nuevaFecha}T${nuevaHora}:${nuevosMinutos}` : nuevaFecha)
@@ -50,26 +54,27 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     setEscrito(texto)
     const nueva = aFecha(texto)
 
-    // setCustomValidity (del DOM) hace que el navegador no deje enviar el formulario
-    // y muestre este mensaje, igual que con min y max en un input comun
-    let problema = ''
-    if (texto && !nueva) problema = 'Escribí la fecha como dd/mm/aaaa'
-    else if (nueva && min && nueva < min) problema = `La fecha tiene que ser desde el ${aTexto(min)}`
-    else if (nueva && max && nueva > max) problema = `La fecha tiene que ser hasta el ${aTexto(max)}`
-    e.target.setCustomValidity(problema)
+    // Mientras la fecha esta a medio escribir no se marca error; si ya esta completa
+    // se controla que este dentro de min y max
+    let fueraDeRango = ''
+    if (nueva && min && nueva < min) fueraDeRango = `La fecha tiene que ser desde el ${aTexto(min)}`
+    else if (nueva && max && nueva > max) fueraDeRango = `La fecha tiene que ser hasta el ${aTexto(max)}`
+    setProblema(fueraDeRango)
 
-    if (!texto) avisar('')
-    else if (!problema) avisar(nueva, hora, minutos)
+    if (nueva && !fueraDeRango) avisar(nueva, hora, minutos)
+    else avisar('')
   }
 
-  // Al salir del campo, si la fecha es valida se muestra prolija (1/2/2027 -> 01/02/2027)
-  const salir = (e) => {
-    if (e.target.validationMessage === '') setEscrito(null)
+  // Al salir del campo: si lo escrito no es una fecha se avisa; si es valida se
+  // muestra prolija (1/2/2027 -> 01/02/2027)
+  const salir = () => {
+    if (escrito && !aFecha(escrito)) setProblema('Escribí la fecha como dd/mm/aaaa')
+    else if (!problema) setEscrito(null)
   }
 
   const elegirEnCalendario = (e) => {
     setEscrito(null)
-    document.getElementById(id).setCustomValidity('')
+    setProblema('')
     avisar(e.target.value, hora, minutos)
   }
 
@@ -139,6 +144,9 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
           <span className="texto-suave">hs</span>
         </div>
       )}
+
+      {/* Renderizado condicional: el aviso aparece solo si la fecha escrita tiene un problema */}
+      {problema && <small className="campo-fecha-error">{problema}</small>}
     </div>
   )
 }
