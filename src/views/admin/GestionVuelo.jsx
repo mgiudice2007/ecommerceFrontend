@@ -68,8 +68,12 @@ function GestionVuelo() {
         subtitulo={`${vuelo.origenIata} → ${vuelo.destinoIata} · Sale el ${fechaLarga(vuelo.fechaSalida)} a las ${hora(vuelo.fechaSalida)} hs`}
         acciones={
           <>
-            <Link to={`/vuelos/${vuelo.id}`} className="boton boton-contorno">
-              Ver como comprador
+            <Link
+              to={`/vuelos/${vuelo.id}`}
+              className="boton boton-contorno"
+              title="Abre la página del vuelo tal como la ve un pasajero. Es solo para mirar."
+            >
+              👁 Ver vista del comprador
             </Link>
           </>
         }

@@ -16,7 +16,7 @@ function DetalleVuelo() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams() // trae los pasajeros elegidos en el buscador
-  const { estaLogueado, esComprador, actualizarCarrito } = useAuth()
+  const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
   // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [clases, setClases] = useState([])
 
@@ -182,6 +182,21 @@ function DetalleVuelo() {
 
   return (
     <>
+      {/* El admin llega desde "Ver vista del comprador": se le aclara que es solo para mirar */}
+      {esAdmin && (
+        <div className="detalle-vista-admin">
+          <div className="contenedor">
+            <span>
+              👁 Estás viendo este vuelo <strong>como lo ve un comprador</strong>. Es solo para mirar: como
+              administrador no podés comprar.
+            </span>
+            <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-claro">
+              ← Volver a gestionar el vuelo
+            </Link>
+          </div>
+        </div>
+      )}
+
       <section className="detalle-portada" style={fondoPortada}>
         <div className="contenedor">
           <nav className="detalle-migas">

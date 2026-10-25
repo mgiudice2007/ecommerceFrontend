@@ -229,3 +229,20 @@
 .detalle-asientos-ayuda {
   margin: -6px 0 12px;
 }
+
+/* Aviso para el admin que entra a ver el vuelo como lo ve un comprador */
+.detalle-vista-admin {
+  background: var(--durazno);
+  color: var(--azul-noche);
+  font-size: 14px;
+}
+
+.detalle-vista-admin .contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
