@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
+import CampoFecha from '../../components/CampoFecha'
 import Confirmacion from '../../components/Confirmacion'
 import { hoy, precio } from '../../utils/formato'
 
@@ -162,25 +163,23 @@ function TabDescuentos({ vuelo, onCambio }) {
           <div className="fila-campos">
             <div className="campo">
               <label htmlFor="fechaDesde">Desde</label>
-              <input
+              <CampoFecha
                 id="fechaDesde"
-                type="date"
                 min={hoy()}
                 max={diaDelVuelo}
                 value={nuevo.fechaDesde}
-                onChange={(e) => setNuevo({ ...nuevo, fechaDesde: e.target.value })}
+                onChange={(valor) => setNuevo({ ...nuevo, fechaDesde: valor })}
                 required
               />
             </div>
             <div className="campo">
               <label htmlFor="fechaHasta">Hasta</label>
-              <input
+              <CampoFecha
                 id="fechaHasta"
-                type="date"
                 min={nuevo.fechaDesde}
                 max={diaDelVuelo}
                 value={nuevo.fechaHasta}
-                onChange={(e) => setNuevo({ ...nuevo, fechaHasta: e.target.value })}
+                onChange={(valor) => setNuevo({ ...nuevo, fechaHasta: valor })}
                 required
               />
             </div>

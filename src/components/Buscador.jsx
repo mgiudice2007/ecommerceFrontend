@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { hoy } from '../utils/formato'
 import { SIN_PASAJEROS_EXTRA, textoPasajeros } from '../utils/pasajeros'
+import CampoFecha from './CampoFecha'
 import SelectorPasajeros from './SelectorPasajeros'
 import './Buscador.css'
 
@@ -67,8 +68,8 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     return aeropuerto ? etiqueta(aeropuerto) : ''
   }
 
-  const handleChange = (e) => {
-    setFiltros({ ...filtros, [e.target.name]: e.target.value })
+  const cambiarFecha = (campo, valor) => {
+    setFiltros({ ...filtros, [campo]: valor })
     setError('')
   }
 
@@ -199,22 +200,20 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
 
       {/* Fechas y pasajeros en la misma fila */}
       <div className="buscador-fila">
-        {/* type="date" muestra el calendario del navegador; min no deja elegir dias pasados */}
+        {/* CampoFecha muestra siempre dd/mm/aaaa; min no deja elegir dias pasados */}
         <div className="buscador-fechas">
           <div className="buscador-campo">
             <label htmlFor="ida">Ida</label>
-            <input id="ida" name="ida" type="date" min={hoy()} value={filtros.ida} onChange={handleChange} />
+            <CampoFecha id="ida" min={hoy()} value={filtros.ida} onChange={(valor) => cambiarFecha('ida', valor)} />
           </div>
           {viaje === 'idavuelta' && (
             <div className="buscador-campo">
               <label htmlFor="vuelta">Vuelta</label>
-              <input
+              <CampoFecha
                 id="vuelta"
-                name="vuelta"
-                type="date"
                 min={filtros.ida || hoy()}
                 value={filtros.vuelta}
-                onChange={handleChange}
+                onChange={(valor) => cambiarFecha('vuelta', valor)}
               />
             </div>
           )}

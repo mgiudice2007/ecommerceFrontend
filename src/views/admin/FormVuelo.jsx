@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
+import CampoFecha from '../../components/CampoFecha'
 import { paraInputFechaHora } from '../../utils/formato'
 import './Panel.css'
 
@@ -174,23 +175,21 @@ function FormVuelo() {
             <div className="fila-campos">
               <div className="campo">
                 <label htmlFor="fechaSalida">Salida</label>
-                <input
+                <CampoFecha
                   id="fechaSalida"
-                  name="fechaSalida"
-                  type="datetime-local"
+                  conHora
                   value={formData.fechaSalida}
-                  onChange={handleChange}
+                  onChange={(valor) => setFormData({ ...formData, fechaSalida: valor })}
                   required
                 />
               </div>
               <div className="campo">
                 <label htmlFor="fechaLlegada">Llegada</label>
-                <input
+                <CampoFecha
                   id="fechaLlegada"
-                  name="fechaLlegada"
-                  type="datetime-local"
+                  conHora
                   value={formData.fechaLlegada}
-                  onChange={handleChange}
+                  onChange={(valor) => setFormData({ ...formData, fechaLlegada: valor })}
                   required
                 />
               </div>

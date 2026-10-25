@@ -42,7 +42,7 @@ export const duracion = (minutos) => {
   return m ? `${h}h ${m}m` : `${h}h`
 }
 
-// Para los <input type="datetime-local"> hace falta "2026-12-15T10:00"
+// Para CampoFecha con hora hace falta "2026-12-15T10:00"
 export const paraInputFechaHora = (fecha) => (fecha ? fecha.slice(0, 16) : '')
 
 // Fecha de hoy como "2026-10-01" en horario local (toISOString usaria UTC

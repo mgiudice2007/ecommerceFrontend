@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import EncabezadoPagina from '../components/EncabezadoPagina'
-import { fechaLarga, millas } from '../utils/formato'
+import { fechaLarga, hoy, millas } from '../utils/formato'
+import CampoFecha from '../components/CampoFecha'
 import './Perfil.css'
 
 const NOMBRES_DE_ROL = {
@@ -148,12 +149,14 @@ function Perfil() {
                 </div>
                 <div className="campo">
                   <label htmlFor="fechaNacimiento">Fecha de nacimiento</label>
-                  <input
+                  <CampoFecha
                     id="fechaNacimiento"
-                    name="fechaNacimiento"
-                    type="date"
+                    max={hoy()}
                     value={formData.fechaNacimiento}
-                    onChange={handleChange}
+                    onChange={(valor) => {
+                      setFormData({ ...formData, fechaNacimiento: valor })
+                      setExito('')
+                    }}
                   />
                 </div>
               </div>

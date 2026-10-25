@@ -1,0 +1,59 @@
+/* Fecha (dd/mm/aaaa + boton del calendario) y, si hace falta, la hora en 24 hs */
+.campo-fecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campo-fecha-dia {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Lugar a la derecha para el boton del calendario */
+.campo-fecha .campo-fecha-dia input[type='text'] {
+  padding-right: 40px;
+  cursor: text;
+}
+
+.campo-fecha-boton {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  padding: 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.campo-fecha-boton:hover {
+  color: var(--azul);
+}
+
+/* El input de fecha del navegador queda escondido: solo se usa para abrir su calendario */
+.campo-fecha input.campo-fecha-nativo {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.campo-fecha-hora {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.campo-fecha .campo-fecha-hora select {
+  width: auto;
+}
