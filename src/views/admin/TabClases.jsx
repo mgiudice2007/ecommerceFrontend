@@ -26,9 +26,33 @@ function TabClases({ vuelo, onCambio }) {
   // Solo se pueden agregar las clases que el vuelo todavia no tiene
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
 
-  // Cada clase tiene un maximo de asientos por vuelo (viene del backend, tabla clases)
-  const maximoDe = (claseId) => clases.find((c) => String(c.id) === String(claseId))?.maximoAsientos
-  const maximoNueva = maximoDe(nueva.claseId)
+  // Cada clase tiene un minimo y un maximo de asientos por vuelo (vienen del backend, tabla clases)
+  const claseDe = (claseId) => clases.find((c) => String(c.id) === String(claseId))
+  const claseNueva = claseDe(nueva.claseId)
+
+  // Una clase mejor no puede costar menos que una mas basica (Economica <= Ejecutiva <= Primera).
+  // Devuelve entre que precios tiene que estar, segun las otras clases del vuelo.
+  const rangoDePrecio = (claseId, idQueSeEdita) => {
+    const nivel = claseDe(claseId)?.nivel
+    let desde = null
+    let hasta = null
+    vuelo.disponibilidades.forEach((d) => {
+      const otroNivel = claseDe(d.claseId)?.nivel
+      if (d.id === idQueSeEdita || !nivel || !otroNivel) return
+      if (otroNivel < nivel && (desde === null || d.precio > desde)) desde = d.precio
+      if (otroNivel > nivel && (hasta === null || d.precio < hasta)) hasta = d.precio
+    })
+    return { desde, hasta }
+  }
+  const rangoNueva = rangoDePrecio(nueva.claseId, null)
+
+  // "Desde $ 145.900", "Hasta $ 349.000" o "Entre $ 145.900 y $ 349.000"
+  const textoRango = ({ desde, hasta }) => {
+    if (desde !== null && hasta !== null) return `Entre ${precio(desde)} y ${precio(hasta)}, por las otras clases del vuelo.`
+    if (desde !== null) return `Desde ${precio(desde)}: no puede costar menos que una clase más básica.`
+    if (hasta !== null) return `Hasta ${precio(hasta)}: no puede costar más que una clase mejor.`
+    return ''
+  }
 
   // Antes de agregar la clase se muestra lo que se va a cargar y se pide confirmacion
   const agregar = (e) => {
@@ -84,6 +108,31 @@ function TabClases({ vuelo, onCambio }) {
     })
   }
 
+  const preguntarEliminar = (disponibilidad) => {
+    setPregunta({
+      titulo: `¿Eliminar la clase ${disponibilidad.claseNombre} de este vuelo?`,
+      mensaje:
+        'Si estaba en el carrito de algún pasajero, se saca de su carrito. Si ya tiene compras, no se puede eliminar.',
+      textoConfirmar: 'Sí, eliminar',
+      peligro: true,
+      accion: () => eliminarClase(disponibilidad),
+    })
+  }
+
+  // DELETE /api/disponibilidades/:id (el backend no deja si la clase ya tiene compras)
+  const eliminarClase = (disponibilidad) => {
+    setError('')
+    setExito('')
+    setGuardando(true)
+    api(`/api/disponibilidades/${disponibilidad.id}`, { method: 'DELETE' })
+      .then(() => {
+        setExito(`Se eliminó la clase ${disponibilidad.claseNombre} del vuelo.`)
+        onCambio()
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setGuardando(false))
+  }
+
   const guardarClase = (disponibilidad) => {
     setError('')
     setExito('')
@@ -110,7 +159,8 @@ function TabClases({ vuelo, onCambio }) {
       <section className="tarjeta">
         <h2>Clases del vuelo</h2>
         <p className="texto-suave">
-          No se puede bajar el total de asientos por debajo de los que ya se vendieron.
+          No se puede bajar el total de asientos por debajo de los que ya se vendieron. Una clase solo se puede
+          eliminar si todavía no tiene compras.
         </p>
 
         {error && <div className="mensaje mensaje-error">{error}</div>}
@@ -144,8 +194,8 @@ function TabClases({ vuelo, onCambio }) {
                         {enEdicion ? (
                           <input
                             type="number"
-                            min={Math.max(vendidos, 1)}
-                            max={maximoDe(d.claseId)}
+                            min={Math.max(vendidos, claseDe(d.claseId)?.minimoAsientos ?? 1)}
+                            max={claseDe(d.claseId)?.maximoAsientos}
                             value={editando.asientosTotales}
                             onChange={(e) => setEditando({ ...editando, asientosTotales: e.target.value })}
                             aria-label="Asientos totales"
@@ -159,7 +209,8 @@ function TabClases({ vuelo, onCambio }) {
                         {enEdicion ? (
                           <input
                             type="number"
-                            min="1"
+                            min={rangoDePrecio(d.claseId, d.id).desde ?? 1}
+                            max={rangoDePrecio(d.claseId, d.id).hasta ?? undefined}
                             step="0.01"
                             value={editando.precio}
                             onChange={(e) => setEditando({ ...editando, precio: e.target.value })}
@@ -189,14 +240,23 @@ function TabClases({ vuelo, onCambio }) {
                             </button>
                           </>
                         ) : (
-                          <button
-                            className="boton boton-secundario"
-                            onClick={() =>
-                              setEditando({ id: d.id, asientosTotales: d.asientosTotales, precio: d.precio })
-                            }
-                          >
-                            Editar
-                          </button>
+                          <>
+                            <button
+                              className="boton boton-secundario"
+                              onClick={() =>
+                                setEditando({ id: d.id, asientosTotales: d.asientosTotales, precio: d.precio })
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="boton boton-peligro"
+                              onClick={() => preguntarEliminar(d)}
+                              disabled={guardando}
+                            >
+                              Eliminar
+                            </button>
+                          </>
                         )}
                       </td>
                     </tr>
@@ -235,25 +295,31 @@ function TabClases({ vuelo, onCambio }) {
               <input
                 id="asientosTotales"
                 type="number"
-                min="1"
-                max={maximoNueva}
+                min={claseNueva?.minimoAsientos ?? 1}
+                max={claseNueva?.maximoAsientos}
                 value={nueva.asientosTotales}
                 onChange={(e) => setNueva({ ...nueva, asientosTotales: e.target.value })}
                 required
               />
-              {maximoNueva && <small className="texto-suave">Entre 1 y {maximoNueva} asientos para esta clase.</small>}
+              {claseNueva?.maximoAsientos && (
+                <small className="texto-suave">
+                  Entre {claseNueva.minimoAsientos ?? 1} y {claseNueva.maximoAsientos} asientos para esta clase.
+                </small>
+              )}
             </div>
             <div className="campo">
               <label htmlFor="precioClase">Precio por pasajero</label>
               <input
                 id="precioClase"
                 type="number"
-                min="1"
+                min={rangoNueva.desde ?? 1}
+                max={rangoNueva.hasta ?? undefined}
                 step="0.01"
                 value={nueva.precio}
                 onChange={(e) => setNueva({ ...nueva, precio: e.target.value })}
                 required
               />
+              {textoRango(rangoNueva) && <small className="texto-suave">{textoRango(rangoNueva)}</small>}
             </div>
             <button className="boton boton-primario boton-ancho" disabled={guardando}>
               Agregar clase
