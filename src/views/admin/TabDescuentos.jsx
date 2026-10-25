@@ -69,6 +69,9 @@ function TabDescuentos({ vuelo, onCambio }) {
     ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
   }
 
+  // El descuento va de hoy al dia que sale el vuelo (el backend controla lo mismo)
+  const diaDelVuelo = vuelo.fechaSalida.slice(0, 10) // "2026-11-06T07:15:00" -> "2026-11-06"
+
   const textoValor = (d) => (d.tipoDescuento === 'PORCENTAJE' ? `${Number(d.valor)}%` : precio(d.valor))
 
   const estado = (d) => {
@@ -162,6 +165,8 @@ function TabDescuentos({ vuelo, onCambio }) {
               <input
                 id="fechaDesde"
                 type="date"
+                min={hoy()}
+                max={diaDelVuelo}
                 value={nuevo.fechaDesde}
                 onChange={(e) => setNuevo({ ...nuevo, fechaDesde: e.target.value })}
                 required
@@ -173,6 +178,7 @@ function TabDescuentos({ vuelo, onCambio }) {
                 id="fechaHasta"
                 type="date"
                 min={nuevo.fechaDesde}
+                max={diaDelVuelo}
                 value={nuevo.fechaHasta}
                 onChange={(e) => setNuevo({ ...nuevo, fechaHasta: e.target.value })}
                 required
