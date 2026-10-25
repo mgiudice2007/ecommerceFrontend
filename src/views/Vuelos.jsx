@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { api, pedirPortadas } from '../api/api'
+import { api } from '../api/api'
 import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import TarjetaVuelo from '../components/TarjetaVuelo'
@@ -54,10 +54,6 @@ function Vuelos() {
       .catch(() => setClases([]))
   }, [])
 
-  // Las fotos de los vuelos de la pagina: { idVuelo: imagen }. Se piden aca y cada
-  // TarjetaVuelo recibe la suya por props.
-  const [portadas, setPortadas] = useState({})
-
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',
     precioMax: searchParams.get('precioMax') ?? '',
@@ -94,10 +90,7 @@ function Vuelos() {
       params.set('page', params.get('page') ?? 0)
       params.set('size', POR_PAGINA)
       buscarVuelos(params)
-        .then((ida) => {
-          setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' })
-          pedirPortadas(ida.content.map((v) => v.id)).then((datos) => setPortadas(datos))
-        })
+        .then((ida) => setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' }))
         .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
       return
     }
@@ -116,11 +109,7 @@ function Vuelos() {
 
     buscarVuelos(params)
       .then((ida) =>
-        buscarVuelos(vuelta).then((regreso) => {
-          setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })
-          const vuelos = [...ida.content, ...regreso.content]
-          pedirPortadas(vuelos.map((v) => v.id)).then((datos) => setPortadas(datos))
-        }),
+        buscarVuelos(vuelta).then((regreso) => setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })),
       )
       .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
   }, [busqueda])
@@ -190,7 +179,7 @@ function Vuelos() {
       )}
       <div className="vuelos-lista">
         {pagina.content.map((vuelo) => (
-          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} imagen={portadas[vuelo.id]} pasajeros={consulta} />
+          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consulta} />
         ))}
       </div>
     </>

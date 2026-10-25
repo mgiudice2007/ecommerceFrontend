@@ -6,16 +6,16 @@ import './ItemCarrito.css'
 
 // Un item del carrito. Recibe el item (ItemCarritoResponse) y dos funciones
 // del padre: onCambiarCantidad y onEliminar.
-// vuelo e imagen los pide el Carrito: el item no trae la fecha ni los asientos que
-// quedan, y con el vuelo se muestran y no se deja sumar de mas.
-function ItemCarrito({ item, vuelo, imagen, onCambiarCantidad, onEliminar, ocupado }) {
+// vuelo lo pide el Carrito: el item no trae la fecha ni los asientos que quedan,
+// y con el vuelo se muestran y no se deja sumar de mas.
+function ItemCarrito({ item, vuelo, onCambiarCantidad, onEliminar, ocupado }) {
   const disponibilidad = vuelo?.disponibilidades.find((d) => d.id === item.disponibilidadId)
   const maximo = disponibilidad?.asientosDisponibles ?? Infinity
 
   return (
     <article className="tarjeta item-carrito">
       <Link to={`/vuelos/${item.vueloId}`} className="item-carrito-foto" tabIndex={-1} aria-hidden="true">
-        <FotoVuelo imagen={imagen} destinoIata={vuelo?.destinoIata ?? ''} destinoCiudad={item.destino} />
+        <FotoVuelo destinoIata={vuelo?.destinoIata ?? ''} destinoCiudad={item.destino} />
       </Link>
 
       <div className="item-carrito-info">

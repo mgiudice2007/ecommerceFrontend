@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api, pedirPortadas } from '../../api/api'
+import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FotoVuelo from '../../components/FotoVuelo'
@@ -24,7 +24,6 @@ function PanelVuelos() {
   const [vuelos, setVuelos] = useState(null)
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
-  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen } de los vuelos de la pagina
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [aEliminar, setAEliminar] = useState(null) // vuelo que espera confirmacion (muestra el cartel)
@@ -67,15 +66,6 @@ function PanelVuelos() {
   )
   const totalPaginas = Math.ceil(visibles.length / POR_PAGINA)
   const enPagina = visibles.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA)
-
-  // Las fotos solo de los vuelos de la pagina que se ve. Cada vez que cambian esos
-  // vuelos (otra pagina u otra busqueda), se vuelven a pedir.
-  const idsEnPagina = enPagina.map((v) => v.id).join(',')
-
-  useEffect(() => {
-    if (!idsEnPagina) return
-    pedirPortadas(idsEnPagina.split(',')).then((datos) => setPortadas(datos))
-  }, [idsEnPagina])
 
   const resumen = (vuelos ?? []).reduce(
     (total, vuelo) => {
@@ -160,7 +150,7 @@ function PanelVuelos() {
             return (
               <article key={vuelo.id} className="tarjeta panel-vuelo">
                 <div className="panel-vuelo-foto" aria-hidden="true">
-                  <FotoVuelo imagen={portadas[vuelo.id]} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+                  <FotoVuelo destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
                 </div>
                 <div className="panel-vuelo-info">
                   <div className="panel-vuelo-titulo">
