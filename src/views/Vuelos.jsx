@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { api } from '../api/api'
+import { api, pedirPortadas } from '../api/api'
 import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import TarjetaVuelo from '../components/TarjetaVuelo'
@@ -36,6 +36,28 @@ function Vuelos() {
   const resultado = cargando ? null : respuesta.datos
   const error = cargando ? '' : respuesta.error
 
+  // Datos del catalogo para el buscador (si falla un pedido, ese campo queda vacio).
+  // Los pide esta pantalla y se los pasa al Buscador por props.
+  const [aeropuertos, setAeropuertos] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [clases, setClases] = useState([])
+
+  useEffect(() => {
+    api('/api/aeropuertos')
+      .then((data) => setAeropuertos(data))
+      .catch(() => setAeropuertos([]))
+    api('/api/categorias')
+      .then((data) => setCategorias(data))
+      .catch(() => setCategorias([]))
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
+  }, [])
+
+  // Las fotos de los vuelos de la pagina: { idVuelo: imagen }. Se piden aca y cada
+  // TarjetaVuelo recibe la suya por props.
+  const [portadas, setPortadas] = useState({})
+
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',
     precioMax: searchParams.get('precioMax') ?? '',
@@ -66,7 +88,10 @@ function Vuelos() {
       params.set('page', params.get('page') ?? 0)
       params.set('size', POR_PAGINA)
       buscarVuelos(params)
-        .then((ida) => setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' }))
+        .then((ida) => {
+          setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' })
+          pedirPortadas(ida.content.map((v) => v.id)).then((datos) => setPortadas(datos))
+        })
         .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
       return
     }
@@ -85,7 +110,11 @@ function Vuelos() {
 
     buscarVuelos(params)
       .then((ida) =>
-        buscarVuelos(vuelta).then((regreso) => setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })),
+        buscarVuelos(vuelta).then((regreso) => {
+          setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' })
+          const vuelos = [...ida.content, ...regreso.content]
+          pedirPortadas(vuelos.map((v) => v.id)).then((datos) => setPortadas(datos))
+        }),
       )
       .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
   }, [busqueda])
@@ -155,7 +184,7 @@ function Vuelos() {
       )}
       <div className="vuelos-lista">
         {pagina.content.map((vuelo) => (
-          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consulta} />
+          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} imagen={portadas[vuelo.id]} pasajeros={consulta} />
         ))}
       </div>
     </>
@@ -170,7 +199,13 @@ function Vuelos() {
 
       <div className="contenedor sobre-encabezado vuelos-pagina">
         {/* La key hace que el buscador se reinicie con los filtros nuevos si cambia la URL */}
-        <Buscador key={searchParams.toString()} inicial={filtrosIniciales} />
+        <Buscador
+          key={searchParams.toString()}
+          inicial={filtrosIniciales}
+          aeropuertos={aeropuertos}
+          categorias={categorias}
+          clases={clases}
+        />
 
         <div className="vuelos-layout">
           <aside className="tarjeta vuelos-filtros">

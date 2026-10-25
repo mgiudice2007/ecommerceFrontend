@@ -195,3 +195,13 @@
   }
 }
 
+
+/* Paginas del listado de vuelos del panel */
+.panel-paginas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  color: var(--texto-suave);
+}

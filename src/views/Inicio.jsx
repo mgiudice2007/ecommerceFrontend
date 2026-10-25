@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../api/api'
+import { api, pedirPortadas } from '../api/api'
 import portada from '../assets/portada.jpg'
 import Buscador from '../components/Buscador'
 import TarjetaDestino from '../components/TarjetaDestino'
@@ -45,11 +45,25 @@ const BENEFICIOS = [
   },
 ]
 
+// Un vuelo por destino (el primero que aparezca) para no repetir ciudades
+const unoPorDestino = (lista) =>
+  lista.filter((vuelo, i) => lista.findIndex((v) => v.destinoIata === vuelo.destinoIata) === i)
+
+// Las secciones del inicio se arman filtrando la misma lista de vuelos
+const ofertasDe = (vuelos) =>
+  unoPorDestino(vuelos.filter((v) => v.descuentoVigente))
+    .sort((a, b) => b.descuentoVigente.valor - a.descuentoVigente.valor)
+    .slice(0, 4)
+const argentinaDe = (vuelos) => unoPorDestino(vuelos.filter((v) => v.categoriaNombre === 'Cabotaje')).slice(0, 8)
+const mundoDe = (vuelos, region) => unoPorDestino(vuelos.filter((v) => v.categoriaNombre === region)).slice(0, 8)
+
 function Inicio() {
   const { estaLogueado } = useAuth()
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
+  // Datos del catalogo para el buscador (si falla un pedido, ese campo queda vacio).
+  // Los pide esta pantalla y se los pasa al Buscador por props.
   const [aeropuertos, setAeropuertos] = useState([])
   const [categorias, setCategorias] = useState([])
+  const [clases, setClases] = useState([])
 
   useEffect(() => {
     api('/api/aeropuertos')
@@ -58,38 +72,52 @@ function Inicio() {
     api('/api/categorias')
       .then((data) => setCategorias(data))
       .catch(() => setCategorias([]))
+    api('/api/clases')
+      .then((data) => setClases(data))
+      .catch(() => setClases([]))
   }, [])
 
   const [vuelos, setVuelos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [region, setRegion] = useState(REGIONES[0].categoria)
+  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen } de las tarjetas que se muestran
 
-  // Una sola llamada trae todos los vuelos publicados; las secciones se arman filtrando
+  // Una sola llamada trae los vuelos publicados; las secciones se arman filtrando
   useEffect(() => {
     api('/api/vuelos?page=0&size=60')
-      // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados)
-      .then((pagina) => setVuelos(pagina.content.filter(estaOperativo)))
+      .then((pagina) => {
+        // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados)
+        const operativos = pagina.content.filter(estaOperativo)
+        setVuelos(operativos)
+        // Las fotos solo de los vuelos que aparecen en alguna seccion
+        const mostrados = [
+          ...ofertasDe(operativos),
+          ...argentinaDe(operativos),
+          ...mundoDe(operativos, REGIONES[0].categoria),
+          ...mundoDe(operativos, REGIONES[1].categoria),
+        ]
+        pedirPortadas(mostrados.map((v) => v.id)).then((datos) => setPortadas(datos))
+      })
       .catch((err) => setError(err.message))
       .finally(() => setCargando(false))
   }, [])
 
   const paisDe = (iata) => aeropuertos.find((a) => a.codigoIata === iata)?.pais
 
-  // Un vuelo por destino (el primero que aparezca) para no repetir ciudades
-  const unoPorDestino = (lista) =>
-    lista.filter((vuelo, i) => lista.findIndex((v) => v.destinoIata === vuelo.destinoIata) === i)
-
-  const ofertas = unoPorDestino(vuelos.filter((v) => v.descuentoVigente))
-    .sort((a, b) => b.descuentoVigente.valor - a.descuentoVigente.valor)
-    .slice(0, 4)
-  const argentina = unoPorDestino(vuelos.filter((v) => v.categoriaNombre === 'Cabotaje')).slice(0, 8)
-  const mundo = unoPorDestino(vuelos.filter((v) => v.categoriaNombre === region)).slice(0, 8)
+  const ofertas = ofertasDe(vuelos)
+  const argentina = argentinaDe(vuelos)
+  const mundo = mundoDe(vuelos, region)
 
   const grilla = (lista) => (
     <div className="inicio-grilla">
       {lista.map((vuelo) => (
-        <TarjetaDestino key={vuelo.id} vuelo={vuelo} pais={paisDe(vuelo.destinoIata)} />
+        <TarjetaDestino
+          key={vuelo.id}
+          vuelo={vuelo}
+          pais={paisDe(vuelo.destinoIata)}
+          imagen={portadas[vuelo.id]}
+        />
       ))}
     </div>
   )
@@ -107,7 +135,7 @@ function Inicio() {
       </section>
 
       <div className="contenedor inicio-buscador">
-        <Buscador />
+        <Buscador aeropuertos={aeropuertos} categorias={categorias} clases={clases} />
         <div className="inicio-atajos">
           <span>Búsquedas frecuentes:</span>
           {ATAJOS.map((a) => (

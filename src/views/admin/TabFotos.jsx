@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { api } from '../../api/api'
+import { api, pedirImagen } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
-import ImagenFoto from '../../components/ImagenFoto'
 
 const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
 const MAXIMO_MB = 5
@@ -9,6 +8,7 @@ const MAXIMO_MB = 5
 // Pestaña "Fotos": subir (multipart/form-data) y borrar fotos del vuelo.
 function TabFotos({ vuelo, onCambio }) {
   const [fotos, setFotos] = useState([])
+  const [imagenes, setImagenes] = useState([]) // la imagen (data URL) de cada foto, en el mismo orden
   const [archivo, setArchivo] = useState(null)
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
@@ -18,8 +18,13 @@ function TabFotos({ vuelo, onCambio }) {
   const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
+    // Primero la lista de fotos y despues la imagen (en Base64) de cada una
     api(`/api/fotos?vueloId=${vuelo.id}`)
-      .then((data) => setFotos(data))
+      .then((data) => {
+        setFotos(data)
+        return Promise.all(data.map((foto) => pedirImagen(foto.id)))
+      })
+      .then((data) => setImagenes(data))
       .catch((err) => setError(err.message))
   }, [vuelo.id, recargar])
 
@@ -93,7 +98,8 @@ function TabFotos({ vuelo, onCambio }) {
           <div className="gestion-fotos">
             {fotos.map((foto, indice) => (
               <figure key={foto.id} className="gestion-foto">
-                <ImagenFoto fotoId={foto.id} alt={foto.nombreArchivo} />
+                {/* Mientras llega la imagen se ve el recuadro gris de fondo */}
+                {imagenes[indice] && <img src={imagenes[indice]} alt={foto.nombreArchivo} />}
                 {indice === 0 && <span className="etiqueta">Portada</span>}
                 <div>
                   <span className="texto-suave">{Math.round(foto.tamano / 1024)} KB</span>

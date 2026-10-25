@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { api } from '../api/api'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { hoy } from '../utils/formato'
 import { SIN_PASAJEROS_EXTRA, textoPasajeros } from '../utils/pasajeros'
@@ -32,24 +31,9 @@ const buscarAeropuerto = (lista, texto) =>
 // Con "Ida y vuelta" la pagina de resultados busca dos veces: la ida (origen -> destino)
 // y la vuelta (destino -> origen).
 // inicial: los filtros con los que arranca (por ejemplo, los que ya estan en la URL)
-function Buscador({ inicial = {} }) {
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
-  const [aeropuertos, setAeropuertos] = useState([])
-  const [categorias, setCategorias] = useState([])
-  const [clases, setClases] = useState([])
-
-  useEffect(() => {
-    api('/api/aeropuertos')
-      .then((data) => setAeropuertos(data))
-      .catch(() => setAeropuertos([]))
-    api('/api/categorias')
-      .then((data) => setCategorias(data))
-      .catch(() => setCategorias([]))
-    api('/api/clases')
-      .then((data) => setClases(data))
-      .catch(() => setClases([]))
-  }, [])
-
+// aeropuertos, categorias y clases: los datos del catalogo para los campos. El buscador
+// no los pide: los trae la pantalla que lo usa (Inicio o Vuelos) y se los pasa por props.
+function Buscador({ inicial = {}, aeropuertos = [], categorias = [], clases = [] }) {
   const navigate = useNavigate()
 
   const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')
@@ -69,27 +53,13 @@ function Buscador({ inicial = {} }) {
   // muestra el aeropuerto que venia en los filtros (por ejemplo desde la URL)
   const [textos, setTextos] = useState({ origen: null, destino: null })
 
-  // Los destinos a los que hay vuelos desde el origen elegido (sale de los vuelos publicados)
-  const [rutas, setRutas] = useState({ origen: null, destinos: [] })
-
-  useEffect(() => {
-    if (!filtros.origen) return
-    api(`/api/vuelos?origen=${filtros.origen}`)
-      .then((pagina) => {
-        const destinos = []
-        pagina.content.forEach((vuelo) => {
-          if (!destinos.includes(vuelo.destinoIata)) destinos.push(vuelo.destinoIata)
-        })
-        setRutas({ origen: filtros.origen, destinos })
-      })
-      .catch(() => setRutas({ origen: filtros.origen, destinos: [] }))
-  }, [filtros.origen])
-
   const origenes = aeropuertos.filter((a) => ORIGENES.includes(a.codigoIata))
-  // Sin origen elegido se ofrecen todos los destinos; con origen, solo los que tienen vuelos desde ahi
+  // Como en las aerolineas de Buenos Aires: Aeroparque vuela dentro de Argentina y Ezeiza
+  // al exterior. Sin origen elegido se ofrecen todos los destinos.
   const destinos = aeropuertos.filter((a) => {
     if (ORIGENES.includes(a.codigoIata)) return false
-    if (filtros.origen && rutas.origen === filtros.origen) return rutas.destinos.includes(a.codigoIata)
+    if (filtros.origen === 'AEP') return a.pais === 'Argentina'
+    if (filtros.origen === 'EZE') return a.pais !== 'Argentina'
     return true
   })
 

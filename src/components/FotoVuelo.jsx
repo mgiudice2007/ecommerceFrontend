@@ -1,20 +1,10 @@
-import { useEffect, useState } from 'react'
-import { api, pedirImagen } from '../api/api'
 import './FotoVuelo.css'
 
-// Muestra la primera foto que el admin subio para el vuelo.
-// Si no subio ninguna, muestra un fondo azul con el codigo del destino.
-function FotoVuelo({ vueloId, destinoIata, destinoCiudad }) {
-  const [imagen, setImagen] = useState(null)
-
-  useEffect(() => {
-    // Primero la lista de fotos del vuelo y despues la imagen (en Base64) de la primera
-    api(`/api/fotos?vueloId=${vueloId}`)
-      .then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
-      .then((data) => setImagen(data))
-      .catch(() => setImagen(null))
-  }, [vueloId])
-
+// Muestra la portada de un vuelo. No le pide nada al backend: la pantalla que lo usa
+// trae la imagen y se la pasa por props (como PostCard en el ejemplo de clase).
+// Si el vuelo no tiene fotos (o todavia no llego la imagen), muestra un fondo azul
+// con el codigo del destino.
+function FotoVuelo({ imagen, destinoIata, destinoCiudad }) {
   if (imagen) {
     return <img className="foto-vuelo" src={imagen} alt={`Foto de ${destinoCiudad}`} />
   }

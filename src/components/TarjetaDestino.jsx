@@ -6,7 +6,8 @@ import './TarjetaDestino.css'
 
 // Tarjeta con foto grande para las secciones del inicio.
 // pais: viene del catalogo de aeropuertos (el vuelo solo trae la ciudad)
-function TarjetaDestino({ vuelo, pais }) {
+// imagen: la portada del vuelo (la pide el inicio)
+function TarjetaDestino({ vuelo, pais, imagen }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)
   const conRebaja = desde.precioConDescuento < desde.precio
@@ -14,7 +15,7 @@ function TarjetaDestino({ vuelo, pais }) {
   return (
     <Link to={`/vuelos/${vuelo.id}`} className="tarjeta-destino">
       <div className="tarjeta-destino-foto">
-        <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+        <FotoVuelo imagen={imagen} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
       </div>
 
       {descuento && <span className="tarjeta-destino-oferta">{descuento}</span>}

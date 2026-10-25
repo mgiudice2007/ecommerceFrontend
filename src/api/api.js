@@ -73,3 +73,25 @@ export const api = (url, opciones = {}) => {
 // que se puede poner en el src de un <img> o en un background-image.
 export const pedirImagen = (fotoId) =>
   api(`/api/fotos/${fotoId}`).then((imagen) => `data:${imagen.tipo};base64,${imagen.file}`)
+
+// La portada de un vuelo: la imagen de su primera foto, o null si no tiene fotos.
+export const pedirPortada = (vueloId) =>
+  api(`/api/fotos?vueloId=${vueloId}`).then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
+
+// Hace un pedido por cada id (sin repetir) y junta las respuestas en un objeto { id: respuesta }.
+// Si un pedido falla, ese id queda en null y el resto se muestra igual.
+const pedirPorId = (ids, pedir) => {
+  const unicos = ids.filter((id, i) => ids.indexOf(id) === i)
+  return Promise.all(unicos.map((id) => pedir(id).catch(() => null))).then((respuestas) => {
+    const porId = {}
+    unicos.forEach((id, i) => {
+      porId[id] = respuestas[i]
+    })
+    return porId
+  })
+}
+
+// Las pantallas con listas (resultados, inicio, carrito, mis compras, panel) piden todo
+// de una vez con estas funciones y le pasan a cada tarjeta lo suyo por props.
+export const pedirPortadas = (vueloIds) => pedirPorId(vueloIds, pedirPortada)
+export const pedirVuelos = (vueloIds) => pedirPorId(vueloIds, (id) => api(`/api/vuelos/${id}`))

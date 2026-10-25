@@ -1,23 +1,13 @@
-import { useEffect, useState } from 'react'
-import { api } from '../api/api'
 import './SelectorAsientos.css'
 
-// Mapa del avion para elegir los asientos de un vuelo y clase del carrito.
-// grupo: { disponibilidadId, titulo, adultos, ninos, asientos }  (asientos = los ya elegidos)
-// onCambio: recibe la lista nueva de asientos para guardarla en el backend
-function SelectorAsientos({ grupo, onCambio, ocupado }) {
-  const [mapa, setMapa] = useState(null)
-  const [error, setError] = useState('')
-
+// Mapa del avion para elegir los asientos de la clase elegida.
+// mapa: las filas del avion y los asientos ya vendidos (lo pide DetalleVuelo)
+// error: si no se pudo traer el mapa
+// grupo: { titulo, adultos, ninos, asientos }  (asientos = los ya elegidos)
+// onCambio: recibe la lista nueva de asientos y el padre la guarda en su estado
+function SelectorAsientos({ mapa, error, grupo, onCambio, ocupado }) {
   const pasajeros = grupo.adultos + grupo.ninos
   const elegidos = grupo.asientos
-
-  // GET /api/disponibilidades/{id}/asientos: las filas del avion y los asientos ya vendidos
-  useEffect(() => {
-    api(`/api/disponibilidades/${grupo.disponibilidadId}/asientos`)
-      .then((data) => setMapa(data))
-      .catch((err) => setError(err.message))
-  }, [grupo.disponibilidadId])
 
   if (error) {
     return <div className="mensaje mensaje-error">{error}</div>

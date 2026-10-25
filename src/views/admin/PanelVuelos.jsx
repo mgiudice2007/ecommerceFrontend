@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../../api/api'
+import { api, pedirPortadas } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FotoVuelo from '../../components/FotoVuelo'
 import { fechaCorta, hora, precio } from '../../utils/formato'
 import { ESTADOS_VUELO, textoDescuento, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
+
+const POR_PAGINA = 20 // la aerolinea tiene miles de vuelos: se muestran de a 20
 
 // Cuenta asientos totales y vendidos sumando todas las clases del vuelo
 const asientosDe = (vuelo) =>
@@ -21,6 +23,8 @@ const asientosDe = (vuelo) =>
 function PanelVuelos() {
   const [vuelos, setVuelos] = useState(null)
   const [busqueda, setBusqueda] = useState('')
+  const [pagina, setPagina] = useState(0)
+  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen } de los vuelos de la pagina
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [aEliminar, setAEliminar] = useState(null) // vuelo que espera confirmacion (muestra el cartel)
@@ -61,6 +65,17 @@ function PanelVuelos() {
       .toLowerCase()
       .includes(texto),
   )
+  const totalPaginas = Math.ceil(visibles.length / POR_PAGINA)
+  const enPagina = visibles.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA)
+
+  // Las fotos solo de los vuelos de la pagina que se ve. Cada vez que cambian esos
+  // vuelos (otra pagina u otra busqueda), se vuelven a pedir.
+  const idsEnPagina = enPagina.map((v) => v.id).join(',')
+
+  useEffect(() => {
+    if (!idsEnPagina) return
+    pedirPortadas(idsEnPagina.split(',')).then((datos) => setPortadas(datos))
+  }, [idsEnPagina])
 
   const resumen = (vuelos ?? []).reduce(
     (total, vuelo) => {
@@ -127,14 +142,17 @@ function PanelVuelos() {
               id="buscarVuelo"
               type="search"
               value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
+              onChange={(e) => {
+                setBusqueda(e.target.value)
+                setPagina(0) // una busqueda nueva arranca en la primera pagina
+              }}
               placeholder="Ciudad, código de aeropuerto o número de vuelo"
             />
           </div>
         )}
 
         <div className="panel-lista">
-          {visibles.map((vuelo) => {
+          {enPagina.map((vuelo) => {
             const asientos = asientosDe(vuelo)
             const descuento = textoDescuento(vuelo.descuentoVigente, precio)
             const sinClases = vuelo.disponibilidades.length === 0
@@ -142,7 +160,7 @@ function PanelVuelos() {
             return (
               <article key={vuelo.id} className="tarjeta panel-vuelo">
                 <div className="panel-vuelo-foto" aria-hidden="true">
-                  <FotoVuelo vueloId={vuelo.id} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+                  <FotoVuelo imagen={portadas[vuelo.id]} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
                 </div>
                 <div className="panel-vuelo-info">
                   <div className="panel-vuelo-titulo">
@@ -197,6 +215,24 @@ function PanelVuelos() {
             )
           })}
         </div>
+
+        {totalPaginas > 1 && (
+          <nav className="panel-paginas" aria-label="Páginas del panel">
+            <button className="boton boton-secundario" disabled={pagina === 0} onClick={() => setPagina(pagina - 1)}>
+              ← Anterior
+            </button>
+            <span>
+              Página {pagina + 1} de {totalPaginas}
+            </span>
+            <button
+              className="boton boton-secundario"
+              disabled={pagina + 1 >= totalPaginas}
+              onClick={() => setPagina(pagina + 1)}
+            >
+              Siguiente →
+            </button>
+          </nav>
+        )}
       </div>
 
       {aEliminar && (

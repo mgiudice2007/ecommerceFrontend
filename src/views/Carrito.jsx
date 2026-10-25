@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../api/api'
+import { api, pedirPortadas, pedirVuelos } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
 import { useAuth } from '../context/AuthContext'
@@ -17,10 +17,19 @@ function Carrito() {
   const [ocupado, setOcupado] = useState(false)
   const [usarMillas, setUsarMillas] = useState(false) // casilla "Usar millas + dinero"
   const [millasElegidas, setMillasElegidas] = useState('')
+  // El carrito no trae la fecha ni los asientos que quedan de cada vuelo, ni su foto:
+  // los pide esta pantalla y se los pasa a cada ItemCarrito por props
+  const [vuelos, setVuelos] = useState({}) // { idVuelo: vuelo }
+  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen }
 
   useEffect(() => {
     api('/api/carrito')
-      .then(setCarrito)
+      .then((data) => {
+        setCarrito(data)
+        const ids = data.items.map((item) => item.vueloId)
+        pedirVuelos(ids).then((datos) => setVuelos(datos))
+        pedirPortadas(ids).then((datos) => setPortadas(datos))
+      })
       .catch((err) => setError(err.message))
   }, [])
 
@@ -129,6 +138,8 @@ function Carrito() {
                 <ItemCarrito
                   key={item.id}
                   item={item}
+                  vuelo={vuelos[item.vueloId]}
+                  imagen={portadas[item.vueloId]}
                   onCambiarCantidad={cambiarCantidad}
                   onEliminar={eliminar}
                   ocupado={ocupado}

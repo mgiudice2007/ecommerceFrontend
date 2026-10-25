@@ -27,8 +27,7 @@ function DetalleVuelo() {
   }, [])
 
   const [vuelo, setVuelo] = useState(null)
-  const [fotos, setFotos] = useState([])
-  const [portada, setPortada] = useState(null) // imagen de la primera foto (data URL)
+  const [imagenes, setImagenes] = useState([]) // las fotos del vuelo ya convertidas en imagen (data URL)
   const [error, setError] = useState('')
 
   const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
@@ -50,15 +49,26 @@ function DetalleVuelo() {
       .catch((err) => setError(err.message))
 
     // Las fotos van aparte: si fallan, el vuelo se muestra igual.
-    // La primera es el fondo de la portada (su imagen llega en Base64).
+    // Primero la lista de fotos y despues la imagen (en Base64) de cada una.
+    // La primera es el fondo de la portada y todas juntas arman la galeria.
     api(`/api/fotos?vueloId=${id}`)
-      .then((data) => {
-        setFotos(data)
-        return data.length > 0 ? pedirImagen(data[0].id) : null
-      })
-      .then((imagen) => setPortada(imagen))
-      .catch(() => setFotos([]))
+      .then((fotos) => Promise.all(fotos.map((foto) => pedirImagen(foto.id))))
+      .then((data) => setImagenes(data))
+      .catch(() => setImagenes([]))
   }, [id, claseInicial])
+
+  // El mapa de asientos de la clase elegida (GET /api/disponibilidades/{id}/asientos).
+  // Se guarda junto con el id de la clase que lo pidio: si el usuario cambia de clase,
+  // hasta que llegue el mapa nuevo no se muestra el de la clase anterior.
+  const [mapa, setMapa] = useState({ disponibilidadId: null, datos: null, error: '' })
+  const elegidaId = elegida?.id
+
+  useEffect(() => {
+    if (!elegidaId) return
+    api(`/api/disponibilidades/${elegidaId}/asientos`)
+      .then((datos) => setMapa({ disponibilidadId: elegidaId, datos, error: '' }))
+      .catch((err) => setMapa({ disponibilidadId: elegidaId, datos: null, error: err.message }))
+  }, [elegidaId])
 
   if (error) {
     return (
@@ -168,7 +178,7 @@ function DetalleVuelo() {
   }
 
   // La primera foto del vuelo es el fondo de la portada (si no tiene, queda el azul)
-  const fondoPortada = portada ? { backgroundImage: `url("${portada}")` } : undefined
+  const fondoPortada = imagenes.length > 0 ? { backgroundImage: `url("${imagenes[0]}")` } : undefined
 
   return (
     <>
@@ -249,8 +259,9 @@ function DetalleVuelo() {
                   {pasajeros.bebes > 0 && ' Los bebés viajan a upa, sin asiento propio.'}
                 </p>
                 <SelectorAsientos
+                  mapa={mapa.disponibilidadId === elegida.id ? mapa.datos : null}
+                  error={mapa.disponibilidadId === elegida.id ? mapa.error : ''}
                   grupo={{
-                    disponibilidadId: elegida.id,
                     titulo: `Clase ${elegida.claseNombre}`,
                     adultos: pasajeros.adultos,
                     ninos: pasajeros.ninos,
@@ -262,10 +273,10 @@ function DetalleVuelo() {
               </section>
             )}
 
-            {fotos.length > 1 && (
+            {imagenes.length > 1 && (
               <section>
                 <h2 className="detalle-subtitulo">Conocé {vuelo.destinoCiudad}</h2>
-                <GaleriaFotos fotos={fotos} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+                <GaleriaFotos imagenes={imagenes} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
               </section>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../api/api'
+import { api, pedirPortadas } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FotoVuelo from '../components/FotoVuelo'
 import { fechaLarga, hora, precio } from '../utils/formato'
@@ -16,10 +16,15 @@ function MisCompras() {
   const [mensaje, setMensaje] = useState('')
   const [cancelando, setCancelando] = useState(null) // id de la orden que se esta cancelando
   const [aCancelar, setACancelar] = useState(null) // orden que espera confirmacion (muestra el cartel)
+  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen } para la foto de cada compra
 
   useEffect(() => {
     api('/api/ordenes')
-      .then(setOrdenes)
+      .then((data) => {
+        setOrdenes(data)
+        // La foto de cada compra es la del primer vuelo
+        pedirPortadas(data.map((orden) => orden.items[0].vueloId)).then((datos) => setPortadas(datos))
+      })
       .catch((err) => setError(err.message))
   }, [])
 
@@ -68,7 +73,7 @@ function MisCompras() {
               <article key={orden.id} className={`tarjeta compra ${cancelada ? 'compra-cancelada' : ''}`}>
                 <div className="compra-foto" aria-hidden="true">
                   <FotoVuelo
-                    vueloId={orden.items[0].vueloId}
+                    imagen={portadas[orden.items[0].vueloId]}
                     destinoIata=""
                     destinoCiudad={orden.items[0].destino}
                   />

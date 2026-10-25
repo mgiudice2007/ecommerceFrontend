@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import ImagenFoto from './ImagenFoto'
 import './GaleriaFotos.css'
 
 // Foto grande + miniaturas. Al tocar una miniatura pasa a ser la grande.
-// fotos: la lista que devuelve GET /api/fotos?vueloId=...
-function GaleriaFotos({ fotos, destinoIata, destinoCiudad }) {
+// imagenes: las fotos del vuelo ya convertidas en imagen (data URL). Las pide DetalleVuelo.
+function GaleriaFotos({ imagenes, destinoIata, destinoCiudad }) {
   const [seleccionada, setSeleccionada] = useState(0)
 
-  if (fotos.length === 0) {
+  if (imagenes.length === 0) {
     return (
       <div className="galeria-principal galeria-vacia">
         <span>{destinoIata}</span>
@@ -18,22 +17,22 @@ function GaleriaFotos({ fotos, destinoIata, destinoCiudad }) {
 
   return (
     <div className="galeria">
-      <ImagenFoto
+      <img
         className="galeria-principal"
-        fotoId={fotos[seleccionada].id}
+        src={imagenes[seleccionada]}
         alt={`Foto ${seleccionada + 1} de ${destinoCiudad}`}
       />
 
-      {fotos.length > 1 && (
+      {imagenes.length > 1 && (
         <div className="galeria-miniaturas">
-          {fotos.map((foto, indice) => (
+          {imagenes.map((imagen, indice) => (
             <button
-              key={foto.id}
+              key={indice}
               className={indice === seleccionada ? 'activa' : ''}
               onClick={() => setSeleccionada(indice)}
               aria-label={`Ver foto ${indice + 1}`}
             >
-              <ImagenFoto fotoId={foto.id} alt="" />
+              <img src={imagen} alt="" />
             </button>
           ))}
         </div>
