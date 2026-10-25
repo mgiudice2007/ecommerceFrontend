@@ -36,18 +36,14 @@ function Vuelos() {
   const resultado = cargando ? null : respuesta.datos
   const error = cargando ? '' : respuesta.error
 
-  // Datos del catalogo para el buscador (si falla un pedido, ese campo queda vacio).
+  // Aeropuertos para el buscador (si falla el pedido, Desde y Hacia quedan vacios).
   // Los pide esta pantalla y se los pasa al Buscador por props.
   const [aeropuertos, setAeropuertos] = useState([])
-  const [clases, setClases] = useState([])
 
   useEffect(() => {
     api('/api/aeropuertos')
       .then((data) => setAeropuertos(data))
       .catch(() => setAeropuertos([]))
-    api('/api/clases')
-      .then((data) => setClases(data))
-      .catch(() => setClases([]))
   }, [])
 
   const [precios, setPrecios] = useState({
@@ -132,7 +128,6 @@ function Vuelos() {
   const filtrosIniciales = {
     origen: searchParams.get('origen') ?? '',
     destino: searchParams.get('destino') ?? '',
-    claseId: searchParams.get('claseId') ?? '',
     viaje: searchParams.get('viaje') ?? 'ida',
     ida: searchParams.get('ida') ?? '',
     vuelta: searchParams.get('vuelta') ?? '',
@@ -189,12 +184,7 @@ function Vuelos() {
 
       <div className="contenedor sobre-encabezado vuelos-pagina">
         {/* La key hace que el buscador se reinicie con los filtros nuevos si cambia la URL */}
-        <Buscador
-          key={searchParams.toString()}
-          inicial={filtrosIniciales}
-          aeropuertos={aeropuertos}
-          clases={clases}
-        />
+        <Buscador key={searchParams.toString()} inicial={filtrosIniciales} aeropuertos={aeropuertos} />
 
         {faltaRuta && (
           <div className="tarjeta vuelos-vacio">

@@ -65,7 +65,7 @@
 
 .buscador-fila {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: 12px;
 }
 
@@ -124,12 +124,6 @@
 }
 
 /* Pasajeros: un boton que abre el desplegable con adultos, ninos y bebes */
-.buscador-fila-pasajeros {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
 .buscador-pasajeros {
   position: relative;
 }
@@ -191,8 +185,7 @@
 }
 
 @media (max-width: 860px) {
-  .buscador-fila,
-  .buscador-fila-pasajeros {
+  .buscador-fila {
     grid-template-columns: 1fr;
   }
 }

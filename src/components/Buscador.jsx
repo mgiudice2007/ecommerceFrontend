@@ -27,13 +27,13 @@ const buscarAeropuerto = (lista, texto) =>
   )
 
 // Buscador de vuelos. Usa los filtros que acepta GET /api/vuelos:
-// origen, destino, claseId y las fechas.
+// origen, destino y las fechas. La clase se elige despues, en el detalle del vuelo.
 // Con "Ida y vuelta" la pagina de resultados busca dos veces: la ida (origen -> destino)
 // y la vuelta (destino -> origen).
 // inicial: los filtros con los que arranca (por ejemplo, los que ya estan en la URL)
-// aeropuertos y clases: los datos del catalogo para los campos. El buscador no los
-// pide: los trae la pantalla que lo usa (Inicio o Vuelos) y se los pasa por props.
-function Buscador({ inicial = {}, aeropuertos = [], clases = [] }) {
+// aeropuertos: el catalogo para Desde y Hacia. El buscador no lo pide: lo trae la
+// pantalla que lo usa (Inicio o Vuelos) y se lo pasa por props.
+function Buscador({ inicial = {}, aeropuertos = [] }) {
   const navigate = useNavigate()
 
   const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')
@@ -43,7 +43,6 @@ function Buscador({ inicial = {}, aeropuertos = [], clases = [] }) {
   const [filtros, setFiltros] = useState({
     origen: inicial.origen ?? '',
     destino: inicial.destino ?? '',
-    claseId: inicial.claseId ?? '',
     ida: inicial.ida ?? '',
     vuelta: inicial.vuelta ?? '',
   })
@@ -198,19 +197,8 @@ function Buscador({ inicial = {}, aeropuertos = [], clases = [] }) {
         </div>
       </div>
 
+      {/* Fechas y pasajeros en la misma fila */}
       <div className="buscador-fila">
-        <div className="buscador-campo">
-          <label htmlFor="claseId">Clase</label>
-          <select id="claseId" name="claseId" value={filtros.claseId} onChange={handleChange}>
-            <option value="">Todas</option>
-            {clases.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* type="date" muestra el calendario del navegador; min no deja elegir dias pasados */}
         <div className="buscador-fechas">
           <div className="buscador-campo">
@@ -231,9 +219,7 @@ function Buscador({ inicial = {}, aeropuertos = [], clases = [] }) {
             </div>
           )}
         </div>
-      </div>
 
-      <div className="buscador-fila-pasajeros">
         <div className="buscador-campo buscador-pasajeros">
           <label htmlFor="pasajeros">Pasajeros</label>
           <button id="pasajeros" type="button" onClick={() => setVerPasajeros(!verPasajeros)} aria-expanded={verPasajeros}>

@@ -59,18 +59,14 @@ const mundoDe = (vuelos, region) => unoPorDestino(vuelos.filter((v) => v.categor
 
 function Inicio() {
   const { estaLogueado } = useAuth()
-  // Datos del catalogo para el buscador (si falla un pedido, ese campo queda vacio).
+  // Aeropuertos para el buscador (si falla el pedido, Desde y Hacia quedan vacios).
   // Los pide esta pantalla y se los pasa al Buscador por props.
   const [aeropuertos, setAeropuertos] = useState([])
-  const [clases, setClases] = useState([])
 
   useEffect(() => {
     api('/api/aeropuertos')
       .then((data) => setAeropuertos(data))
       .catch(() => setAeropuertos([]))
-    api('/api/clases')
-      .then((data) => setClases(data))
-      .catch(() => setClases([]))
   }, [])
 
   const [vuelos, setVuelos] = useState([])
@@ -131,7 +127,7 @@ function Inicio() {
       </section>
 
       <div className="contenedor inicio-buscador">
-        <Buscador aeropuertos={aeropuertos} clases={clases} />
+        <Buscador aeropuertos={aeropuertos} />
         <div className="inicio-atajos">
           <span>Búsquedas frecuentes:</span>
           {ATAJOS.map((a) => (
