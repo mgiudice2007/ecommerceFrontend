@@ -64,7 +64,14 @@
 .compra-acciones {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+}
+
+/* Faltan menos de 24 horas para el vuelo o ya salio */
+.compra-sin-cancelar {
+  color: var(--texto-suave);
+  font-size: 14px;
 }
 
 .compra-cancelada .compra-pie > strong {

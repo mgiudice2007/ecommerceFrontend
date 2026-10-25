@@ -105,7 +105,8 @@ function MisCompras() {
                   <div className="compra-pie">
                     <strong>{precio(orden.total)}</strong>
                     <div className="compra-acciones">
-                      {!cancelada && (
+                      {/* El backend dice si todavia se puede cancelar (hasta 24 hs antes del vuelo) */}
+                      {orden.sePuedeCancelar && (
                         <button
                           className="boton boton-peligro"
                           onClick={() => setACancelar(orden)}
@@ -113,6 +114,9 @@ function MisCompras() {
                         >
                           {cancelando === orden.id ? 'Cancelando…' : 'Cancelar compra'}
                         </button>
+                      )}
+                      {!cancelada && !orden.sePuedeCancelar && (
+                        <span className="compra-sin-cancelar">Ya no se puede cancelar</span>
                       )}
                       <Link to={`/mis-compras/${orden.id}`} className="boton boton-secundario">
                         Ver detalle

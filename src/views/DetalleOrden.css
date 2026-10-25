@@ -154,6 +154,12 @@
   margin-top: 24px;
 }
 
+.orden-cancelacion {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 14px;
+}
+
 .orden-millas {
   margin: 12px 0 0;
   color: var(--azul);

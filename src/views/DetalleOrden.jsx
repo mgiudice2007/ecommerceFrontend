@@ -4,7 +4,7 @@ import { api } from '../api/api'
 import { fechaLarga, hora, millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import Confirmacion from '../components/Confirmacion'
-import { cancelarOrden, numerosDeVuelo } from '../utils/ordenes'
+import { cancelarOrden, numerosDeVuelo, textoCancelacion } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
 import './DetalleOrden.css'
 
@@ -158,12 +158,14 @@ function DetalleOrden() {
         <Link to="/" className="boton boton-secundario">
           Volver al inicio
         </Link>
-        {!cancelada && (
+        {/* El backend dice si todavia se puede cancelar (hasta 24 hs antes del vuelo) */}
+        {orden.sePuedeCancelar && (
           <button className="boton boton-peligro" onClick={() => setPreguntando(true)} disabled={cancelando}>
             {cancelando ? 'Cancelando…' : 'Cancelar compra'}
           </button>
         )}
       </div>
+      {!cancelada && <p className="texto-suave orden-cancelacion">{textoCancelacion(orden)}</p>}
 
       {preguntando && (
         <Confirmacion
