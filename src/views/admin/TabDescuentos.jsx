@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
+import Confirmacion from '../../components/Confirmacion'
 import { hoy, precio } from '../../utils/formato'
 
 const fechaCorta = (fecha) => new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR')
@@ -12,6 +13,7 @@ function TabDescuentos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
+  const [aEliminar, setAEliminar] = useState(null) // descuento que espera confirmacion
   // Cada vez que cambia, el useEffect vuelve a pedir la lista de descuentos
   const [recargar, setRecargar] = useState(0)
 
@@ -63,7 +65,7 @@ function TabDescuentos({ vuelo, onCambio }) {
   }
 
   const eliminar = (d) => {
-    if (!window.confirm('¿Eliminar este descuento? Las compras ya hechas mantienen su precio.')) return
+    setAEliminar(null) // se cierra el cartel
     ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
   }
 
@@ -114,7 +116,7 @@ function TabDescuentos({ vuelo, onCambio }) {
                       <button className="boton boton-secundario" onClick={() => alternarActivo(d)} disabled={guardando}>
                         {d.activo ? 'Pausar' : 'Activar'}
                       </button>
-                      <button className="boton boton-peligro" onClick={() => eliminar(d)} disabled={guardando}>
+                      <button className="boton boton-peligro" onClick={() => setAEliminar(d)} disabled={guardando}>
                         Eliminar
                       </button>
                     </td>
@@ -182,6 +184,17 @@ function TabDescuentos({ vuelo, onCambio }) {
           </button>
         </form>
       </section>
+
+      {aEliminar && (
+        <Confirmacion
+          titulo="¿Eliminar este descuento?"
+          mensaje="Las compras ya hechas mantienen su precio."
+          textoConfirmar="Sí, eliminar"
+          peligro
+          onConfirmar={() => eliminar(aEliminar)}
+          onCancelar={() => setAEliminar(null)}
+        />
+      )}
     </div>
   )
 }

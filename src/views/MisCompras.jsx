@@ -4,7 +4,8 @@ import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FotoVuelo from '../components/FotoVuelo'
 import { fechaLarga, hora, precio } from '../utils/formato'
-import { cancelarOrden, confirmarCancelacion, numerosDeVuelo } from '../utils/ordenes'
+import Confirmacion from '../components/Confirmacion'
+import { cancelarOrden, numerosDeVuelo } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
 import './MisCompras.css'
 
@@ -14,6 +15,7 @@ function MisCompras() {
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [cancelando, setCancelando] = useState(null) // id de la orden que se esta cancelando
+  const [aCancelar, setACancelar] = useState(null) // orden que espera confirmacion (muestra el cartel)
 
   useEffect(() => {
     api('/api/ordenes')
@@ -22,8 +24,7 @@ function MisCompras() {
   }, [])
 
   const cancelar = (orden) => {
-    if (!confirmarCancelacion(orden)) return
-
+    setACancelar(null) // se cierra el cartel
     setError('')
     setMensaje('')
     setCancelando(orden.id)
@@ -108,7 +109,7 @@ function MisCompras() {
                       {!cancelada && (
                         <button
                           className="boton boton-peligro"
-                          onClick={() => cancelar(orden)}
+                          onClick={() => setACancelar(orden)}
                           disabled={cancelando === orden.id}
                         >
                           {cancelando === orden.id ? 'Cancelando…' : 'Cancelar compra'}
@@ -125,6 +126,18 @@ function MisCompras() {
           })}
         </div>
       </div>
+
+      {/* Renderizado condicional: el cartel aparece solo si hay una compra elegida para cancelar */}
+      {aCancelar && (
+        <Confirmacion
+          titulo={`¿Cancelar la compra #${aCancelar.id}?`}
+          mensaje="Se liberan los asientos y no se puede deshacer."
+          textoConfirmar="Sí, cancelar compra"
+          peligro
+          onConfirmar={() => cancelar(aCancelar)}
+          onCancelar={() => setACancelar(null)}
+        />
+      )}
     </>
   )
 }

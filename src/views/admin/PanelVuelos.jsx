@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
+import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FotoVuelo from '../../components/FotoVuelo'
 import { fechaCorta, hora, precio } from '../../utils/formato'
@@ -22,6 +23,7 @@ function PanelVuelos() {
   const [busqueda, setBusqueda] = useState('')
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
+  const [aEliminar, setAEliminar] = useState(null) // vuelo que espera confirmacion (muestra el cartel)
 
   useEffect(() => {
     // El admin es el unico vendedor de la aerolinea: ve y maneja todos los vuelos
@@ -48,10 +50,8 @@ function PanelVuelos() {
   }
 
   const eliminar = (vuelo) => {
-    const seguro = window.confirm(
-      `¿Eliminar el vuelo ${vuelo.numeroVuelo}? Deja de mostrarse en la búsqueda. Las compras ya hechas no se modifican.`,
-    )
-    if (seguro) cambiarEstado(vuelo, 'ELIMINADO')
+    setAEliminar(null) // se cierra el cartel
+    cambiarEstado(vuelo, 'ELIMINADO')
   }
 
   // Filtro de la lista por texto (solo en el navegador, no vuelve a pedir al backend)
@@ -189,7 +189,7 @@ function PanelVuelos() {
                   <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-secundario">
                     Editar
                   </Link>
-                  <button className="boton boton-peligro" onClick={() => eliminar(vuelo)}>
+                  <button className="boton boton-peligro" onClick={() => setAEliminar(vuelo)}>
                     Eliminar
                   </button>
                 </div>
@@ -198,6 +198,17 @@ function PanelVuelos() {
           })}
         </div>
       </div>
+
+      {aEliminar && (
+        <Confirmacion
+          titulo={`¿Eliminar el vuelo ${aEliminar.numeroVuelo}?`}
+          mensaje="Deja de mostrarse en la búsqueda. Las compras ya hechas no se modifican."
+          textoConfirmar="Sí, eliminar"
+          peligro
+          onConfirmar={() => eliminar(aEliminar)}
+          onCancelar={() => setAEliminar(null)}
+        />
+      )}
     </>
   )
 }

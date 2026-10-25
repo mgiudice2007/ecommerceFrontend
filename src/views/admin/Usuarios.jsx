@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
+import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { useAuth } from '../../context/AuthContext'
 import { fechaLarga } from '../../utils/formato'
@@ -29,6 +30,7 @@ function Usuarios() {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(null)
+  const [aGuardar, setAGuardar] = useState(null) // usuario que espera confirmacion del cambio de rol
 
   useEffect(() => {
     api('/api/usuarios')
@@ -48,8 +50,7 @@ function Usuarios() {
   const guardar = (usuario) => {
     const rol = cambios[usuario.id]
     const nombreRol = nombreDeRol(rol)
-    if (!window.confirm(`¿Cambiar a ${usuario.username} a ${nombreRol}?`)) return
-
+    setAGuardar(null) // se cierra el cartel
     setError('')
     setExito('')
     setGuardando(usuario.id)
@@ -185,7 +186,7 @@ function Usuarios() {
                           {cambios[u.id] && (
                             <button
                               className="boton boton-primario"
-                              onClick={() => guardar(u)}
+                              onClick={() => setAGuardar(u)}
                               disabled={guardando === u.id}
                             >
                               {guardando === u.id ? 'Guardando…' : 'Guardar'}
@@ -201,6 +202,16 @@ function Usuarios() {
           )}
         </section>
       </div>
+
+      {aGuardar && (
+        <Confirmacion
+          titulo="¿Cambiar el rol?"
+          mensaje={`${aGuardar.username} va a pasar a ser ${nombreDeRol(cambios[aGuardar.id])}.`}
+          textoConfirmar="Sí, cambiar"
+          onConfirmar={() => guardar(aGuardar)}
+          onCancelar={() => setAGuardar(null)}
+        />
+      )}
     </>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
+import Confirmacion from '../../components/Confirmacion'
 import ImagenFoto from '../../components/ImagenFoto'
 
 const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
@@ -12,6 +13,7 @@ function TabFotos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [subiendo, setSubiendo] = useState(false)
+  const [aEliminar, setAEliminar] = useState(null) // foto que espera confirmacion
   // Cada vez que cambia, el useEffect vuelve a pedir las fotos
   const [recargar, setRecargar] = useState(0)
 
@@ -60,7 +62,7 @@ function TabFotos({ vuelo, onCambio }) {
   }
 
   const eliminar = (foto) => {
-    if (!window.confirm('¿Eliminar esta foto?')) return
+    setAEliminar(null) // se cierra el cartel
     setError('')
     setExito('')
     api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
@@ -95,7 +97,7 @@ function TabFotos({ vuelo, onCambio }) {
                 {indice === 0 && <span className="etiqueta">Portada</span>}
                 <div>
                   <span className="texto-suave">{Math.round(foto.tamano / 1024)} KB</span>
-                  <button onClick={() => eliminar(foto)}>Eliminar</button>
+                  <button onClick={() => setAEliminar(foto)}>Eliminar</button>
                 </div>
               </figure>
             ))}
@@ -119,6 +121,17 @@ function TabFotos({ vuelo, onCambio }) {
           </form>
         )}
       </section>
+
+      {aEliminar && (
+        <Confirmacion
+          titulo="¿Eliminar esta foto?"
+          mensaje="Deja de mostrarse en la página del vuelo."
+          textoConfirmar="Sí, eliminar"
+          peligro
+          onConfirmar={() => eliminar(aEliminar)}
+          onCancelar={() => setAEliminar(null)}
+        />
+      )}
     </div>
   )
 }

@@ -3,7 +3,8 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import { fechaLarga, hora, millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
-import { cancelarOrden, confirmarCancelacion, numerosDeVuelo } from '../utils/ordenes'
+import Confirmacion from '../components/Confirmacion'
+import { cancelarOrden, numerosDeVuelo } from '../utils/ordenes'
 import { useAuth } from '../context/AuthContext'
 import './DetalleOrden.css'
 
@@ -18,6 +19,7 @@ function DetalleOrden() {
   const [orden, setOrden] = useState(null)
   const [error, setError] = useState('')
   const [cancelando, setCancelando] = useState(false)
+  const [preguntando, setPreguntando] = useState(false) // true mientras se muestra el cartel de confirmacion
 
   useEffect(() => {
     api(`/api/ordenes/${id}`)
@@ -41,8 +43,7 @@ function DetalleOrden() {
   const cancelada = orden.estado === 'CANCELADA'
 
   const cancelar = () => {
-    if (!confirmarCancelacion(orden)) return
-
+    setPreguntando(false) // se cierra el cartel
     setCancelando(true)
     cancelarOrden(orden)
       .then((actualizada) => {
@@ -158,11 +159,22 @@ function DetalleOrden() {
           Volver al inicio
         </Link>
         {!cancelada && (
-          <button className="boton boton-peligro" onClick={cancelar} disabled={cancelando}>
+          <button className="boton boton-peligro" onClick={() => setPreguntando(true)} disabled={cancelando}>
             {cancelando ? 'Cancelando…' : 'Cancelar compra'}
           </button>
         )}
       </div>
+
+      {preguntando && (
+        <Confirmacion
+          titulo={`¿Cancelar la compra #${orden.id}?`}
+          mensaje="Se liberan los asientos y no se puede deshacer."
+          textoConfirmar="Sí, cancelar compra"
+          peligro
+          onConfirmar={cancelar}
+          onCancelar={() => setPreguntando(false)}
+        />
+      )}
     </div>
   )
 }
