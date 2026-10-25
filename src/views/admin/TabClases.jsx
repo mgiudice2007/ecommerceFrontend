@@ -23,6 +23,10 @@ function TabClases({ vuelo, onCambio }) {
   // Solo se pueden agregar las clases que el vuelo todavia no tiene
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
 
+  // Cada clase tiene un maximo de asientos por vuelo (viene del backend, tabla clases)
+  const maximoDe = (claseId) => clases.find((c) => String(c.id) === String(claseId))?.maximoAsientos
+  const maximoNueva = maximoDe(nueva.claseId)
+
   const agregar = (e) => {
     e.preventDefault()
     setError('')
@@ -105,7 +109,8 @@ function TabClases({ vuelo, onCambio }) {
                         {enEdicion ? (
                           <input
                             type="number"
-                            min={vendidos}
+                            min={Math.max(vendidos, 1)}
+                            max={maximoDe(d.claseId)}
                             value={editando.asientosTotales}
                             onChange={(e) => setEditando({ ...editando, asientosTotales: e.target.value })}
                             aria-label="Asientos totales"
@@ -196,10 +201,12 @@ function TabClases({ vuelo, onCambio }) {
                 id="asientosTotales"
                 type="number"
                 min="1"
+                max={maximoNueva}
                 value={nueva.asientosTotales}
                 onChange={(e) => setNueva({ ...nueva, asientosTotales: e.target.value })}
                 required
               />
+              {maximoNueva && <small className="texto-suave">Entre 1 y {maximoNueva} asientos para esta clase.</small>}
             </div>
             <div className="campo">
               <label htmlFor="precioClase">Precio por pasajero</label>
