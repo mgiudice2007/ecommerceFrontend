@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
+import Confirmacion from '../../components/Confirmacion'
 import { precio } from '../../utils/formato'
 
 // Pestaña "Clases y asientos": cada fila es una Disponibilidad del vuelo
@@ -19,6 +20,8 @@ function TabClases({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
+  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
+  const [pregunta, setPregunta] = useState(null)
 
   // Solo se pueden agregar las clases que el vuelo todavia no tiene
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
@@ -27,8 +30,19 @@ function TabClases({ vuelo, onCambio }) {
   const maximoDe = (claseId) => clases.find((c) => String(c.id) === String(claseId))?.maximoAsientos
   const maximoNueva = maximoDe(nueva.claseId)
 
+  // Antes de agregar la clase se muestra lo que se va a cargar y se pide confirmacion
   const agregar = (e) => {
     e.preventDefault()
+    const clase = clases.find((c) => String(c.id) === nueva.claseId)
+    setPregunta({
+      titulo: `¿Agregar la clase ${clase?.nombre ?? ''}?`,
+      detalle: [`Asientos: ${nueva.asientosTotales}`, `Precio por pasajero: ${precio(nueva.precio)}`],
+      textoConfirmar: 'Sí, agregar',
+      accion: agregarClase,
+    })
+  }
+
+  const agregarClase = () => {
     setError('')
     setExito('')
     setGuardando(true)
@@ -49,7 +63,28 @@ function TabClases({ vuelo, onCambio }) {
       .finally(() => setGuardando(false))
   }
 
+  // Antes de guardar se muestra que cambia (antes -> despues) y se pide confirmacion
   const guardarEdicion = (disponibilidad) => {
+    const detalle = []
+    if (Number(editando.asientosTotales) !== disponibilidad.asientosTotales) {
+      detalle.push(`Asientos: ${disponibilidad.asientosTotales} → ${editando.asientosTotales}`)
+    }
+    if (Number(editando.precio) !== Number(disponibilidad.precio)) {
+      detalle.push(`Precio por pasajero: ${precio(disponibilidad.precio)} → ${precio(editando.precio)}`)
+    }
+    if (detalle.length === 0) {
+      setEditando(null) // no cambio nada: no hay nada que guardar
+      return
+    }
+    setPregunta({
+      titulo: `¿Guardar los cambios de la clase ${disponibilidad.claseNombre}?`,
+      detalle,
+      textoConfirmar: 'Sí, guardar',
+      accion: () => guardarClase(disponibilidad),
+    })
+  }
+
+  const guardarClase = (disponibilidad) => {
     setError('')
     setExito('')
     setGuardando(true)
@@ -226,6 +261,22 @@ function TabClases({ vuelo, onCambio }) {
           </form>
         )}
       </section>
+
+      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
+      {pregunta && (
+        <Confirmacion
+          titulo={pregunta.titulo}
+          mensaje={pregunta.mensaje}
+          detalle={pregunta.detalle}
+          textoConfirmar={pregunta.textoConfirmar}
+          peligro={pregunta.peligro}
+          onConfirmar={() => {
+            setPregunta(null)
+            pregunta.accion()
+          }}
+          onCancelar={() => setPregunta(null)}
+        />
+      )}
     </div>
   )
 }

@@ -4,12 +4,14 @@ import { api, pedirImagen } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { fechaLarga, hora } from '../../utils/formato'
 import TabClases from './TabClases'
+import TabDatos from './TabDatos'
 import TabDescuentos from './TabDescuentos'
 import TabFotos from './TabFotos'
 import './Panel.css'
 import './GestionVuelo.css'
 
 const PESTANIAS = [
+  { id: 'datos', titulo: 'Datos del vuelo' },
   { id: 'clases', titulo: 'Clases y asientos' },
   { id: 'descuentos', titulo: 'Descuentos' },
   { id: 'fotos', titulo: 'Fotos' },
@@ -22,7 +24,8 @@ function GestionVuelo() {
   const [vuelo, setVuelo] = useState(null)
   const [portada, setPortada] = useState(null) // imagen de la primera foto, para el encabezado
   const [error, setError] = useState('')
-  const [pestania, setPestania] = useState('clases')
+  // Un vuelo recien publicado arranca en "Clases", porque sin clases no se puede comprar
+  const [pestania, setPestania] = useState(location.state?.recienCreado ? 'clases' : 'datos')
 
   // Cada vez que cambia, el useEffect vuelve a traer el vuelo
   const [recargar, setRecargar] = useState(0)
@@ -68,9 +71,6 @@ function GestionVuelo() {
             <Link to={`/vuelos/${vuelo.id}`} className="boton boton-contorno">
               Ver como comprador
             </Link>
-            <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-claro">
-              Editar datos
-            </Link>
           </>
         }
       >
@@ -100,6 +100,7 @@ function GestionVuelo() {
         </div>
 
         {/* Solo se muestra la pestaña elegida */}
+        {pestania === 'datos' && <TabDatos vuelo={vuelo} />}
         {pestania === 'clases' && <TabClases vuelo={vuelo} onCambio={recargarVuelo} />}
         {pestania === 'descuentos' && <TabDescuentos vuelo={vuelo} onCambio={recargarVuelo} />}
         {pestania === 'fotos' && <TabFotos vuelo={vuelo} onCambio={recargarVuelo} />}

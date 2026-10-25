@@ -29,6 +29,15 @@
   line-height: 1.5;
 }
 
+/* Lista de lo que va a cambiar */
+.confirmacion-detalle {
+  margin: 0 0 24px;
+  padding: 12px 16px 12px 32px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  line-height: 1.7;
+}
+
 .confirmacion-botones {
   display: flex;
   justify-content: flex-end;

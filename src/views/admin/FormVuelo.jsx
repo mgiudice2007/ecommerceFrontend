@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
-import CampoFecha from '../../components/CampoFecha'
-import { paraInputFechaHora } from '../../utils/formato'
+import { cuerpoVuelo, problemaEnVuelo } from '../../utils/vuelos'
+import CamposVuelo from './CamposVuelo'
 import './Panel.css'
 
 const FORM_VACIO = {
@@ -17,11 +17,9 @@ const FORM_VACIO = {
   precio: '',
 }
 
-// Sirve para crear (/panel/vuelos/nuevo) y para editar (/panel/vuelos/:id/editar).
-// Si la URL tiene :id, es edicion: carga el vuelo y al guardar hace PUT.
+// Publicar un vuelo nuevo (/panel/vuelos/nuevo). Para cambiar un vuelo que ya existe
+// se usa la pestaña "Datos del vuelo" de la gestion (TabDatos).
 function FormVuelo() {
-  const { id } = useParams()
-  const esEdicion = Boolean(id)
   const navigate = useNavigate()
   // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [aeropuertos, setAeropuertos] = useState([])
@@ -37,60 +35,17 @@ function FormVuelo() {
   }, [])
 
   const [formData, setFormData] = useState(FORM_VACIO)
-  const [cargando, setCargando] = useState(esEdicion)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!esEdicion) return
-    api(`/api/vuelos/${id}`)
-      .then((vuelo) =>
-        setFormData({
-          numeroVuelo: vuelo.numeroVuelo,
-          descripcion: vuelo.descripcion ?? '',
-          categoriaId: vuelo.categoriaId,
-          origenIata: vuelo.origenIata,
-          destinoIata: vuelo.destinoIata,
-          fechaSalida: paraInputFechaHora(vuelo.fechaSalida),
-          fechaLlegada: paraInputFechaHora(vuelo.fechaLlegada),
-          precio: vuelo.precio,
-        }),
-      )
-      .catch((err) => setError(err.message))
-      .finally(() => setCargando(false))
-  }, [esEdicion, id])
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault()
-    setError('')
-
-    if (formData.origenIata === formData.destinoIata) {
-      setError('El origen y el destino tienen que ser distintos')
-      return
-    }
-    if (formData.fechaLlegada <= formData.fechaSalida) {
-      setError('La llegada tiene que ser después de la salida')
-      return
-    }
+    const problema = problemaEnVuelo(formData)
+    setError(problema)
+    if (problema) return
 
     setGuardando(true)
-    const body = { ...formData, categoriaId: Number(formData.categoriaId), precio: Number(formData.precio) }
-
-    if (esEdicion) {
-      api(`/api/vuelos/${id}`, { method: 'PUT', body })
-        .then((vuelo) => navigate(`/panel/vuelos/${vuelo.id}`))
-        .catch((err) => {
-          setError(err.message)
-          setGuardando(false)
-        })
-      return
-    }
-
-    api('/api/vuelos', { method: 'POST', body })
+    api('/api/vuelos', { method: 'POST', body: cuerpoVuelo(formData) })
       // Un vuelo nuevo nace sin asientos ni fotos: lo mandamos a su pagina para cargarlos
       .then((vuelo) => navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: true } }))
       .catch((err) => {
@@ -99,20 +54,12 @@ function FormVuelo() {
       })
   }
 
-  if (cargando) {
-    return <div className="contenedor pagina texto-suave">Cargando vuelo…</div>
-  }
-
   return (
     <>
       <EncabezadoPagina
         etiqueta="Panel de vuelos"
-        titulo={esEdicion ? 'Editar vuelo' : 'Publicar un vuelo nuevo'}
-        subtitulo={
-          esEdicion
-            ? 'Los cambios se ven enseguida en la búsqueda. Las compras ya hechas no cambian.'
-            : 'Cargá los datos del vuelo. Después vas a poder agregar las clases con asientos, los descuentos y las fotos.'
-        }
+        titulo="Publicar un vuelo nuevo"
+        subtitulo="Cargá los datos del vuelo. Después vas a poder agregar las clases con asientos, los descuentos y las fotos."
       >
         <Link to="/panel">← Volver al panel</Link>
       </EncabezadoPagina>
@@ -122,122 +69,16 @@ function FormVuelo() {
           {error && <div className="mensaje mensaje-error">{error}</div>}
 
           <form onSubmit={handleSubmit}>
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="numeroVuelo">Número de vuelo</label>
-                <input
-                  id="numeroVuelo"
-                  name="numeroVuelo"
-                  value={formData.numeroVuelo}
-                  onChange={handleChange}
-                  placeholder="Ej: AR1500"
-                  required
-                />
-              </div>
-              <div className="campo">
-                <label htmlFor="categoriaId">Tipo de vuelo</label>
-                <select id="categoriaId" name="categoriaId" value={formData.categoriaId} onChange={handleChange} required>
-                  <option value="">Elegí una opción</option>
-                  {categorias.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nombre} — {c.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="origenIata">Origen</label>
-                <select id="origenIata" name="origenIata" value={formData.origenIata} onChange={handleChange} required>
-                  <option value="">Elegí el aeropuerto</option>
-                  {aeropuertos.map((a) => (
-                    <option key={a.codigoIata} value={a.codigoIata}>
-                      {a.ciudad} — {a.nombre} ({a.codigoIata})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="campo">
-                <label htmlFor="destinoIata">Destino</label>
-                <select id="destinoIata" name="destinoIata" value={formData.destinoIata} onChange={handleChange} required>
-                  <option value="">Elegí el aeropuerto</option>
-                  {aeropuertos.map((a) => (
-                    <option key={a.codigoIata} value={a.codigoIata}>
-                      {a.ciudad} — {a.nombre} ({a.codigoIata})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="fechaSalida">Salida</label>
-                <CampoFecha
-                  id="fechaSalida"
-                  conHora
-                  value={formData.fechaSalida}
-                  onChange={(valor) => setFormData({ ...formData, fechaSalida: valor })}
-                  required
-                />
-              </div>
-              <div className="campo">
-                <label htmlFor="fechaLlegada">Llegada</label>
-                <CampoFecha
-                  id="fechaLlegada"
-                  conHora
-                  value={formData.fechaLlegada}
-                  onChange={(valor) => setFormData({ ...formData, fechaLlegada: valor })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="campo">
-              <label htmlFor="precio">Precio base</label>
-              <input
-                id="precio"
-                name="precio"
-                type="number"
-                min="1"
-                step="0.01"
-                value={formData.precio}
-                onChange={handleChange}
-                required
-              />
-              <span className="panel-ayuda">
-                Es el precio de referencia del vuelo. El precio de cada clase se carga aparte, con sus asientos.
-              </span>
-            </div>
-
-            <div className="campo">
-              <label htmlFor="descripcion">Descripción (opcional)</label>
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                rows="3"
-                value={formData.descripcion}
-                onChange={handleChange}
-                placeholder="Ej: Vuelo directo, incluye snack a bordo"
-              />
-            </div>
-
-            {esEdicion && (
-              <p className="panel-ayuda">
-                Las fotos, clases y descuentos se manejan desde{' '}
-                <Link to={`/panel/vuelos/${id}`}>la gestión del vuelo</Link>.
-              </p>
-            )}
+            <CamposVuelo
+              formData={formData}
+              setFormData={setFormData}
+              aeropuertos={aeropuertos}
+              categorias={categorias}
+            />
 
             <div className="panel-botones">
               <button className="boton boton-primario" disabled={guardando}>
-                {guardando
-                  ? 'Guardando…'
-                  : esEdicion
-                    ? 'Guardar cambios'
-                    : 'Publicar vuelo'}
+                {guardando ? 'Guardando…' : 'Publicar vuelo'}
               </button>
               <Link to="/panel" className="boton boton-secundario">
                 Cancelar

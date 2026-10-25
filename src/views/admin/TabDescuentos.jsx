@@ -14,7 +14,8 @@ function TabDescuentos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
-  const [aEliminar, setAEliminar] = useState(null) // descuento que espera confirmacion
+  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
+  const [pregunta, setPregunta] = useState(null)
   // Cada vez que cambia, el useEffect vuelve a pedir la lista de descuentos
   const [recargar, setRecargar] = useState(0)
 
@@ -44,16 +45,51 @@ function TabDescuentos({ vuelo, onCambio }) {
       .finally(() => setGuardando(false))
   }
 
+  // Cada accion pide confirmacion antes de mandarse al backend
   const crear = (e) => {
     e.preventDefault()
+    setPregunta({
+      titulo: '¿Crear este descuento?',
+      detalle: [
+        `Descuento: ${textoValor({ ...nuevo, valor: Number(nuevo.valor) })} OFF`,
+        `Desde: ${fechaCorta(nuevo.fechaDesde)}`,
+        `Hasta: ${fechaCorta(nuevo.fechaHasta)}`,
+      ],
+      textoConfirmar: 'Sí, crear',
+      accion: crearDescuento,
+    })
+  }
+
+  const crearDescuento = () => {
     const body = { ...nuevo, vueloId: vuelo.id, valor: Number(nuevo.valor) }
     ejecutar('/api/descuentos', { method: 'POST', body }, 'Descuento creado.').then((ok) => {
       if (ok) setNuevo({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
     })
   }
 
-  // Prende o apaga un descuento sin borrarlo (PUT con activo cambiado)
   const alternarActivo = (d) => {
+    setPregunta({
+      titulo: `¿${d.activo ? 'Pausar' : 'Activar'} el descuento de ${textoValor(d)}?`,
+      mensaje: d.activo
+        ? 'Mientras esté pausado no se aplica al precio del vuelo.'
+        : 'Vuelve a aplicarse al precio del vuelo en sus fechas.',
+      textoConfirmar: d.activo ? 'Sí, pausar' : 'Sí, activar',
+      accion: () => cambiarActivo(d),
+    })
+  }
+
+  const preguntarEliminar = (d) => {
+    setPregunta({
+      titulo: '¿Eliminar este descuento?',
+      mensaje: 'Las compras ya hechas mantienen su precio.',
+      textoConfirmar: 'Sí, eliminar',
+      peligro: true,
+      accion: () => eliminar(d),
+    })
+  }
+
+  // Prende o apaga un descuento sin borrarlo (PUT con activo cambiado)
+  const cambiarActivo = (d) => {
     const body = {
       vueloId: vuelo.id,
       tipoDescuento: d.tipoDescuento,
@@ -66,7 +102,6 @@ function TabDescuentos({ vuelo, onCambio }) {
   }
 
   const eliminar = (d) => {
-    setAEliminar(null) // se cierra el cartel
     ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
   }
 
@@ -120,7 +155,7 @@ function TabDescuentos({ vuelo, onCambio }) {
                       <button className="boton boton-secundario" onClick={() => alternarActivo(d)} disabled={guardando}>
                         {d.activo ? 'Pausar' : 'Activar'}
                       </button>
-                      <button className="boton boton-peligro" onClick={() => setAEliminar(d)} disabled={guardando}>
+                      <button className="boton boton-peligro" onClick={() => preguntarEliminar(d)} disabled={guardando}>
                         Eliminar
                       </button>
                     </td>
@@ -190,14 +225,19 @@ function TabDescuentos({ vuelo, onCambio }) {
         </form>
       </section>
 
-      {aEliminar && (
+      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
+      {pregunta && (
         <Confirmacion
-          titulo="¿Eliminar este descuento?"
-          mensaje="Las compras ya hechas mantienen su precio."
-          textoConfirmar="Sí, eliminar"
-          peligro
-          onConfirmar={() => eliminar(aEliminar)}
-          onCancelar={() => setAEliminar(null)}
+          titulo={pregunta.titulo}
+          mensaje={pregunta.mensaje}
+          detalle={pregunta.detalle}
+          textoConfirmar={pregunta.textoConfirmar}
+          peligro={pregunta.peligro}
+          onConfirmar={() => {
+            setPregunta(null)
+            pregunta.accion()
+          }}
+          onCancelar={() => setPregunta(null)}
         />
       )}
     </div>

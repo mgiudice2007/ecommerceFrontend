@@ -34,3 +34,14 @@ export const textoDescuento = (descuento, formatearPrecio) => {
     ? `${Number(descuento.valor)}% OFF`
     : `${formatearPrecio(descuento.valor)} OFF`
 }
+
+// Controles del formulario de un vuelo antes de mandarlo al backend.
+// Devuelve el problema como texto, o '' si esta todo bien.
+export const problemaEnVuelo = (datos) => {
+  if (datos.origenIata === datos.destinoIata) return 'El origen y el destino tienen que ser distintos'
+  if (datos.fechaLlegada <= datos.fechaSalida) return 'La llegada tiene que ser después de la salida'
+  return ''
+}
+
+// El body que espera POST / PUT /api/vuelos (los numeros como numeros)
+export const cuerpoVuelo = (datos) => ({ ...datos, categoriaId: Number(datos.categoriaId), precio: Number(datos.precio) })

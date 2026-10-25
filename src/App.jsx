@@ -96,14 +96,6 @@ function App() {
               </RutaProtegida>
             }
           />
-          <Route
-            path="/panel/vuelos/:id/editar"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <FormVuelo />
-              </RutaProtegida>
-            }
-          />
 
           {/* Solo administradores */}
           <Route

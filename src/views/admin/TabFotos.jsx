@@ -13,7 +13,8 @@ function TabFotos({ vuelo, onCambio }) {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [subiendo, setSubiendo] = useState(false)
-  const [aEliminar, setAEliminar] = useState(null) // foto que espera confirmacion
+  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
+  const [pregunta, setPregunta] = useState(null)
   // Cada vez que cambia, el useEffect vuelve a pedir las fotos
   const [recargar, setRecargar] = useState(0)
 
@@ -40,10 +41,21 @@ function TabFotos({ vuelo, onCambio }) {
     setArchivo(elegido)
   }
 
+  // Antes de subir se muestra que archivo se va a subir y se pide confirmacion
   const subir = (e) => {
     e.preventDefault()
     if (!archivo) return
     const formulario = e.target // para vaciar el <input type="file"> despues de subir
+    setPregunta({
+      titulo: '¿Subir esta foto?',
+      mensaje: 'Se va a ver en la página del vuelo.',
+      detalle: [`Archivo: ${archivo.name}`, `Tamaño: ${Math.round(archivo.size / 1024)} KB`],
+      textoConfirmar: 'Sí, subir',
+      accion: () => subirFoto(formulario),
+    })
+  }
+
+  const subirFoto = (formulario) => {
 
     // Igual que en la clase de subida de imagenes: los datos van en un FormData.
     // El campo del archivo se tiene que llamar "file", como espera el backend.
@@ -66,8 +78,17 @@ function TabFotos({ vuelo, onCambio }) {
       .finally(() => setSubiendo(false))
   }
 
+  const preguntarEliminar = (foto) => {
+    setPregunta({
+      titulo: '¿Eliminar esta foto?',
+      mensaje: 'Deja de mostrarse en la página del vuelo.',
+      textoConfirmar: 'Sí, eliminar',
+      peligro: true,
+      accion: () => eliminar(foto),
+    })
+  }
+
   const eliminar = (foto) => {
-    setAEliminar(null) // se cierra el cartel
     setError('')
     setExito('')
     api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
@@ -103,7 +124,7 @@ function TabFotos({ vuelo, onCambio }) {
                 {indice === 0 && <span className="etiqueta">Portada</span>}
                 <div>
                   <span className="texto-suave">{Math.round(foto.tamano / 1024)} KB</span>
-                  <button onClick={() => setAEliminar(foto)}>Eliminar</button>
+                  <button onClick={() => preguntarEliminar(foto)}>Eliminar</button>
                 </div>
               </figure>
             ))}
@@ -128,14 +149,19 @@ function TabFotos({ vuelo, onCambio }) {
         )}
       </section>
 
-      {aEliminar && (
+      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
+      {pregunta && (
         <Confirmacion
-          titulo="¿Eliminar esta foto?"
-          mensaje="Deja de mostrarse en la página del vuelo."
-          textoConfirmar="Sí, eliminar"
-          peligro
-          onConfirmar={() => eliminar(aEliminar)}
-          onCancelar={() => setAEliminar(null)}
+          titulo={pregunta.titulo}
+          mensaje={pregunta.mensaje}
+          detalle={pregunta.detalle}
+          textoConfirmar={pregunta.textoConfirmar}
+          peligro={pregunta.peligro}
+          onConfirmar={() => {
+            setPregunta(null)
+            pregunta.accion()
+          }}
+          onCancelar={() => setPregunta(null)}
         />
       )}
     </div>

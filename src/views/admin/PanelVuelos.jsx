@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
@@ -25,8 +25,11 @@ function PanelVuelos() {
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
   const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const location = useLocation()
+  // Al volver de guardar los datos de un vuelo llega el mensaje ("Se guardaron los cambios...")
+  const [mensaje, setMensaje] = useState(location.state?.mensaje ?? '')
   const [aEliminar, setAEliminar] = useState(null) // vuelo que espera confirmacion (muestra el cartel)
+  const [nuevoEstado, setNuevoEstado] = useState(null) // { vuelo, estado } que espera confirmacion
 
   useEffect(() => {
     // El admin es el unico vendedor de la aerolinea: ve y maneja todos los vuelos
@@ -182,7 +185,7 @@ function PanelVuelos() {
                   <select
                     className="panel-vuelo-estado"
                     value={vuelo.estado}
-                    onChange={(e) => cambiarEstado(vuelo, e.target.value)}
+                    onChange={(e) => setNuevoEstado({ vuelo, estado: e.target.value })}
                     aria-label={`Estado del vuelo ${vuelo.numeroVuelo}`}
                   >
                     {ESTADOS_VUELO.map((e) => (
@@ -193,9 +196,6 @@ function PanelVuelos() {
                   </select>
                   <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-primario">
                     Gestionar
-                  </Link>
-                  <Link to={`/panel/vuelos/${vuelo.id}/editar`} className="boton boton-secundario">
-                    Editar
                   </Link>
                   <button className="boton boton-peligro" onClick={() => setAEliminar(vuelo)}>
                     Eliminar
@@ -224,6 +224,20 @@ function PanelVuelos() {
           </nav>
         )}
       </div>
+
+      {nuevoEstado && (
+        <Confirmacion
+          titulo={`¿Cambiar el vuelo ${nuevoEstado.vuelo.numeroVuelo} a ${textoEstado(nuevoEstado.estado)}?`}
+          detalle={[`Estado: ${textoEstado(nuevoEstado.vuelo.estado)} → ${textoEstado(nuevoEstado.estado)}`]}
+          textoConfirmar="Sí, cambiar"
+          peligro={nuevoEstado.estado === 'CANCELADO'}
+          onConfirmar={() => {
+            cambiarEstado(nuevoEstado.vuelo, nuevoEstado.estado)
+            setNuevoEstado(null)
+          }}
+          onCancelar={() => setNuevoEstado(null)}
+        />
+      )}
 
       {aEliminar && (
         <Confirmacion
