@@ -159,8 +159,9 @@ function TabClases({ vuelo, onCambio }) {
       <section className="tarjeta">
         <h2>Clases del vuelo</h2>
         <p className="texto-suave">
-          No se puede bajar el total de asientos por debajo de los que ya se vendieron. Una clase solo se puede
-          eliminar si todavía no tiene compras.
+          Cada clase tiene sus asientos y su precio. El precio "desde" que ve el pasajero en la búsqueda es el de la
+          clase más barata. No se puede bajar el total de asientos por debajo de los ya vendidos, y una clase solo
+          se puede eliminar si todavía no tiene compras.
         </p>
 
         {error && <div className="mensaje mensaje-error">{error}</div>}

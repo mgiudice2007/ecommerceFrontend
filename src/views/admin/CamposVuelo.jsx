@@ -1,4 +1,5 @@
 import CampoFecha from '../../components/CampoFecha'
+import { hoy, sumarDias } from '../../utils/formato'
 
 // Los campos con los datos de un vuelo. Los usan "Publicar vuelo" (FormVuelo) y la
 // pestaña "Datos del vuelo" de la gestion (TabDatos). No guarda estado: recibe los
@@ -7,6 +8,9 @@ function CamposVuelo({ formData, setFormData, aeropuertos, categorias }) {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
+
+  // Fechas con logica: la salida desde hoy, y la llegada el mismo dia o el siguiente
+  const diaSalida = formData.fechaSalida ? formData.fechaSalida.slice(0, 10) : ''
 
   return (
     <>
@@ -66,6 +70,7 @@ function CamposVuelo({ formData, setFormData, aeropuertos, categorias }) {
           <CampoFecha
             id="fechaSalida"
             conHora
+            min={hoy()}
             value={formData.fechaSalida}
             onChange={(valor) => setFormData({ ...formData, fechaSalida: valor })}
             required
@@ -76,28 +81,13 @@ function CamposVuelo({ formData, setFormData, aeropuertos, categorias }) {
           <CampoFecha
             id="fechaLlegada"
             conHora
+            min={diaSalida || hoy()}
+            max={diaSalida ? sumarDias(diaSalida, 1) : undefined}
             value={formData.fechaLlegada}
             onChange={(valor) => setFormData({ ...formData, fechaLlegada: valor })}
             required
           />
         </div>
-      </div>
-
-      <div className="campo">
-        <label htmlFor="precio">Precio base</label>
-        <input
-          id="precio"
-          name="precio"
-          type="number"
-          min="1"
-          step="0.01"
-          value={formData.precio}
-          onChange={handleChange}
-          required
-        />
-        <span className="panel-ayuda">
-          Es el precio de referencia del vuelo. El precio de cada clase se carga aparte, con sus asientos.
-        </span>
       </div>
 
       <div className="campo">

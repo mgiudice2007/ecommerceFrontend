@@ -79,8 +79,8 @@ function Inicio() {
   useEffect(() => {
     api('/api/vuelos?page=0&size=60')
       .then((pagina) => {
-        // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados)
-        const operativos = pagina.content.filter(estaOperativo)
+        // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados, y con asientos)
+        const operativos = pagina.content.filter((v) => estaOperativo(v) && v.hayStock)
         setVuelos(operativos)
         // Las fotos solo de los vuelos que aparecen en alguna seccion
         const mostrados = [

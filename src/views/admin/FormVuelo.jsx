@@ -14,7 +14,6 @@ const FORM_VACIO = {
   destinoIata: '',
   fechaSalida: '',
   fechaLlegada: '',
-  precio: '',
 }
 
 // Publicar un vuelo nuevo (/panel/vuelos/nuevo). Para cambiar un vuelo que ya existe
@@ -59,7 +58,7 @@ function FormVuelo() {
       <EncabezadoPagina
         etiqueta="Panel de vuelos"
         titulo="Publicar un vuelo nuevo"
-        subtitulo="Cargá los datos del vuelo. Después vas a poder agregar las clases con asientos, los descuentos y las fotos."
+        subtitulo="Cargá los datos del vuelo. Después le agregás las clases con sus asientos y precios, los descuentos y las fotos."
       >
         <Link to="/panel">← Volver al panel</Link>
       </EncabezadoPagina>

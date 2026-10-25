@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
-import { paraInputFechaHora, precio } from '../../utils/formato'
+import { paraInputFechaHora } from '../../utils/formato'
 import { cuerpoVuelo, problemaEnVuelo } from '../../utils/vuelos'
 import CamposVuelo from './CamposVuelo'
 
@@ -15,7 +15,6 @@ const datosDe = (vuelo) => ({
   destinoIata: vuelo.destinoIata,
   fechaSalida: paraInputFechaHora(vuelo.fechaSalida),
   fechaLlegada: paraInputFechaHora(vuelo.fechaLlegada),
-  precio: String(vuelo.precio),
 })
 
 // "2026-11-06T07:15" -> "06/11/2026 07:15"
@@ -58,7 +57,6 @@ function TabDatos({ vuelo }) {
     { clave: 'destinoIata', nombre: 'Destino', mostrar: nombreAeropuerto },
     { clave: 'fechaSalida', nombre: 'Salida', mostrar: fechaHora },
     { clave: 'fechaLlegada', nombre: 'Llegada', mostrar: fechaHora },
-    { clave: 'precio', nombre: 'Precio base', mostrar: precio },
     { clave: 'descripcion', nombre: 'Descripción', mostrar: (v) => (v ? `"${v}"` : '(vacía)') },
   ]
 
