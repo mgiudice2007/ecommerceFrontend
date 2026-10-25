@@ -54,6 +54,11 @@
   grid-template-columns: 1fr 1fr;
 }
 
+/* Para que la lista de sugerencias quede pegada debajo de cada campo */
+.buscador-ruta .buscador-campo {
+  position: relative;
+}
+
 .buscador-ruta .buscador-campo:first-child {
   border-radius: var(--radio) 0 0 var(--radio);
 }
@@ -212,4 +217,51 @@
     .buscador-boton {
     width: 100%;
   }
+}
+
+/* Lista de sugerencias de Desde y Hacia */
+.buscador-sugerencias {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 6;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.buscador-sugerencias button {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.buscador-sugerencias button:hover {
+  background: var(--superficie-2);
+}
+
+.buscador-sugerencias small {
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.buscador-sin-sugerencias {
+  padding: 8px 12px;
+  color: var(--texto-suave);
+  font-size: 14px;
 }

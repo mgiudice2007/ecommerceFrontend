@@ -19,6 +19,13 @@ const etiqueta = (aeropuerto) => {
     : `${aeropuerto.ciudad} (${aeropuerto.codigoIata})`
 }
 
+// Para comparar sin mayusculas ni tildes: "Córdoba" -> "cordoba"
+const normalizar = (texto) =>
+  texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+
 // Busca el aeropuerto que corresponde a lo que escribio el usuario ("Madrid (MAD)" o "MAD")
 const buscarAeropuerto = (lista, texto) =>
   lista.find(
@@ -51,6 +58,8 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
   // Lo que esta escrito en "Desde" y "Hacia". null = todavia no escribio nada y se
   // muestra el aeropuerto que venia en los filtros (por ejemplo desde la URL)
   const [textos, setTextos] = useState({ origen: null, destino: null })
+  // Que lista de sugerencias esta abierta: 'origen', 'destino' o null
+  const [abierto, setAbierto] = useState(null)
 
   const origenes = aeropuertos.filter((a) => ORIGENES.includes(a.codigoIata))
   // Como en las aerolineas de Buenos Aires: Aeroparque vuela dentro de Argentina y Ezeiza
@@ -66,6 +75,34 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     if (textos[campo] !== null) return textos[campo]
     const aeropuerto = lista.find((a) => a.codigoIata === filtros[campo])
     return aeropuerto ? etiqueta(aeropuerto) : ''
+  }
+
+  // Las sugerencias: los aeropuertos cuya ciudad o codigo EMPIEZA con lo escrito
+  // ("ba" -> Barcelona, Bariloche). Sin nada escrito, o con uno ya elegido de la lista, se ven todos.
+  const sugerenciasDe = (campo, lista) => {
+    const escrito = normalizar(textoDe(campo, lista).trim())
+    const elegido = lista.find((a) => a.codigoIata === filtros[campo])
+    if (!escrito || (elegido && escrito === normalizar(etiqueta(elegido)))) return lista
+    return lista.filter(
+      (a) =>
+        normalizar(a.ciudad).startsWith(escrito) ||
+        normalizar(a.codigoIata).startsWith(escrito) ||
+        normalizar(NOMBRE_ORIGEN[a.codigoIata] ?? '').startsWith(escrito),
+    )
+  }
+
+  // Al tocar una sugerencia queda elegido ese aeropuerto
+  const elegir = (campo, aeropuerto) => {
+    const nuevos = { ...filtros, [campo]: aeropuerto.codigoIata }
+    if (campo === 'origen' && filtros.origen !== aeropuerto.codigoIata) nuevos.destino = ''
+    setFiltros(nuevos)
+    setTextos(
+      campo === 'origen' && filtros.origen !== aeropuerto.codigoIata
+        ? { origen: etiqueta(aeropuerto), destino: '' }
+        : { ...textos, [campo]: etiqueta(aeropuerto) },
+    )
+    setAbierto(null)
+    setError('')
   }
 
   const cambiarFecha = (campo, valor) => {
@@ -163,38 +200,74 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
           <label htmlFor="origen">Desde</label>
           <input
             id="origen"
-            list="lista-origenes"
             value={textoDe('origen', origenes)}
             onChange={(e) => escribir('origen', origenes, e.target.value)}
+            onFocus={() => setAbierto('origen')}
+            onBlur={() => setAbierto(null)}
             placeholder="Aeroparque o Ezeiza"
             autoComplete="off"
           />
-          <datalist id="lista-origenes">
-            {origenes.map((a) => (
-              <option key={a.codigoIata} value={etiqueta(a)}>
-                {a.codigoIata === 'AEP' ? 'Vuelos de cabotaje' : 'Vuelos internacionales'}
-              </option>
-            ))}
-          </datalist>
+          {/* Sugerencias propias (antes era un datalist del navegador, que buscaba el texto
+              en cualquier parte de la palabra: "ba" mostraba Cordoba) */}
+          {abierto === 'origen' && (
+            <ul className="buscador-sugerencias" role="listbox">
+              {sugerenciasDe('origen', origenes).map((a) => (
+                <li key={a.codigoIata}>
+                  {/* onMouseDown (y no onClick) para elegir antes de que el input pierda el foco */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      elegir('origen', a)
+                    }}
+                  >
+                    <strong>{etiqueta(a)}</strong>
+                    <small>{a.codigoIata === 'AEP' ? 'Vuelos de cabotaje' : 'Vuelos internacionales'}</small>
+                  </button>
+                </li>
+              ))}
+              {sugerenciasDe('origen', origenes).length === 0 && (
+                <li className="buscador-sin-sugerencias">Los vuelos salen de Aeroparque o Ezeiza</li>
+              )}
+            </ul>
+          )}
         </div>
 
         <div className="buscador-campo">
           <label htmlFor="destino">Hacia</label>
           <input
             id="destino"
-            list="lista-destinos"
             value={textoDe('destino', destinos)}
             onChange={(e) => escribir('destino', destinos, e.target.value)}
+            onFocus={() => setAbierto('destino')}
+            onBlur={() => setAbierto(null)}
             placeholder="Escribí un destino"
             autoComplete="off"
           />
-          <datalist id="lista-destinos">
-            {destinos.map((a) => (
-              <option key={a.codigoIata} value={etiqueta(a)}>
-                {a.pais}
-              </option>
-            ))}
-          </datalist>
+          {/* Sugerencias propias (antes era un datalist del navegador, que buscaba el texto
+              en cualquier parte de la palabra: "ba" mostraba Cordoba) */}
+          {abierto === 'destino' && (
+            <ul className="buscador-sugerencias" role="listbox">
+              {sugerenciasDe('destino', destinos).map((a) => (
+                <li key={a.codigoIata}>
+                  {/* onMouseDown (y no onClick) para elegir antes de que el input pierda el foco */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      elegir('destino', a)
+                    }}
+                  >
+                    <strong>{etiqueta(a)}</strong>
+                    <small>{a.pais}</small>
+                  </button>
+                </li>
+              ))}
+              {sugerenciasDe('destino', destinos).length === 0 && (
+                <li className="buscador-sin-sugerencias">No hay destinos que empiecen así</li>
+              )}
+            </ul>
+          )}
         </div>
       </div>
 
