@@ -101,7 +101,17 @@ function Carrito() {
 
   // Millas: no se pueden usar mas de las que tiene ni pagar mas que el total
   const maximoMillas = Math.min(carrito.millasDisponibles, Math.floor(carrito.total / carrito.valorMilla))
-  const millasAUsar = usarMillas ? Math.min(Number(millasElegidas) || 0, maximoMillas) : 0
+  // Si escribe mas de lo permitido no se recorta en silencio: se avisa y no deja confirmar
+  const millasEscritas = Number(millasElegidas) || 0
+  let problemaMillas = ''
+  if (usarMillas && millasEscritas > carrito.millasDisponibles) {
+    problemaMillas = `No tenés tantas millas: tu saldo es de ${millas(carrito.millasDisponibles)}.`
+  } else if (usarMillas && millasEscritas > maximoMillas) {
+    problemaMillas = `Con ${millas(maximoMillas)} millas ya pagás todo: no podés usar más.`
+  } else if (usarMillas && (millasEscritas < 0 || !Number.isInteger(millasEscritas))) {
+    problemaMillas = 'Escribí una cantidad entera de millas.'
+  }
+  const millasAUsar = usarMillas && !problemaMillas ? millasEscritas : 0
   const descuentoMillas = millasAUsar * carrito.valorMilla
   const aPagar = carrito.total - descuentoMillas
   // Lo pagado con millas no suma millas (el backend hace la misma cuenta)
@@ -185,6 +195,7 @@ function Carrito() {
                       value={millasElegidas}
                       onChange={(e) => setMillasElegidas(e.target.value)}
                     />
+                    {problemaMillas && <small className="carrito-millas-error">{problemaMillas}</small>}
                   </div>
                 )}
               </div>
@@ -213,7 +224,7 @@ function Carrito() {
               <button
                 className="boton boton-primario boton-ancho"
                 onClick={confirmarCompra}
-                disabled={comprando || ocupado || vuelosSinAdulto.length > 0}
+                disabled={comprando || ocupado || vuelosSinAdulto.length > 0 || problemaMillas !== ''}
               >
                 {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(aPagar)}`}
               </button>

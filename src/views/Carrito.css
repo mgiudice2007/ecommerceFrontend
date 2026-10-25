@@ -129,3 +129,10 @@
   font-size: 14px;
   font-weight: 700;
 }
+
+/* Escribio mas millas de las que puede usar */
+.carrito-millas-error {
+  color: var(--rojo);
+  font-size: 13px;
+  font-weight: 600;
+}
