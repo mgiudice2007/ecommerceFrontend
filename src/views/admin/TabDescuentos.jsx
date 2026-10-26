@@ -13,22 +13,21 @@ function TabDescuentos({ vuelo, onCambio }) {
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [pregunta, setPregunta] = useState(null)
-  const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
     api(`/api/descuentos?vueloId=${vuelo.id}`)
       .then((data) => setDescuentos(data))
       .catch((err) => setError(err.message))
-  }, [vuelo.id, recargar])
+  }, [vuelo.id])
 
-  const ejecutar = (url, options, textoExito) => {
+  const ejecutar = (url, options, textoExito, actualizarLista) => {
     setError('')
     setExito('')
     setGuardando(true)
     return api(url, options)
       .then((respuesta) => {
         setExito(textoExito ?? respuesta.mensaje)
-        setRecargar(recargar + 1)
+        actualizarLista(respuesta)
         onCambio()
         return true
       })
@@ -59,7 +58,8 @@ function TabDescuentos({ vuelo, onCambio }) {
 
   const crearDescuento = () => {
     const body = { ...nuevo, vueloId: vuelo.id, valor: Number(nuevo.valor) }
-    ejecutar('/api/descuentos', { method: 'POST', body }, 'Descuento creado.').then((ok) => {
+    const agregar = (creado) => setDescuentos([...descuentos, creado])
+    ejecutar('/api/descuentos', { method: 'POST', body }, 'Descuento creado.', agregar).then((ok) => {
       if (ok) setNuevo({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
     })
   }
@@ -94,11 +94,18 @@ function TabDescuentos({ vuelo, onCambio }) {
       fechaHasta: d.fechaHasta,
       activo: !d.activo,
     }
-    ejecutar(`/api/descuentos/${d.id}`, { method: 'PUT', body }, d.activo ? 'Descuento pausado.' : 'Descuento activado.')
+    const reemplazar = (actualizado) => setDescuentos(descuentos.map((x) => (x.id === actualizado.id ? actualizado : x)))
+    ejecutar(
+      `/api/descuentos/${d.id}`,
+      { method: 'PUT', body },
+      d.activo ? 'Descuento pausado.' : 'Descuento activado.',
+      reemplazar,
+    )
   }
 
   const eliminar = (d) => {
-    ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
+    const sacar = () => setDescuentos(descuentos.filter((x) => x.id !== d.id))
+    ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' }, null, sacar)
   }
 
   const diaDelVuelo = vuelo.fechaSalida.slice(0, 10)

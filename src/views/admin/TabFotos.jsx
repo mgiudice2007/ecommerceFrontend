@@ -13,7 +13,6 @@ function TabFotos({ vuelo, onCambio }) {
   const [exito, setExito] = useState('')
   const [subiendo, setSubiendo] = useState(false)
   const [pregunta, setPregunta] = useState(null)
-  const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
     api(`/api/fotos?vueloId=${vuelo.id}`)
@@ -23,7 +22,7 @@ function TabFotos({ vuelo, onCambio }) {
       })
       .then((data) => setImagenes(data))
       .catch((err) => setError(err.message))
-  }, [vuelo.id, recargar])
+  }, [vuelo.id])
 
   const elegirArchivo = (e) => {
     const elegido = e.target.files[0] ?? null
@@ -50,8 +49,14 @@ function TabFotos({ vuelo, onCambio }) {
     })
   }
 
-  const subirFoto = (formulario) => {
+  const leerArchivo = (archivoElegido) =>
+    new Promise((resolve) => {
+      const lector = new FileReader()
+      lector.onload = () => resolve(lector.result)
+      lector.readAsDataURL(archivoElegido)
+    })
 
+  const subirFoto = (formulario) => {
     const formData = new FormData()
     formData.append('vueloId', vuelo.id)
     formData.append('file', archivo)
@@ -60,11 +65,13 @@ function TabFotos({ vuelo, onCambio }) {
     setError('')
     setExito('')
     api('/api/fotos', { method: 'POST', body: formData })
-      .then(() => {
+      .then((nueva) => leerArchivo(archivo).then((imagen) => [nueva, imagen]))
+      .then(([nueva, imagen]) => {
+        setFotos([...fotos, nueva])
+        setImagenes([...imagenes, imagen])
         setExito('Foto subida.')
         setArchivo(null)
         formulario.reset()
-        setRecargar(recargar + 1)
         onCambio()
       })
       .catch((err) => setError(err.message))
@@ -86,8 +93,10 @@ function TabFotos({ vuelo, onCambio }) {
     setExito('')
     api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
       .then((respuesta) => {
+        const indice = fotos.findIndex((f) => f.id === foto.id)
+        setFotos(fotos.filter((f) => f.id !== foto.id))
+        setImagenes(imagenes.filter((_, i) => i !== indice))
         setExito(respuesta.mensaje)
-        setRecargar(recargar + 1)
         onCambio()
       })
       .catch((err) => setError(err.message))
