@@ -39,6 +39,9 @@ function Login() {
         <h1>¡Hola de nuevo! Ingresá a tu cuenta</h1>
         <p className="texto-suave">Gestioná tus pasajes, tu carrito y tus próximos viajes.</p>
 
+        {location.state?.sesionVencida && !error && (
+          <div className="mensaje mensaje-error">Tu sesión venció. Iniciá sesión de nuevo para seguir.</div>
+        )}
         {error && <div className="mensaje mensaje-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>

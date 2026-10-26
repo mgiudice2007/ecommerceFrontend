@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api, borrarToken, guardarToken, obtenerToken } from '../api/api'
 
 const AuthContext = createContext(null)
@@ -11,7 +12,7 @@ const leerToken = (token) => {
 
     if (payload.exp * 1000 < Date.now()) return null
 
-    return { id: payload.id, username: payload.sub, rol: payload.rol }
+    return { id: payload.id, username: payload.sub, rol: payload.rol, vence: payload.exp * 1000 }
   } catch {
     return null
   }
@@ -21,6 +22,7 @@ export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(leerToken(obtenerToken()))
   const [cantidadCarrito, setCantidadCarrito] = useState(0)
   const [perfil, setPerfil] = useState(null)
+  const navigate = useNavigate()
 
   const actualizarCarrito = (carrito) => {
     setCantidadCarrito(carrito.items.reduce((total, item) => total + item.cantidad, 0))
@@ -45,6 +47,19 @@ export function AuthProvider({ children }) {
         .catch(() => setCantidadCarrito(0))
     }
   }, [usuario])
+
+  useEffect(() => {
+    if (!usuario) return
+    const cerrarSesionVencida = () => {
+      borrarToken()
+      setUsuario(null)
+      setPerfil(null)
+      setCantidadCarrito(0)
+      navigate('/login', { state: { sesionVencida: true } })
+    }
+    const timer = setTimeout(cerrarSesionVencida, usuario.vence - Date.now())
+    return () => clearTimeout(timer)
+  }, [usuario, navigate])
 
   const login = (username, password) =>
     api('/api/auth/login', { method: 'POST', body: { username, password } }).then((data) => {
