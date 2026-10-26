@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { millas, precio, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import './Carrito.css'
+import { sinRuedita } from '../utils/validaciones'
 
 function Carrito() {
   const { actualizarCarrito, recargarPerfil } = useAuth()
@@ -175,6 +176,7 @@ function Carrito() {
                     <input
                       id="millas"
                       type="number"
+                      onWheel={sinRuedita}
                       min="0"
                       max={maximoMillas}
                       value={millasElegidas}

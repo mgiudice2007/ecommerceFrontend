@@ -11,3 +11,5 @@ export const REGLA_USUARIO = {
   maxLength: 20,
   title: 'De 4 a 20 caracteres. Empieza con una letra y puede tener letras sin tilde, números, punto o guion bajo.',
 }
+
+export const sinRuedita = (e) => e.currentTarget.blur()

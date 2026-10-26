@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import { precio } from '../../utils/formato'
+import { sinRuedita } from '../../utils/validaciones'
 
 function TabClases({ vuelo, onCambio }) {
   const [clases, setClases] = useState([])
@@ -183,6 +184,7 @@ function TabClases({ vuelo, onCambio }) {
                         {enEdicion ? (
                           <input
                             type="number"
+                            onWheel={sinRuedita}
                             min={Math.max(vendidos, claseDe(d.claseId)?.minimoAsientos ?? 1)}
                             max={claseDe(d.claseId)?.maximoAsientos}
                             value={editando.asientosTotales}
@@ -198,6 +200,7 @@ function TabClases({ vuelo, onCambio }) {
                         {enEdicion ? (
                           <input
                             type="number"
+                            onWheel={sinRuedita}
                             min={rangoDePrecio(d.claseId, d.id).desde ?? 1}
                             max={rangoDePrecio(d.claseId, d.id).hasta ?? undefined}
                             step="0.01"
@@ -284,6 +287,7 @@ function TabClases({ vuelo, onCambio }) {
               <input
                 id="asientosTotales"
                 type="number"
+                onWheel={sinRuedita}
                 min={claseNueva?.minimoAsientos ?? 1}
                 max={claseNueva?.maximoAsientos}
                 value={nueva.asientosTotales}
@@ -301,6 +305,7 @@ function TabClases({ vuelo, onCambio }) {
               <input
                 id="precioClase"
                 type="number"
+                onWheel={sinRuedita}
                 min={rangoNueva.desde ?? 1}
                 max={rangoNueva.hasta ?? undefined}
                 step="0.01"

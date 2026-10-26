@@ -7,6 +7,7 @@ import TarjetaVuelo from '../components/TarjetaVuelo'
 import { sumarDias } from '../utils/formato'
 import { leerPasajeros } from '../utils/pasajeros'
 import './Vuelos.css'
+import { sinRuedita } from '../utils/validaciones'
 
 const POR_PAGINA = 10
 const DIAS_FLEXIBLES = 3
@@ -180,6 +181,7 @@ function Vuelos() {
                   <input
                     id="precioMin"
                     type="number"
+                    onWheel={sinRuedita}
                     min="0"
                     value={precios.precioMin}
                     onChange={(e) => setPrecios({ ...precios, precioMin: e.target.value })}
@@ -191,6 +193,7 @@ function Vuelos() {
                   <input
                     id="precioMax"
                     type="number"
+                    onWheel={sinRuedita}
                     min="0"
                     value={precios.precioMax}
                     onChange={(e) => setPrecios({ ...precios, precioMax: e.target.value })}

@@ -3,6 +3,7 @@ import { api } from '../../api/api'
 import CampoFecha from '../../components/CampoFecha'
 import Confirmacion from '../../components/Confirmacion'
 import { hoy, precio } from '../../utils/formato'
+import { sinRuedita } from '../../utils/validaciones'
 
 const fechaCorta = (fecha) => new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR')
 
@@ -188,6 +189,7 @@ function TabDescuentos({ vuelo, onCambio }) {
             <input
               id="valor"
               type="number"
+              onWheel={sinRuedita}
               min="1"
               max={nuevo.tipoDescuento === 'PORCENTAJE' ? 100 : undefined}
               step="0.01"
