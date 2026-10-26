@@ -97,6 +97,7 @@ function DetalleVuelo() {
 
   const necesitanAsiento = pasajeros.adultos + pasajeros.ninos
   const faltanAsientos = necesitanAsiento - asientos.length
+  const agregado = mensaje?.tipo === 'exito'
 
   const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
   let total = 0
@@ -245,7 +246,7 @@ function DetalleVuelo() {
               )}
             </section>
 
-            {sePuedeComprar && elegida && (
+            {sePuedeComprar && elegida && !agregado && (
               <section>
                 <h2 className="detalle-subtitulo">Elegí tus asientos</h2>
                 <p className="texto-suave detalle-asientos-ayuda">
@@ -323,7 +324,20 @@ function DetalleVuelo() {
 
                 {mensaje && <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>}
 
-                {estaLogueado && !esComprador ? (
+                {agregado ? (
+                  <>
+                    <Link to="/carrito" className="boton boton-primario boton-ancho">
+                      Ir al carrito →
+                    </Link>
+                    <button
+                      type="button"
+                      className="boton boton-secundario boton-ancho detalle-ir-carrito"
+                      onClick={() => setMensaje(null)}
+                    >
+                      Agregar otros pasajeros a este vuelo
+                    </button>
+                  </>
+                ) : estaLogueado && !esComprador ? (
                   <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
                 ) : (
                   <>
@@ -355,11 +369,6 @@ function DetalleVuelo() {
                   </>
                 )}
 
-                {mensaje?.tipo === 'exito' && (
-                  <Link to="/carrito" className="boton boton-secundario boton-ancho detalle-ir-carrito">
-                    Ir al carrito →
-                  </Link>
-                )}
               </>
             )}
           </aside>
