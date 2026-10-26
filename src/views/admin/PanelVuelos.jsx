@@ -20,20 +20,42 @@ const asientosDe = (vuelo) =>
   )
 
 function PanelVuelos() {
-  const [vuelos, setVuelos] = useState(null)
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
+  const [respuesta, setRespuesta] = useState({ clave: null, datos: null })
+  const [resumen, setResumen] = useState(null)
   const [error, setError] = useState('')
   const location = useLocation()
   const [mensaje, setMensaje] = useState(location.state?.mensaje ?? '')
   const [aEliminar, setAEliminar] = useState(null)
   const [nuevoEstado, setNuevoEstado] = useState(null)
 
+  const texto = busqueda.trim()
+  const clave = `${pagina}|${texto}`
+  const cargando = respuesta.clave !== clave
+  const datos = cargando ? null : respuesta.datos
+  const vuelos = datos?.content ?? []
+  const totalPaginas = datos?.totalPages ?? 0
+
   useEffect(() => {
-    api('/api/vuelos')
-      .then((pagina) => setVuelos(pagina.content))
+    api('/api/vuelos/resumen')
+      .then((data) => setResumen(data))
       .catch((err) => setError(err.message))
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams({ page: pagina, size: POR_PAGINA })
+    if (texto) params.set('texto', texto)
+    api(`/api/vuelos?${params.toString()}`)
+      .then((data) => setRespuesta({ clave: `${pagina}|${texto}`, datos: data }))
+      .catch((err) => setError(err.message))
+  }, [pagina, texto])
+
+  const cambiarLista = (nuevaLista, menos = 0) =>
+    setRespuesta({
+      clave: respuesta.clave,
+      datos: { ...respuesta.datos, content: nuevaLista, totalElements: respuesta.datos.totalElements - menos },
+    })
 
   const cambiarEstado = (vuelo, estado) => {
     setError('')
@@ -41,9 +63,18 @@ function PanelVuelos() {
     api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
       .then((respuesta) => {
         if (estado === 'ELIMINADO') {
-          setVuelos(vuelos.filter((v) => v.id !== vuelo.id))
+          cambiarLista(
+            vuelos.filter((v) => v.id !== vuelo.id),
+            1,
+          )
+          const asientos = asientosDe(vuelo)
+          setResumen({
+            vuelos: resumen.vuelos - 1,
+            asientosVendidos: resumen.asientosVendidos - asientos.vendidos,
+            asientosTotales: resumen.asientosTotales - asientos.totales,
+          })
         } else {
-          setVuelos(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
+          cambiarLista(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
         }
         setMensaje(respuesta.mensaje)
       })
@@ -55,22 +86,6 @@ function PanelVuelos() {
     cambiarEstado(vuelo, 'ELIMINADO')
   }
 
-  const texto = busqueda.trim().toLowerCase()
-  const visibles = (vuelos ?? []).filter((v) =>
-    `${v.origenCiudad} ${v.destinoCiudad} ${v.origenIata} ${v.destinoIata} ${v.numeroVuelo}`
-      .toLowerCase()
-      .includes(texto),
-  )
-  const totalPaginas = Math.ceil(visibles.length / POR_PAGINA)
-  const enPagina = visibles.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA)
-
-  const resumen = (vuelos ?? []).reduce(
-    (total, vuelo) => {
-      const asientos = asientosDe(vuelo)
-      return { totales: total.totales + asientos.totales, vendidos: total.vendidos + asientos.vendidos }
-    },
-    { totales: 0, vendidos: 0 },
-  )
 
   return (
     <>
@@ -91,28 +106,26 @@ function PanelVuelos() {
       />
 
       <div className="contenedor sobre-encabezado">
-        {vuelos && (
+        {resumen && (
           <div className="panel-numeros">
             <div className="tarjeta">
               <small>Vuelos publicados</small>
-              <strong>{vuelos.length}</strong>
+              <strong>{resumen.vuelos}</strong>
             </div>
             <div className="tarjeta">
               <small>Asientos vendidos</small>
-              <strong>{resumen.vendidos}</strong>
+              <strong>{resumen.asientosVendidos}</strong>
             </div>
             <div className="tarjeta">
               <small>Asientos cargados</small>
-              <strong>{resumen.totales}</strong>
+              <strong>{resumen.asientosTotales}</strong>
             </div>
           </div>
         )}
 
         {error && <div className="mensaje mensaje-error">{error}</div>}
         {mensaje && <div className="mensaje mensaje-exito">{mensaje}</div>}
-        {!vuelos && !error && <p className="texto-suave">Cargando vuelos…</p>}
-
-        {vuelos?.length === 0 && (
+        {resumen?.vuelos === 0 && (
           <div className="tarjeta panel-vacio">
             <h2>Todavía no publicaste vuelos</h2>
             <p className="texto-suave">Creá tu primer vuelo y después cargale las clases con asientos y precio.</p>
@@ -122,7 +135,7 @@ function PanelVuelos() {
           </div>
         )}
 
-        {vuelos?.length > 0 && (
+        {resumen?.vuelos > 0 && (
           <div className="campo panel-buscar">
             <label htmlFor="buscarVuelo">Buscar en el panel</label>
             <input
@@ -138,8 +151,13 @@ function PanelVuelos() {
           </div>
         )}
 
+        {cargando && !error && <p className="texto-suave">Cargando vuelos…</p>}
+        {!cargando && texto && vuelos.length === 0 && (
+          <p className="texto-suave">No hay vuelos que coincidan con "{texto}".</p>
+        )}
+
         <div className="panel-lista">
-          {enPagina.map((vuelo) => {
+          {vuelos.map((vuelo) => {
             const asientos = asientosDe(vuelo)
             const descuento = textoDescuento(vuelo.descuentoVigente, precio)
             const sinClases = vuelo.disponibilidades.length === 0
