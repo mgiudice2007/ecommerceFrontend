@@ -7,6 +7,7 @@ import CamposVuelo from './CamposVuelo'
 import './Panel.css'
 
 const FORM_VACIO = {
+  tramo: 'ida',
   numeroVuelo: '',
   descripcion: '',
   categoriaId: '',

@@ -7,6 +7,7 @@ import { cuerpoVuelo, problemaEnVuelo } from '../../utils/vuelos'
 import CamposVuelo from './CamposVuelo'
 
 const datosDe = (vuelo) => ({
+  tramo: ['AEP', 'EZE'].includes(vuelo.origenIata) ? 'ida' : 'vuelta',
   numeroVuelo: vuelo.numeroVuelo,
   descripcion: vuelo.descripcion ?? '',
   categoriaId: String(vuelo.categoriaId),

@@ -39,4 +39,8 @@ export const problemaEnVuelo = (datos) => {
   return ''
 }
 
-export const cuerpoVuelo = (datos) => ({ ...datos, categoriaId: Number(datos.categoriaId) })
+export const cuerpoVuelo = (datos) => {
+  const cuerpo = { ...datos, categoriaId: Number(datos.categoriaId) }
+  delete cuerpo.tramo
+  return cuerpo
+}
