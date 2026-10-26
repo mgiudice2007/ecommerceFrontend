@@ -1,4 +1,3 @@
-/* Estilos del carrito */
 .carrito-layout {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -89,7 +88,6 @@
   }
 }
 
-/* Usar millas + dinero */
 .carrito-millas {
   display: flex;
   flex-direction: column;
@@ -130,7 +128,6 @@
   font-weight: 700;
 }
 
-/* Escribio mas millas de las que puede usar */
 .carrito-millas-error {
   color: var(--rojo);
   font-size: 13px;

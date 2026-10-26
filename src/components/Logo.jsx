@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import './Logo.css'
 
-// claro: version blanca para fondos oscuros (footer, paneles azules)
 function Logo({ claro = false }) {
   return (
     <Link to="/" className={`logo ${claro ? 'logo-claro' : ''}`}>

@@ -1,7 +1,6 @@
 .footer {
   margin-top: 64px;
   padding: 56px 0 28px;
-  /* Linea de color arriba para separarlo de las secciones azules */
   border-top: 4px solid transparent;
   border-image: var(--degradado-cielo) 1;
   background: #021530;

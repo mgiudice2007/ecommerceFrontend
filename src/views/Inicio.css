@@ -1,4 +1,3 @@
-/* ---------- Portada con foto ---------- */
 .inicio-hero {
   position: relative;
   padding: 96px 0 150px;
@@ -8,7 +7,6 @@
   isolation: isolate;
 }
 
-/* Capa azul encima de la foto para que el texto se lea bien */
 .inicio-hero::before {
   content: '';
   position: absolute;
@@ -53,7 +51,6 @@
   font-size: 18px;
 }
 
-/* ---------- Buscador superpuesto a la portada ---------- */
 .inicio-buscador {
   position: relative;
   margin-top: -92px;
@@ -84,7 +81,6 @@
   font-size: 13px;
 }
 
-/* ---------- Beneficios ---------- */
 .inicio-beneficios {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -118,7 +114,6 @@
   font-size: 13px;
 }
 
-/* ---------- Secciones ---------- */
 .inicio-seccion {
   padding-top: 64px;
 }
@@ -152,7 +147,6 @@
   gap: 20px;
 }
 
-/* ---------- El mundo (fondo azul) ---------- */
 .inicio-mundo {
   margin-top: 72px;
   padding: 64px 0;
@@ -198,7 +192,6 @@
   color: var(--azul);
 }
 
-/* ---------- Crear cuenta ---------- */
 .inicio-cuenta {
   display: flex;
   justify-content: space-between;

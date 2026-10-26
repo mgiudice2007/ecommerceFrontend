@@ -1,5 +1,3 @@
-/* Como el de Aerolineas Argentinas: una linea por tipo, la edad al lado
-   y los botones - y + sueltos, sin recuadro (con la tipografia de la pagina) */
 .selector-pasajeros {
   display: flex;
   flex-direction: column;

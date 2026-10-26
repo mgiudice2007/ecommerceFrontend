@@ -6,12 +6,9 @@ import CampoFecha from './CampoFecha'
 import SelectorPasajeros from './SelectorPasajeros'
 import './Buscador.css'
 
-// La aerolinea vende vuelos que salen de Buenos Aires: Aeroparque (cabotaje) y Ezeiza
-// (internacionales). La vuelta se busca sola con "Ida y vuelta".
 const ORIGENES = ['AEP', 'EZE']
 const NOMBRE_ORIGEN = { AEP: 'Aeroparque', EZE: 'Ezeiza' }
 
-// Lo que se ve en el campo, por ejemplo "Madrid (MAD)" o "Buenos Aires · Ezeiza (EZE)"
 const etiqueta = (aeropuerto) => {
   const nombre = NOMBRE_ORIGEN[aeropuerto.codigoIata]
   return nombre
@@ -19,14 +16,12 @@ const etiqueta = (aeropuerto) => {
     : `${aeropuerto.ciudad} (${aeropuerto.codigoIata})`
 }
 
-// Para comparar sin mayusculas ni tildes: "Córdoba" -> "cordoba"
 const normalizar = (texto) =>
   texto
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
 
-// Busca el aeropuerto que corresponde a lo que escribio el usuario ("Madrid (MAD)" o "MAD")
 const buscarAeropuerto = (lista, texto) =>
   lista.find(
     (a) =>
@@ -34,19 +29,12 @@ const buscarAeropuerto = (lista, texto) =>
       a.codigoIata.toLowerCase() === texto.trim().toLowerCase(),
   )
 
-// Buscador de vuelos. Usa los filtros que acepta GET /api/vuelos:
-// origen, destino y las fechas. La clase se elige despues, en el detalle del vuelo.
-// Con "Ida y vuelta" la pagina de resultados busca dos veces: la ida (origen -> destino)
-// y la vuelta (destino -> origen).
-// inicial: los filtros con los que arranca (por ejemplo, los que ya estan en la URL)
-// aeropuertos: el catalogo para Desde y Hacia. El buscador no lo pide: lo trae la
-// pantalla que lo usa (Inicio o Vuelos) y se lo pasa por props.
 function Buscador({ inicial = {}, aeropuertos = [] }) {
   const navigate = useNavigate()
 
   const [viaje, setViaje] = useState(inicial.viaje ?? 'idavuelta')
   const [pasajeros, setPasajeros] = useState(inicial.pasajeros ?? SIN_PASAJEROS_EXTRA)
-  const [verPasajeros, setVerPasajeros] = useState(false) // desplegable de pasajeros abierto
+  const [verPasajeros, setVerPasajeros] = useState(false)
   const [error, setError] = useState('')
   const [filtros, setFiltros] = useState({
     origen: inicial.origen ?? '',
@@ -55,15 +43,10 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     vuelta: inicial.vuelta ?? '',
   })
 
-  // Lo que esta escrito en "Desde" y "Hacia". null = todavia no escribio nada y se
-  // muestra el aeropuerto que venia en los filtros (por ejemplo desde la URL)
   const [textos, setTextos] = useState({ origen: null, destino: null })
-  // Que lista de sugerencias esta abierta: 'origen', 'destino' o null
   const [abierto, setAbierto] = useState(null)
 
   const origenes = aeropuertos.filter((a) => ORIGENES.includes(a.codigoIata))
-  // Como en las aerolineas de Buenos Aires: Aeroparque vuela dentro de Argentina y Ezeiza
-  // al exterior. Sin origen elegido se ofrecen todos los destinos.
   const destinos = aeropuertos.filter((a) => {
     if (ORIGENES.includes(a.codigoIata)) return false
     if (filtros.origen === 'AEP') return a.pais === 'Argentina'
@@ -77,8 +60,6 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     return aeropuerto ? etiqueta(aeropuerto) : ''
   }
 
-  // Las sugerencias: los aeropuertos cuya ciudad o codigo EMPIEZA con lo escrito
-  // ("ba" -> Barcelona, Bariloche). Sin nada escrito, o con uno ya elegido de la lista, se ven todos.
   const sugerenciasDe = (campo, lista) => {
     const escrito = normalizar(textoDe(campo, lista).trim())
     const elegido = lista.find((a) => a.codigoIata === filtros[campo])
@@ -91,7 +72,6 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     )
   }
 
-  // Al tocar una sugerencia queda elegido ese aeropuerto
   const elegir = (campo, aeropuerto) => {
     const nuevos = { ...filtros, [campo]: aeropuerto.codigoIata }
     if (campo === 'origen' && filtros.origen !== aeropuerto.codigoIata) nuevos.destino = ''
@@ -110,11 +90,10 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
     setError('')
   }
 
-  // Al escribir en "Desde" o "Hacia": si lo escrito coincide con un aeropuerto, queda elegido
   const escribir = (campo, lista, texto) => {
     const aeropuerto = buscarAeropuerto(lista, texto)
     const nuevos = { ...filtros, [campo]: aeropuerto ? aeropuerto.codigoIata : '' }
-    if (campo === 'origen') nuevos.destino = '' // cambia el origen: hay que volver a elegir el destino
+    if (campo === 'origen') nuevos.destino = ''
     setFiltros(nuevos)
     setTextos(campo === 'origen' ? { origen: texto, destino: '' } : { ...textos, destino: texto })
     setError('')
@@ -136,7 +115,6 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
       setError('Elegí el origen y el destino para buscar vuelos.')
       return
     }
-    // Las fechas son obligatorias: la de ida siempre y la de vuelta si es ida y vuelta
     if (!filtros.ida || (viaje === 'idavuelta' && !filtros.vuelta)) {
       setError(
         viaje === 'idavuelta'
@@ -150,15 +128,12 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
       return
     }
 
-    // Pasamos a la URL solo los filtros que se completaron: /vuelos?origen=AEP&destino=BRC&ida=2026-10-20
     const params = new URLSearchParams()
     if (viaje === 'idavuelta') params.set('viaje', 'idavuelta')
     Object.entries(filtros).forEach(([clave, valor]) => {
-      // La fecha de vuelta solo sirve si el viaje es de ida y vuelta
       if (clave === 'vuelta' && viaje !== 'idavuelta') return
       if (valor) params.set(clave, valor)
     })
-    // Los pasajeros van a la URL solo si no es el caso comun (1 adulto)
     if (textoPasajeros(pasajeros) !== textoPasajeros(SIN_PASAJEROS_EXTRA)) {
       params.set('adultos', pasajeros.adultos)
       params.set('ninos', pasajeros.ninos)
@@ -194,7 +169,6 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
         </div>
       </div>
 
-      {/* Se puede escribir (por ejemplo "mad") y el navegador sugiere las opciones de la lista (datalist) */}
       <div className="buscador-ruta">
         <div className="buscador-campo">
           <label htmlFor="origen">Desde</label>
@@ -207,13 +181,10 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
             placeholder="Aeroparque o Ezeiza"
             autoComplete="off"
           />
-          {/* Sugerencias propias (antes era un datalist del navegador, que buscaba el texto
-              en cualquier parte de la palabra: "ba" mostraba Cordoba) */}
           {abierto === 'origen' && (
             <ul className="buscador-sugerencias" role="listbox">
               {sugerenciasDe('origen', origenes).map((a) => (
                 <li key={a.codigoIata}>
-                  {/* onMouseDown (y no onClick) para elegir antes de que el input pierda el foco */}
                   <button
                     type="button"
                     onMouseDown={(e) => {
@@ -244,13 +215,10 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
             placeholder="Escribí un destino"
             autoComplete="off"
           />
-          {/* Sugerencias propias (antes era un datalist del navegador, que buscaba el texto
-              en cualquier parte de la palabra: "ba" mostraba Cordoba) */}
           {abierto === 'destino' && (
             <ul className="buscador-sugerencias" role="listbox">
               {sugerenciasDe('destino', destinos).map((a) => (
                 <li key={a.codigoIata}>
-                  {/* onMouseDown (y no onClick) para elegir antes de que el input pierda el foco */}
                   <button
                     type="button"
                     onMouseDown={(e) => {
@@ -271,9 +239,7 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
         </div>
       </div>
 
-      {/* Fechas y pasajeros en la misma fila */}
       <div className="buscador-fila">
-        {/* CampoFecha muestra siempre dd/mm/aaaa; min no deja elegir dias pasados */}
         <div className="buscador-fechas">
           <div className="buscador-campo">
             <label htmlFor="ida">Ida</label>
@@ -299,7 +265,6 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
             <span aria-hidden="true">{verPasajeros ? '▴' : '▾'}</span>
           </button>
           {verPasajeros && (
-            // Se cierra con "Listo" o tocando de nuevo el campo Pasajeros
             <div className="buscador-desplegable">
               <SelectorPasajeros pasajeros={pasajeros} onChange={setPasajeros} />
               <button type="button" className="boton boton-primario boton-ancho" onClick={() => setVerPasajeros(false)}>

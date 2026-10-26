@@ -1,4 +1,3 @@
-/* Fecha (dd/mm/aaaa + boton del calendario) y, si hace falta, la hora en 24 hs */
 .campo-fecha {
   display: flex;
   flex-wrap: wrap;
@@ -6,7 +5,6 @@
   gap: 10px;
 }
 
-/* El aviso en rojo ocupa su propia linea, debajo de la fecha */
 .campo-fecha-error {
   flex-basis: 100%;
   margin-top: -4px;
@@ -23,7 +21,6 @@
   min-width: 0;
 }
 
-/* Lugar a la derecha para el boton del calendario */
 .campo-fecha .campo-fecha-dia input[type='text'] {
   padding-right: 40px;
   cursor: text;
@@ -45,7 +42,6 @@
   color: var(--azul);
 }
 
-/* El input de fecha del navegador queda escondido: solo se usa para abrir su calendario */
 .campo-fecha input.campo-fecha-nativo {
   position: absolute;
   left: 0;

@@ -28,14 +28,12 @@ function App() {
 
       <main>
         <Routes>
-          {/* Publicas */}
           <Route path="/" element={<Inicio />} />
           <Route path="/vuelos" element={<Vuelos />} />
           <Route path="/vuelos/:id" element={<DetalleVuelo />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
 
-          {/* Solo compradores */}
           <Route
             path="/carrito"
             element={
@@ -61,7 +59,6 @@ function App() {
             }
           />
 
-          {/* Cualquier usuario logueado */}
           <Route
             path="/perfil"
             element={
@@ -71,7 +68,6 @@ function App() {
             }
           />
 
-          {/* Solo el administrador: es el unico vendedor de la aerolinea */}
           <Route
             path="/panel"
             element={
@@ -97,7 +93,6 @@ function App() {
             }
           />
 
-          {/* Solo administradores */}
           <Route
             path="/panel/usuarios"
             element={

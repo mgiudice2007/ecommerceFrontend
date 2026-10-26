@@ -4,10 +4,6 @@ import { nombreTipo } from '../utils/pasajeros'
 import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
 
-// Un item del carrito. Recibe el item (ItemCarritoResponse) y dos funciones
-// del padre: onCambiarCantidad y onEliminar.
-// vuelo lo pide el Carrito: el item no trae la fecha ni los asientos que quedan,
-// y con el vuelo se muestran y no se deja sumar de mas.
 function ItemCarrito({ item, vuelo, onCambiarCantidad, onEliminar, ocupado }) {
   const disponibilidad = vuelo?.disponibilidades.find((d) => d.id === item.disponibilidadId)
   const maximo = disponibilidad?.asientosDisponibles ?? Infinity

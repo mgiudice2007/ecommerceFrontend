@@ -25,7 +25,6 @@
   transform: scale(1.06);
 }
 
-/* Degradado oscuro abajo para que el texto blanco se lea sobre cualquier foto */
 .tarjeta-destino::after {
   content: '';
   position: absolute;

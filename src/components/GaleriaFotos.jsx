@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import './GaleriaFotos.css'
 
-// Foto grande + miniaturas. Al tocar una miniatura pasa a ser la grande.
-// imagenes: las fotos del vuelo ya convertidas en imagen (data URL). Las pide DetalleVuelo.
 function GaleriaFotos({ imagenes, destinoIata, destinoCiudad }) {
   const [seleccionada, setSeleccionada] = useState(0)
 

@@ -27,8 +27,6 @@
   font-size: 15px;
 }
 
-/* El link de la pagina en la que estas se pinta de azul. Los botones (como
-   "Registrarse") no, porque ya tienen fondo azul y el texto desapareceria */
 .navbar-links a.active:not(.boton) {
   color: var(--azul);
 }
@@ -64,7 +62,6 @@
   color: #fff;
 }
 
-/* Boton con la inicial y el nombre: abre el menu de la cuenta */
 .navbar-usuario {
   position: relative;
 }
@@ -232,7 +229,6 @@
   }
 }
 
-/* En el celular el menu de la cuenta se abre debajo, dentro del menu hamburguesa */
 @media (max-width: 860px) {
   .navbar-usuario {
     flex-wrap: wrap;
@@ -251,7 +247,7 @@
   margin-top: 6px;
   padding: 2px 10px;
   border-radius: 999px;
-  background: rgba(0, 87, 184, 0.1); /* el --azul, bien clarito */
+  background: rgba(0, 87, 184, 0.1);
   color: var(--azul);
   font-size: 13px;
   font-weight: 700;

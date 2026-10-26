@@ -1,9 +1,6 @@
 import { MAXIMO_PASAJEROS, TIPOS_PASAJERO, totalPasajeros } from '../utils/pasajeros'
 import './SelectorPasajeros.css'
 
-// Elegir cuántos adultos, niños y bebés viajan, con botones - y +.
-// pasajeros: { adultos, ninos, bebes }   onChange: recibe el objeto nuevo
-// maximo: tope de asientos (por ejemplo los que quedan en la clase elegida)
 function SelectorPasajeros({ pasajeros, onChange, maximo = MAXIMO_PASAJEROS }) {
   const tope = Math.min(maximo, MAXIMO_PASAJEROS)
   const total = totalPasajeros(pasajeros)
@@ -12,7 +9,6 @@ function SelectorPasajeros({ pasajeros, onChange, maximo = MAXIMO_PASAJEROS }) {
     onChange({ ...pasajeros, [clave]: cantidad })
   }
 
-  // Reglas como en LATAM: siempre viaja al menos un adulto y cada bebé va a upa de un adulto
   const puedeRestar = (clave) => {
     if (clave === 'adultos') return pasajeros.adultos > 1 && pasajeros.adultos > pasajeros.bebes
     return pasajeros[clave] > 0

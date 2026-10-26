@@ -12,12 +12,11 @@ import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
-  const { id } = useParams() // el :id de la ruta /vuelos/:id
+  const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const [searchParams] = useSearchParams() // trae los pasajeros elegidos en el buscador
+  const [searchParams] = useSearchParams()
   const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [clases, setClases] = useState([])
 
   useEffect(() => {
@@ -27,39 +26,31 @@ function DetalleVuelo() {
   }, [])
 
   const [vuelo, setVuelo] = useState(null)
-  const [imagenes, setImagenes] = useState([]) // las fotos del vuelo ya convertidas en imagen (data URL)
+  const [imagenes, setImagenes] = useState([])
   const [error, setError] = useState('')
 
-  const [elegida, setElegida] = useState(null) // la Disponibilidad (clase) elegida
-  const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams)) // { adultos, ninos, bebes }
-  // Si viene de iniciar sesion, la URL trae la clase y los asientos que habia elegido (?clase=127&asientos=7A,7B)
+  const [elegida, setElegida] = useState(null)
+  const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams))
   const [claseInicial] = useState(searchParams.get('clase'))
-  const [asientos, setAsientos] = useState(searchParams.get('asientos') ? searchParams.get('asientos').split(',') : []) // asientos elegidos: primero los de los adultos y despues los de los niños
+  const [asientos, setAsientos] = useState(searchParams.get('asientos') ? searchParams.get('asientos').split(',') : [])
   const [agregando, setAgregando] = useState(false)
-  const [mensaje, setMensaje] = useState(null) // { tipo: 'exito' | 'error', texto }
+  const [mensaje, setMensaje] = useState(null)
 
   useEffect(() => {
     api(`/api/vuelos/${id}`)
       .then((data) => {
         setVuelo(data)
-        // Arranca elegida la clase que venia en la URL, o si no la primera que tenga asientos
         const deLaUrl = data.disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
         setElegida(deLaUrl ?? data.disponibilidades.find((d) => d.hayStock) ?? null)
       })
       .catch((err) => setError(err.message))
 
-    // Las fotos van aparte: si fallan, el vuelo se muestra igual.
-    // Primero la lista de fotos y despues la imagen (en Base64) de cada una.
-    // La primera es el fondo de la portada y todas juntas arman la galeria.
     api(`/api/fotos?vueloId=${id}`)
       .then((fotos) => Promise.all(fotos.map((foto) => pedirImagen(foto.id))))
       .then((data) => setImagenes(data))
       .catch(() => setImagenes([]))
   }, [id, claseInicial])
 
-  // El mapa de asientos de la clase elegida (GET /api/disponibilidades/{id}/asientos).
-  // Se guarda junto con el id de la clase que lo pidio: si el usuario cambia de clase,
-  // hasta que llegue el mapa nuevo no se muestra el de la clase anterior.
   const [mapa, setMapa] = useState({ disponibilidadId: null, datos: null, error: '' })
   const elegidaId = elegida?.id
 
@@ -84,19 +75,17 @@ function DetalleVuelo() {
   }
 
   const yaSalio = new Date(vuelo.fechaSalida) < new Date()
-  // Un vuelo demorado se sigue vendiendo (igual que en el backend)
   const sePuedeComprar = estaOperativo(vuelo) && !yaSalio && vuelo.hayStock
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
 
   const elegirClase = (disponibilidad) => {
     setElegida(disponibilidad)
-    setAsientos([]) // cada clase tiene su propio mapa de asientos
+    setAsientos([])
     setMensaje(null)
   }
 
   const cambiarPasajeros = (nuevos) => {
     setPasajeros(nuevos)
-    // Si ahora viajan menos personas, sobran asientos elegidos: se quedan los primeros
     setAsientos(asientos.slice(0, nuevos.adultos + nuevos.ninos))
     setMensaje(null)
   }
@@ -106,11 +95,9 @@ function DetalleVuelo() {
     setMensaje(null)
   }
 
-  // Los bebés viajan a upa: solo eligen asiento los adultos y los niños
   const necesitanAsiento = pasajeros.adultos + pasajeros.ninos
   const faltanAsientos = necesitanAsiento - asientos.length
 
-  // Cada tipo de pasajero paga un porcentaje del precio de un adulto (igual que en el backend)
   const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
   let total = 0
   if (elegida) {
@@ -119,10 +106,8 @@ function DetalleVuelo() {
     })
   }
 
-  // Ida y vuelta: si este es el vuelo de ida, despues de agregarlo se sigue con el de vuelta
   const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
 
-  // Vuelve a la lista de resultados mostrando solo los vuelos de vuelta
   const irAElegirVuelta = (pasajerosActuales) => {
     const params = new URLSearchParams()
     for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta']) {
@@ -137,15 +122,12 @@ function DetalleVuelo() {
 
   const agregarAlCarrito = (seguirConVuelta = false) => {
     if (!estaLogueado) {
-      // Lo mandamos a loguearse y despues vuelve a este vuelo con lo que ya habia elegido:
-      // los pasajeros, la clase y los asientos van en la URL de vuelta
       const params = new URLSearchParams()
       params.set('adultos', pasajeros.adultos)
       params.set('ninos', pasajeros.ninos)
       params.set('bebes', pasajeros.bebes)
       if (elegida) params.set('clase', elegida.id)
       if (asientos.length > 0) params.set('asientos', asientos.join(','))
-      // Si es un viaje de ida y vuelta, se conserva para poder seguir con el vuelo de vuelta
       for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta', 'tramo']) {
         if (searchParams.get(clave)) params.set(clave, searchParams.get(clave))
       }
@@ -155,7 +137,6 @@ function DetalleVuelo() {
 
     setAgregando(true)
     setMensaje(null)
-    // Un solo pedido con los adultos, niños y bebés elegidos
     api('/api/carrito/pasajes', {
       method: 'POST',
       body: { disponibilidadId: elegida.id, ...pasajeros, asientos },
@@ -163,7 +144,6 @@ function DetalleVuelo() {
       .then((carrito) => {
         actualizarCarrito(carrito)
         if (seguirConVuelta) {
-          // La ida ya quedo en el carrito: se pasa directo a elegir la vuelta
           irAElegirVuelta(pasajeros)
           return
         }
@@ -177,12 +157,10 @@ function DetalleVuelo() {
       .finally(() => setAgregando(false))
   }
 
-  // La primera foto del vuelo es el fondo de la portada (si no tiene, queda el azul)
   const fondoPortada = imagenes.length > 0 ? { backgroundImage: `url("${imagenes[0]}")` } : undefined
 
   return (
     <>
-      {/* El admin llega desde "Ver vista del comprador": se le aclara que es solo para mirar */}
       {esAdmin && (
         <div className="detalle-vista-admin">
           <div className="contenedor">
@@ -200,7 +178,6 @@ function DetalleVuelo() {
       <section className="detalle-portada" style={fondoPortada}>
         <div className="contenedor">
           <nav className="detalle-migas">
-            {/* "Vuelos" vuelve a la busqueda de esta misma ruta */}
             <Link to={`/vuelos?origen=${vuelo.origenIata}&destino=${vuelo.destinoIata}`}>Vuelos</Link> /{' '}
             {vuelo.origenCiudad} → {vuelo.destinoCiudad}
           </nav>
@@ -329,7 +306,6 @@ function DetalleVuelo() {
                   maximo={elegida.asientosDisponibles}
                 />
 
-                {/* Detalle del precio: una linea por cada tipo de pasajero */}
                 {TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0).map((t) => (
                   <div key={t.clave} className="detalle-resumen">
                     <span>

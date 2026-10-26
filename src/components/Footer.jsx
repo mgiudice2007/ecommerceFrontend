@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import Logo from './Logo'
 import './Footer.css'
 
-// Cada link de destino lleva a la busqueda ya filtrada por esa ruta
 const DESTINOS_POPULARES = [
   { origen: 'AEP', iata: 'BRC', ciudad: 'Bariloche' },
   { origen: 'AEP', iata: 'IGR', ciudad: 'Puerto Iguazú' },

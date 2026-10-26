@@ -22,7 +22,6 @@
   font-size: 14px;
 }
 
-/* Qué asiento le tocó a cada pasajero */
 .selector-asientos-pasajeros {
   display: flex;
   flex-wrap: wrap;
@@ -65,7 +64,6 @@
   cursor: default;
 }
 
-/* El avion: una columna centrada con scroll si hay muchas filas */
 .selector-asientos-avion {
   display: flex;
   flex-direction: column;
@@ -94,7 +92,6 @@
   color: var(--texto-suave);
 }
 
-/* El pasillo: un espacio antes de la segunda mitad de la fila */
 .despues-del-pasillo {
   margin-left: 22px;
 }

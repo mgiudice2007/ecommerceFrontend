@@ -8,7 +8,6 @@
   isolation: isolate;
 }
 
-/* Con foto: la imagen de fondo con una capa azul encima para que se lea el texto */
 .encabezado-pagina.con-imagen {
   padding-top: 56px;
   background-size: cover;
@@ -67,7 +66,6 @@
   gap: 10px;
 }
 
-/* El contenido de la pagina se monta encima de la franja */
 .sobre-encabezado {
   position: relative;
   margin-top: -60px;

@@ -7,8 +7,8 @@ import './Navbar.css'
 
 function Navbar() {
   const { usuario, perfil, estaLogueado, esComprador, esAdmin, logout, cantidadCarrito } = useAuth()
-  const [menuAbierto, setMenuAbierto] = useState(false) // menu hamburguesa (celular)
-  const [cuentaAbierta, setCuentaAbierta] = useState(false) // menu desplegable de la cuenta
+  const [menuAbierto, setMenuAbierto] = useState(false)
+  const [cuentaAbierta, setCuentaAbierta] = useState(false)
   const navigate = useNavigate()
 
   const cerrarMenu = () => {
@@ -23,7 +23,6 @@ function Navbar() {
     })
   }
 
-  // Arriba se muestra el nombre de la persona; mientras carga el perfil, el usuario
   const nombre = perfil?.nombre || usuario?.username || ''
   const nombreCompleto = perfil?.nombre ? `${perfil.nombre} ${perfil.apellido ?? ''}` : nombre
 
@@ -45,7 +44,6 @@ function Navbar() {
 
         <nav className={`navbar-links ${menuAbierto ? 'abierto' : ''}`} onClick={cerrarMenu}>
 
-          {/* Cada rol ve solo los links que le sirven */}
           {esComprador && <NavLink to="/mis-compras">Mis compras</NavLink>}
           {esComprador && (
             <NavLink to="/carrito" className="navbar-carrito">
@@ -73,7 +71,6 @@ function Navbar() {
               </button>
 
               {cuentaAbierta && (
-                // Se cierra al elegir una opcion o al tocar de nuevo el boton con el nombre
                 <div className="navbar-desplegable" onClick={cerrarMenu}>
                   <div className="navbar-desplegable-titular">
                     <span className="navbar-inicial grande" aria-hidden="true">

@@ -5,7 +5,6 @@
   padding: 22px 24px;
 }
 
-/* "¿A donde queres ir?" a la izquierda y "Ida y vuelta / Solo ida" a la derecha */
 .buscador-cabecera {
   display: flex;
   flex-wrap: wrap;
@@ -37,7 +36,7 @@
 
 .buscador-viaje label.activo {
   border-color: var(--azul);
-  background: rgba(0, 87, 184, 0.1); /* el --azul, bien clarito */
+  background: rgba(0, 87, 184, 0.1);
   color: var(--azul);
 }
 
@@ -47,14 +46,12 @@
   pointer-events: none;
 }
 
-/* Desde / Hacia, pegados como un solo campo */
 .buscador-ruta {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
-/* Para que la lista de sugerencias quede pegada debajo de cada campo */
 .buscador-ruta .buscador-campo {
   position: relative;
 }
@@ -74,7 +71,6 @@
   gap: 12px;
 }
 
-/* Ida y Vuelta pegadas, como un solo campo */
 .buscador-fechas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -128,7 +124,6 @@
   outline: none;
 }
 
-/* Pasajeros: un boton que abre el desplegable con adultos, ninos y bebes */
 .buscador-pasajeros {
   position: relative;
 }
@@ -166,7 +161,6 @@
   box-shadow: var(--sombra);
 }
 
-/* Abajo: el error (si hay) y el boton de buscar a la derecha */
 .buscador-pie {
   display: flex;
   flex-wrap: wrap;
@@ -219,7 +213,6 @@
   }
 }
 
-/* Lista de sugerencias de Desde y Hacia */
 .buscador-sugerencias {
   position: absolute;
   top: calc(100% + 6px);

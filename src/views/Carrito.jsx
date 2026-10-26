@@ -15,11 +15,9 @@ function Carrito() {
   const [comprando, setComprando] = useState(false)
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
-  const [usarMillas, setUsarMillas] = useState(false) // casilla "Usar millas + dinero"
+  const [usarMillas, setUsarMillas] = useState(false)
   const [millasElegidas, setMillasElegidas] = useState('')
-  // El carrito no trae la fecha ni los asientos que quedan de cada vuelo:
-  // los pide esta pantalla y se los pasa a cada ItemCarrito por props
-  const [vuelos, setVuelos] = useState({}) // { idVuelo: vuelo }
+  const [vuelos, setVuelos] = useState({})
 
   useEffect(() => {
     api('/api/carrito')
@@ -31,8 +29,6 @@ function Carrito() {
       .catch((err) => setError(err.message))
   }, [])
 
-  // Todas las operaciones del carrito devuelven el carrito actualizado,
-  // asi que despues de cada una reemplazamos el estado con lo que vuelve.
   const mostrarCarrito = (actualizado) => {
     setCarrito(actualizado)
     actualizarCarrito(actualizado)
@@ -56,22 +52,17 @@ function Carrito() {
       .finally(() => setOcupado(false))
   }
 
-  // La compra no pide datos de pago: POST /api/carrito/checkout valida el stock,
-  // descuenta los asientos, crea la orden y vacia el carrito. Despues se muestra
-  // la pantalla de "Compra confirmada".
   const confirmarCompra = () => {
     setComprando(true)
     setError('')
-    // Si eligio usar millas, se mandan en el body; si no, se paga todo con plata
     const opciones = usarMillas ? { method: 'POST', body: { millas: millasAUsar } } : { method: 'POST' }
     api('/api/carrito/checkout', opciones)
       .then((orden) => {
         actualizarCarrito({ items: [] })
-        recargarPerfil() // el saldo de millas cambio
+        recargarPerfil()
         navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
       })
       .catch((err) => {
-        // Por ejemplo: alguien compro los ultimos asientos mientras tanto
         setError(err.message)
         setComprando(false)
       })
@@ -87,7 +78,6 @@ function Carrito() {
 
   const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
 
-  // Los menores no viajan solos: cada vuelo con niños o bebés necesita al menos un adulto
   const vuelosSinAdulto = []
   carrito.items.forEach((item) => {
     const hayAdulto = carrito.items.some(
@@ -98,10 +88,7 @@ function Carrito() {
     }
   })
 
-
-  // Millas: no se pueden usar mas de las que tiene ni pagar mas que el total
   const maximoMillas = Math.min(carrito.millasDisponibles, Math.floor(carrito.total / carrito.valorMilla))
-  // Si escribe mas de lo permitido no se recorta en silencio: se avisa y no deja confirmar
   const millasEscritas = Number(millasElegidas) || 0
   let problemaMillas = ''
   if (usarMillas && millasEscritas > carrito.millasDisponibles) {
@@ -114,7 +101,6 @@ function Carrito() {
   const millasAUsar = usarMillas && !problemaMillas ? millasEscritas : 0
   const descuentoMillas = millasAUsar * carrito.valorMilla
   const aPagar = carrito.total - descuentoMillas
-  // Lo pagado con millas no suma millas (el backend hace la misma cuenta)
   const millasQueSuma = carrito.total > 0 ? Math.floor((carrito.millasAGanar * aPagar) / carrito.total) : 0
 
   return (
@@ -166,7 +152,6 @@ function Carrito() {
                 </div>
               ))}
 
-              {/* Como en LATAM: se puede pagar una parte con millas y el resto con plata */}
               <div className="carrito-millas">
                 <label className="carrito-millas-casilla">
                   <input

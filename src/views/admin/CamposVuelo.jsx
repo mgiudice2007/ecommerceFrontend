@@ -1,15 +1,11 @@
 import CampoFecha from '../../components/CampoFecha'
 import { hoy, sumarDias } from '../../utils/formato'
 
-// Los campos con los datos de un vuelo. Los usan "Publicar vuelo" (FormVuelo) y la
-// pestaña "Datos del vuelo" de la gestion (TabDatos). No guarda estado: recibe los
-// datos y la funcion para cambiarlos por props, y el padre decide que hacer al guardar.
 function CamposVuelo({ formData, setFormData, aeropuertos, categorias }) {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  // Fechas con logica: la salida desde hoy, y la llegada el mismo dia o el siguiente
   const diaSalida = formData.fechaSalida ? formData.fechaSalida.slice(0, 10) : ''
 
   return (

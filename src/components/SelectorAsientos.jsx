@@ -1,10 +1,5 @@
 import './SelectorAsientos.css'
 
-// Mapa del avion para elegir los asientos de la clase elegida.
-// mapa: las filas del avion y los asientos ya vendidos (lo pide DetalleVuelo)
-// error: si no se pudo traer el mapa
-// grupo: { titulo, adultos, ninos, asientos }  (asientos = los ya elegidos)
-// onCambio: recibe la lista nueva de asientos y el padre la guarda en su estado
 function SelectorAsientos({ mapa, error, grupo, onCambio, ocupado }) {
   const pasajeros = grupo.adultos + grupo.ninos
   const elegidos = grupo.asientos
@@ -23,13 +18,12 @@ function SelectorAsientos({ mapa, error, grupo, onCambio, ocupado }) {
   const tocarAsiento = (codigo) => {
     if (estaOcupado(codigo)) return
     if (estaElegido(codigo)) {
-      onCambio(elegidos.filter((c) => c !== codigo)) // tocar uno elegido lo libera
+      onCambio(elegidos.filter((c) => c !== codigo))
     } else if (elegidos.length < pasajeros) {
       onCambio([...elegidos, codigo])
     }
   }
 
-  // Elige un asiento libre al azar para el proximo pasajero sin asiento
   const asientoAleatorio = () => {
     const libres = []
     mapa.filas.forEach((fila) => {
@@ -42,12 +36,11 @@ function SelectorAsientos({ mapa, error, grupo, onCambio, ocupado }) {
     onCambio([...elegidos, alAzar])
   }
 
-  // "Adulto 1", "Adulto 2", "Niño 1"... en el mismo orden en que el backend reparte los asientos
   const nombres = []
   for (let i = 1; i <= grupo.adultos; i++) nombres.push(`Adulto ${i}`)
   for (let i = 1; i <= grupo.ninos; i++) nombres.push(`Niño ${i}`)
 
-  const mitad = mapa.letras.length / 2 // donde va el pasillo
+  const mitad = mapa.letras.length / 2
 
   return (
     <section className="tarjeta selector-asientos">

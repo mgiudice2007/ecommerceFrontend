@@ -4,8 +4,6 @@ import { estaOperativo, precioDesde, textoDescuento, textoEstado } from '../util
 import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
 
-// Una fila del listado de resultados. Recibe el vuelo completo por props.
-// pasajeros: texto como "?adultos=2&ninos=1" para que el detalle arranque con esos pasajeros
 function TarjetaVuelo({ vuelo, pasajeros = '' }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)
@@ -21,7 +19,6 @@ function TarjetaVuelo({ vuelo, pasajeros = '' }) {
         <div className="tarjeta-vuelo-encabezado">
           <span className="tarjeta-vuelo-avion" aria-hidden="true">✈</span>
           <div>
-            {/* Como en las aerolineas: la ruta es el titulo y el numero de vuelo un dato secundario */}
             <strong>
               {vuelo.origenCiudad} → {vuelo.destinoCiudad}
             </strong>

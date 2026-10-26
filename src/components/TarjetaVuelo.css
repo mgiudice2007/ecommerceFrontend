@@ -56,7 +56,6 @@
   color: var(--verde);
 }
 
-/* Fecha de salida y rotulos "Sale" / "Llega" */
 .tarjeta-vuelo-fecha {
   margin: 14px 0 0;
   font-size: 14px;
@@ -204,7 +203,6 @@
   width: 100%;
 }
 
-/* Pantallas medianas: foto + datos arriba y el precio en una franja abajo */
 @media (max-width: 1180px) {
   .tarjeta-vuelo {
     grid-template-columns: 170px 1fr;

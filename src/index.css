@@ -1,12 +1,10 @@
-/* Colores y medidas de BCA Airlines: azul aerolínea + celeste.
-   Se usan en todo el sitio con var(--nombre). */
 :root {
   --azul-noche: #041e42;
   --azul: #0057b8;
   --azul-hover: #00458f;
   --celeste: #1fa2e0;
   --celeste-suave: #e7f4fc;
-  --durazno: #ffc72c; /* acento dorado para ofertas y destacados */
+  --durazno: #ffc72c;
 
   --fondo: #f3f6fa;
   --superficie: #ffffff;
@@ -35,8 +33,6 @@
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  /* Fondo de "cielo": rutas aereas punteadas y avioncitos encima de un degradado
-     celeste con dos manchas de luz. Queda fijo mientras se hace scroll. */
   background-color: var(--fondo);
   background-image:
     url('./assets/patron-vuelos.svg'),
@@ -74,13 +70,11 @@ h3 {
   padding: 0 16px;
 }
 
-/* Solo arriba y abajo: el margen de los costados lo pone .contenedor */
 .pagina {
   padding-top: 40px;
   min-height: calc(100vh - 340px);
 }
 
-/* ---------- Botones ---------- */
 .boton {
   display: inline-flex;
   align-items: center;
@@ -136,7 +130,6 @@ h3 {
   width: 100%;
 }
 
-/* Botones para usar sobre fondos azules (encabezados) */
 .boton-claro {
   background: #fff;
   color: var(--azul);
@@ -159,7 +152,6 @@ h3 {
   text-decoration: none;
 }
 
-/* ---------- Formularios ---------- */
 .campo {
   display: flex;
   flex-direction: column;
@@ -198,7 +190,6 @@ h3 {
   gap: 16px;
 }
 
-/* ---------- Tarjetas y mensajes ---------- */
 .tarjeta {
   background: var(--superficie);
   border: 1px solid var(--borde);
@@ -249,7 +240,6 @@ h3 {
   }
 }
 
-/* Etiquetas de estado del vuelo (las usa el panel, la busqueda y el detalle) */
 .estado-demorado {
   background: #fff4e0;
   color: #9a5b00;
@@ -261,7 +251,6 @@ h3 {
   color: var(--rojo);
 }
 
-/* Contador con botones - y + (pasajes, pasajeros, carrito) */
 .contador {
   display: inline-flex;
   align-items: center;

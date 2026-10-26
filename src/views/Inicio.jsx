@@ -8,13 +8,11 @@ import { useAuth } from '../context/AuthContext'
 import { estaOperativo } from '../utils/vuelos'
 import './Inicio.css'
 
-// Las dos solapas de "El mundo" usan las categorias del backend
 const REGIONES = [
   { categoria: 'Regional', titulo: 'América y el Caribe' },
   { categoria: 'Internacional', titulo: 'Europa' },
 ]
 
-// Accesos rapidos debajo del buscador: llevan a la busqueda ya filtrada por la ruta
 const ATAJOS = [
   { origen: 'AEP', destino: 'BRC', texto: 'Bariloche' },
   { origen: 'AEP', destino: 'IGR', texto: 'Iguazú' },
@@ -45,11 +43,9 @@ const BENEFICIOS = [
   },
 ]
 
-// Un vuelo por destino (el primero que aparezca) para no repetir ciudades
 const unoPorDestino = (lista) =>
   lista.filter((vuelo, i) => lista.findIndex((v) => v.destinoIata === vuelo.destinoIata) === i)
 
-// Las secciones del inicio se arman filtrando la misma lista de vuelos
 const ofertasDe = (vuelos) =>
   unoPorDestino(vuelos.filter((v) => v.descuentoVigente))
     .sort((a, b) => b.descuentoVigente.valor - a.descuentoVigente.valor)
@@ -59,8 +55,6 @@ const mundoDe = (vuelos, region) => unoPorDestino(vuelos.filter((v) => v.categor
 
 function Inicio() {
   const { estaLogueado } = useAuth()
-  // Aeropuertos para el buscador (si falla el pedido, Desde y Hacia quedan vacios).
-  // Los pide esta pantalla y se los pasa al Buscador por props.
   const [aeropuertos, setAeropuertos] = useState([])
 
   useEffect(() => {
@@ -73,16 +67,13 @@ function Inicio() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [region, setRegion] = useState(REGIONES[0].categoria)
-  const [portadas, setPortadas] = useState({}) // { idVuelo: imagen } de las tarjetas que se muestran
+  const [portadas, setPortadas] = useState({})
 
-  // Una sola llamada trae los vuelos publicados; las secciones se arman filtrando
   useEffect(() => {
     api('/api/vuelos?page=0&size=60')
       .then((pagina) => {
-        // En el inicio solo se muestran vuelos que se pueden comprar (no pausados ni cancelados, y con asientos)
         const operativos = pagina.content.filter((v) => estaOperativo(v) && v.hayStock)
         setVuelos(operativos)
-        // Las fotos solo de los vuelos que aparecen en alguna seccion
         const mostrados = [
           ...ofertasDe(operativos),
           ...argentinaDe(operativos),

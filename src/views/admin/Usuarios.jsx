@@ -8,8 +8,6 @@ import { fechaLarga } from '../../utils/formato'
 import './Panel.css'
 import './Usuarios.css'
 
-// Roles que el admin puede asignar. La aerolinea tiene un unico vendedor (el admin),
-// asi que no hay rol de vendedor.
 const ROLES = [
   { valor: 'COMPRADOR', nombre: 'Comprador', plural: 'Compradores' },
   { valor: 'ADMIN', nombre: 'Administrador', plural: 'Administradores' },
@@ -18,19 +16,17 @@ const ROLES = [
 const nombreDeRol = (valor) =>
   ROLES.find((r) => r.valor === valor)?.nombre ?? valor
 
-// Administracion de cuentas y asignacion de permisos (solo ADMIN).
-// GET /api/usuarios trae todas las cuentas; PUT /api/usuarios/:id/rol cambia el rol.
 function Usuarios() {
   const { usuario: yo } = useAuth()
 
   const [usuarios, setUsuarios] = useState(null)
-  const [cambios, setCambios] = useState({}) // { idUsuario: rolElegido } de las filas sin guardar
+  const [cambios, setCambios] = useState({})
   const [busqueda, setBusqueda] = useState('')
   const [filtroRol, setFiltroRol] = useState('')
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(null)
-  const [aGuardar, setAGuardar] = useState(null) // usuario que espera confirmacion del cambio de rol
+  const [aGuardar, setAGuardar] = useState(null)
 
   useEffect(() => {
     api('/api/usuarios')
@@ -40,7 +36,6 @@ function Usuarios() {
 
   const elegirRol = (usuario, rol) => {
     setExito('')
-    // Si vuelve a elegir el rol que ya tenia, deja de ser un cambio pendiente
     const nuevos = { ...cambios }
     if (rol === usuario.rol) delete nuevos[usuario.id]
     else nuevos[usuario.id] = rol
@@ -50,14 +45,13 @@ function Usuarios() {
   const guardar = (usuario) => {
     const rol = cambios[usuario.id]
     const nombreRol = nombreDeRol(rol)
-    setAGuardar(null) // se cierra el cartel
+    setAGuardar(null)
     setError('')
     setExito('')
     setGuardando(usuario.id)
     api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
       .then((actualizado) => {
         setUsuarios(usuarios.map((u) => (u.id === actualizado.id ? actualizado : u)))
-        // Ya se guardo: deja de ser un cambio pendiente
         const pendientes = { ...cambios }
         delete pendientes[usuario.id]
         setCambios(pendientes)

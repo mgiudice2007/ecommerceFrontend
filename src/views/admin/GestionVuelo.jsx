@@ -22,27 +22,22 @@ function GestionVuelo() {
   const location = useLocation()
 
   const [vuelo, setVuelo] = useState(null)
-  const [portada, setPortada] = useState(null) // imagen de la primera foto, para el encabezado
+  const [portada, setPortada] = useState(null)
   const [error, setError] = useState('')
-  // Un vuelo recien publicado arranca en "Clases", porque sin clases no se puede comprar
   const [pestania, setPestania] = useState(location.state?.recienCreado ? 'clases' : 'datos')
 
-  // Cada vez que cambia, el useEffect vuelve a traer el vuelo
   const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
     api(`/api/vuelos/${id}`)
       .then((data) => setVuelo(data))
       .catch((err) => setError(err.message))
-    // La primera foto es la portada del encabezado (su imagen llega en Base64)
     api(`/api/fotos?vueloId=${id}`)
       .then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
       .then((imagen) => setPortada(imagen))
       .catch(() => setPortada(null))
   }, [id, recargar])
 
-  // Las pestañas la llaman cuando cambian algo (por ejemplo un descuento
-  // cambia el precio final), para volver a traer el vuelo actualizado.
   const recargarVuelo = () => setRecargar(recargar + 1)
 
   if (error) {
@@ -57,7 +52,6 @@ function GestionVuelo() {
   if (!vuelo) {
     return <div className="contenedor pagina texto-suave">Cargando vuelo…</div>
   }
-
 
   return (
     <>
@@ -103,7 +97,6 @@ function GestionVuelo() {
           ))}
         </div>
 
-        {/* Solo se muestra la pestaña elegida */}
         {pestania === 'datos' && <TabDatos vuelo={vuelo} />}
         {pestania === 'clases' && <TabClases vuelo={vuelo} onCambio={recargarVuelo} />}
         {pestania === 'descuentos' && <TabDescuentos vuelo={vuelo} onCambio={recargarVuelo} />}

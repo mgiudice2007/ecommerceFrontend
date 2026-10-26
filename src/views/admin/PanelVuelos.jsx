@@ -8,9 +8,8 @@ import { fechaCorta, hora, precio } from '../../utils/formato'
 import { ESTADOS_VUELO, textoDescuento, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
 
-const POR_PAGINA = 20 // la aerolinea tiene miles de vuelos: se muestran de a 20
+const POR_PAGINA = 20
 
-// Cuenta asientos totales y vendidos sumando todas las clases del vuelo
 const asientosDe = (vuelo) =>
   vuelo.disponibilidades.reduce(
     (cuenta, d) => ({
@@ -26,41 +25,36 @@ function PanelVuelos() {
   const [pagina, setPagina] = useState(0)
   const [error, setError] = useState('')
   const location = useLocation()
-  // Al volver de guardar los datos de un vuelo llega el mensaje ("Se guardaron los cambios...")
   const [mensaje, setMensaje] = useState(location.state?.mensaje ?? '')
-  const [aEliminar, setAEliminar] = useState(null) // vuelo que espera confirmacion (muestra el cartel)
-  const [nuevoEstado, setNuevoEstado] = useState(null) // { vuelo, estado } que espera confirmacion
+  const [aEliminar, setAEliminar] = useState(null)
+  const [nuevoEstado, setNuevoEstado] = useState(null)
 
   useEffect(() => {
-    // El admin es el unico vendedor de la aerolinea: ve y maneja todos los vuelos
     api('/api/vuelos')
       .then((pagina) => setVuelos(pagina.content))
       .catch((err) => setError(err.message))
   }, [])
 
-  // PATCH /api/vuelos/:id/estado cambia solo el estado del vuelo (activo, demorado,
-  // pausado, cancelado o eliminado) y devuelve { id, estado, mensaje }.
   const cambiarEstado = (vuelo, estado) => {
     setError('')
     setMensaje('')
     api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
       .then((respuesta) => {
         if (estado === 'ELIMINADO') {
-          setVuelos(vuelos.filter((v) => v.id !== vuelo.id)) // la baja logica lo saca del listado
+          setVuelos(vuelos.filter((v) => v.id !== vuelo.id))
         } else {
           setVuelos(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
         }
-        setMensaje(respuesta.mensaje) // por ejemplo "El vuelo BC1402 fue marcado como demorado"
+        setMensaje(respuesta.mensaje)
       })
       .catch((err) => setError(err.message))
   }
 
   const eliminar = (vuelo) => {
-    setAEliminar(null) // se cierra el cartel
+    setAEliminar(null)
     cambiarEstado(vuelo, 'ELIMINADO')
   }
 
-  // Filtro de la lista por texto (solo en el navegador, no vuelve a pedir al backend)
   const texto = busqueda.trim().toLowerCase()
   const visibles = (vuelos ?? []).filter((v) =>
     `${v.origenCiudad} ${v.destinoCiudad} ${v.origenIata} ${v.destinoIata} ${v.numeroVuelo}`
@@ -137,7 +131,7 @@ function PanelVuelos() {
               value={busqueda}
               onChange={(e) => {
                 setBusqueda(e.target.value)
-                setPagina(0) // una busqueda nueva arranca en la primera pagina
+                setPagina(0)
               }}
               placeholder="Ciudad, código de aeropuerto o número de vuelo"
             />

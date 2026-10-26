@@ -6,7 +6,6 @@ import { paraInputFechaHora } from '../../utils/formato'
 import { cuerpoVuelo, problemaEnVuelo } from '../../utils/vuelos'
 import CamposVuelo from './CamposVuelo'
 
-// Los datos del vuelo como los usa el formulario
 const datosDe = (vuelo) => ({
   numeroVuelo: vuelo.numeroVuelo,
   descripcion: vuelo.descripcion ?? '',
@@ -17,14 +16,10 @@ const datosDe = (vuelo) => ({
   fechaLlegada: paraInputFechaHora(vuelo.fechaLlegada),
 })
 
-// "2026-11-06T07:15" -> "06/11/2026 07:15"
 const fechaHora = (valor) => `${valor.slice(8, 10)}/${valor.slice(5, 7)}/${valor.slice(0, 4)} ${valor.slice(11, 16)}`
 
-// Pestaña "Datos del vuelo": el admin cambia solo lo que necesita. Al guardar se
-// muestra el resumen de lo que cambio y se pide confirmacion.
 function TabDatos({ vuelo }) {
   const navigate = useNavigate()
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [aeropuertos, setAeropuertos] = useState([])
   const [categorias, setCategorias] = useState([])
 
@@ -39,7 +34,7 @@ function TabDatos({ vuelo }) {
 
   const original = datosDe(vuelo)
   const [formData, setFormData] = useState(original)
-  const [cambios, setCambios] = useState(null) // la lista que se muestra en el cartel de confirmacion
+  const [cambios, setCambios] = useState(null)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -49,7 +44,6 @@ function TabDatos({ vuelo }) {
   }
   const nombreCategoria = (id) => categorias.find((c) => String(c.id) === String(id))?.nombre ?? id
 
-  // Cada campo con su nombre y como mostrarlo en el resumen
   const CAMPOS = [
     { clave: 'numeroVuelo', nombre: 'Número de vuelo', mostrar: (v) => v },
     { clave: 'categoriaId', nombre: 'Tipo de vuelo', mostrar: nombreCategoria },
@@ -66,7 +60,6 @@ function TabDatos({ vuelo }) {
     setError(problema)
     if (problema) return
 
-    // Solo los campos que cambiaron: "Salida: 06/11/2026 07:15 → 06/11/2026 09:00"
     const lista = CAMPOS.filter((c) => String(formData[c.clave]) !== String(original[c.clave])).map(
       (c) => `${c.nombre}: ${c.mostrar(original[c.clave])} → ${c.mostrar(formData[c.clave])}`,
     )
@@ -81,7 +74,6 @@ function TabDatos({ vuelo }) {
     setCambios(null)
     setGuardando(true)
     api(`/api/vuelos/${vuelo.id}`, { method: 'PUT', body: cuerpoVuelo(formData) })
-      // Una vez guardado vuelve al panel, que muestra el mensaje
       .then((actualizado) =>
         navigate('/panel', { state: { mensaje: `Se guardaron los cambios del vuelo ${actualizado.numeroVuelo}.` } }),
       )

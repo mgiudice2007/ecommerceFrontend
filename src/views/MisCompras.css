@@ -68,7 +68,6 @@
   gap: 8px;
 }
 
-/* Faltan menos de 24 horas para el vuelo o ya salio */
 .compra-sin-cancelar {
   color: var(--texto-suave);
   font-size: 14px;
@@ -79,7 +78,6 @@
   text-decoration: line-through;
 }
 
-/* Las etiquetas de estado tambien se usan aca */
 .etiqueta-exito {
   background: var(--verde-suave);
   color: var(--verde);
@@ -90,7 +88,6 @@
   color: var(--rojo);
 }
 
-/* Foto del destino a la izquierda de cada compra */
 .compra {
   display: grid;
   grid-template-columns: 150px 1fr;

@@ -37,9 +37,6 @@ function Registro() {
 
     setCargando(true)
 
-    // confirmarPassword es solo del formulario: al backend se manda el resto
-    // (sin espacios de mas al principio o al final).
-    // El registro es solo para pasajeros: el backend crea siempre un COMPRADOR.
     const datosAEnviar = {
       nombre: formData.nombre.trim(),
       apellido: formData.apellido.trim(),
@@ -49,7 +46,6 @@ function Registro() {
     }
 
     api('/api/auth/registro', { method: 'POST', body: datosAEnviar })
-      // Despues de registrarse lo dejamos logueado directamente
       .then(() => login(datosAEnviar.username, datosAEnviar.password))
       .then(() => navigate('/', { replace: true }))
       .catch((err) => {

@@ -1,4 +1,3 @@
-/* ---------- Portada con la foto del destino ---------- */
 .detalle-portada {
   position: relative;
   padding: 40px 0 110px;
@@ -58,7 +57,6 @@
   font-size: 16px;
 }
 
-/* El contenido se monta sobre la portada */
 .detalle-cuerpo {
   position: relative;
   margin-top: -64px;
@@ -196,7 +194,6 @@
   margin-top: 8px;
 }
 
-/* Botones - 1 + (tambien se usan en el carrito) */
 @media (max-width: 960px) {
   .detalle-layout {
     grid-template-columns: 1fr;
@@ -230,7 +227,6 @@
   margin: -6px 0 12px;
 }
 
-/* Aviso para el admin que entra a ver el vuelo como lo ve un comprador */
 .detalle-vista-admin {
   background: var(--durazno);
   color: var(--azul-noche);

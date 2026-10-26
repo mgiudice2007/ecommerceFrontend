@@ -12,7 +12,6 @@ function Login() {
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
 
-  // Un solo handler para todos los inputs: usa el atributo name de cada uno
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -24,12 +23,10 @@ function Login() {
 
     login(formData.username, formData.password)
       .then((usuario) => {
-        // Si venia de una pagina protegida vuelve ahi; si no, segun su rol
         const destino = location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/' : '/panel')
         navigate(destino, { replace: true })
       })
       .catch((err) => {
-        // Si la clave esta mal el backend responde "Usuario o contraseña incorrectos"
         setError(err.message)
         setCargando(false)
       })

@@ -1,10 +1,3 @@
-// Todas las llamadas al backend pasan por aca. Se encarga de:
-// - agregar el token JWT en el header Authorization,
-// - convertir el body a JSON,
-// - y transformar los errores del backend en un mensaje legible.
-
-// Direccion del backend de Spring Boot. El frontend corre en otro puerto (5173),
-// asi que el backend tiene que permitirlo con CORS (ya esta en SecurityConfig).
 export const BASE_URL = 'http://localhost:8080'
 
 const TOKEN_KEY = 'token'
@@ -13,14 +6,10 @@ export const obtenerToken = () => localStorage.getItem(TOKEN_KEY)
 export const guardarToken = (token) => localStorage.setItem(TOKEN_KEY, token)
 export const borrarToken = () => localStorage.removeItem(TOKEN_KEY)
 
-// Arma un mensaje a partir del body de error del GlobalExceptionHandler:
-// { status, error } o, si es de validacion, { error, fields: { campo: mensaje } }
 const mensajeDeError = (data, status) => {
   if (data?.fields) {
     return Object.values(data.fields).join('. ')
   }
-  // Los 401/403 que corta Spring Security antes de llegar al controller
-  // vienen con el texto en ingles ("Unauthorized", "Forbidden")
   if (data?.error && !['Unauthorized', 'Forbidden'].includes(data.error)) {
     return data.error
   }
@@ -38,13 +27,11 @@ export const api = (url, opciones = {}) => {
     headers.Authorization = `Bearer ${token}`
   }
 
-  // Si es un FormData (subida de fotos) el navegador arma el Content-Type solo.
   const esArchivo = body instanceof FormData
   if (body && !esArchivo) {
     headers['Content-Type'] = 'application/json'
   }
 
-  // Igual que en clase: las options del fetch con method, headers y body
   const options = {
     method,
     headers,
@@ -53,11 +40,9 @@ export const api = (url, opciones = {}) => {
 
   return fetch(`${BASE_URL}${url}`, options)
     .catch(() => {
-      // fetch solo falla aca si no pudo llegar al servidor
       throw new Error('No se pudo conectar con el servidor. ¿Está levantado el backend?')
     })
     .then((response) =>
-      // Leemos el cuerpo como texto porque algunas respuestas pueden venir vacias
       response.text().then((texto) => {
         const data = texto ? JSON.parse(texto) : null
         if (!response.ok) {
@@ -68,18 +53,12 @@ export const api = (url, opciones = {}) => {
     )
 }
 
-// Pide la imagen de una foto. Como en el ejemplo de clase de subida de imagenes,
-// llega en Base64 dentro de un JSON ({ id, file, tipo }) y se arma un "data URL"
-// que se puede poner en el src de un <img> o en un background-image.
 export const pedirImagen = (fotoId) =>
   api(`/api/fotos/${fotoId}`).then((imagen) => `data:${imagen.tipo};base64,${imagen.file}`)
 
-// La portada de un vuelo: la imagen de su primera foto, o null si no tiene fotos.
 export const pedirPortada = (vueloId) =>
   api(`/api/fotos?vueloId=${vueloId}`).then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
 
-// Hace un pedido por cada id (sin repetir) y junta las respuestas en un objeto { id: respuesta }.
-// Si un pedido falla, ese id queda en null y el resto se muestra igual.
 const pedirPorId = (ids, pedir) => {
   const unicos = ids.filter((id, i) => ids.indexOf(id) === i)
   return Promise.all(unicos.map((id) => pedir(id).catch(() => null))).then((respuestas) => {
@@ -91,7 +70,5 @@ const pedirPorId = (ids, pedir) => {
   })
 }
 
-// Las pantallas con listas (resultados, inicio, carrito, mis compras, panel) piden todo
-// de una vez con estas funciones y le pasan a cada tarjeta lo suyo por props.
 export const pedirPortadas = (vueloIds) => pedirPorId(vueloIds, pedirPortada)
 export const pedirVuelos = (vueloIds) => pedirPorId(vueloIds, (id) => api(`/api/vuelos/${id}`))

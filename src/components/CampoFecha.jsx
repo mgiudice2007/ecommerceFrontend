@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import './CampoFecha.css'
 
-// El <input type="date"> del navegador muestra la fecha segun el idioma de la compu
-// (en una en ingles sale 12/15/2026 y la hora con AM/PM). Este campo muestra siempre
-// dd/mm/aaaa y la hora en 24 hs, y con el boton del calendario abre el del navegador.
-//
-// value: "2026-12-15" (o "2026-12-15T10:00" con conHora), igual que los inputs nativos
-// onChange: recibe el valor nuevo en ese mismo formato ('' si se borra o si lo escrito no sirve)
-// min / max: "2026-10-25" (opcionales)
-
 const dosDigitos = (n) => String(n).padStart(2, '0')
 
 const HORAS = []
@@ -16,10 +8,8 @@ for (let h = 0; h < 24; h++) HORAS.push(dosDigitos(h))
 const MINUTOS = []
 for (let m = 0; m < 60; m += 5) MINUTOS.push(dosDigitos(m))
 
-// "2026-12-15" -> "15/12/2026"
 const aTexto = (fecha) => (fecha ? `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}/${fecha.slice(0, 4)}` : '')
 
-// "15/12/2026" -> "2026-12-15", o null si no es una fecha que exista (por ejemplo 31/02/2026)
 const aFecha = (texto) => {
   const partes = texto.split('/')
   if (partes.length !== 3 || partes[2].length !== 4) return null
@@ -34,16 +24,11 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
   const fecha = value ? value.slice(0, 10) : ''
   const hora = conHora && value ? value.slice(11, 13) : '12'
   const minutos = conHora && value ? value.slice(14, 16) : '00'
-  // Si la hora guardada no cae en un multiplo de 5 (por ejemplo 07:13), igual se muestra
   const opcionesMinutos = MINUTOS.includes(minutos) ? MINUTOS : [...MINUTOS, minutos].sort()
 
-  // Lo que el usuario esta escribiendo. null = mostrar la fecha que viene en value
   const [escrito, setEscrito] = useState(null)
-  // El problema con la fecha escrita: se muestra en rojo debajo del campo
   const [problema, setProblema] = useState('')
 
-  // Le avisa al padre el valor nuevo. Si la fecha no sirve le manda '' (sin fecha),
-  // asi el formulario del padre la toma como que falta
   const avisar = (nuevaFecha, nuevaHora, nuevosMinutos) => {
     if (!nuevaFecha) onChange('')
     else onChange(conHora ? `${nuevaFecha}T${nuevaHora}:${nuevosMinutos}` : nuevaFecha)
@@ -54,8 +39,6 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     setEscrito(texto)
     const nueva = aFecha(texto)
 
-    // Mientras la fecha esta a medio escribir no se marca error; si ya esta completa
-    // se controla que este dentro de min y max
     let fueraDeRango = ''
     if (nueva && min && nueva < min) fueraDeRango = `La fecha tiene que ser desde el ${aTexto(min)}`
     else if (nueva && max && nueva > max) fueraDeRango = `La fecha tiene que ser hasta el ${aTexto(max)}`
@@ -65,8 +48,6 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     else avisar('')
   }
 
-  // Al salir del campo: si lo escrito no es una fecha se avisa; si es valida se
-  // muestra prolija (1/2/2027 -> 01/02/2027)
   const salir = () => {
     if (escrito && !aFecha(escrito)) setProblema('Escribí la fecha como dd/mm/aaaa')
     else if (!problema) setEscrito(null)
@@ -78,7 +59,6 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     avisar(e.target.value, hora, minutos)
   }
 
-  // showPicker abre el calendario del input de fecha escondido
   const abrirCalendario = () => document.getElementById(`${id}-calendario`).showPicker()
 
   return (
@@ -145,7 +125,6 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
         </div>
       )}
 
-      {/* Renderizado condicional: el aviso aparece solo si la fecha escrita tiene un problema */}
       {problema && <small className="campo-fecha-error">{problema}</small>}
     </div>
   )

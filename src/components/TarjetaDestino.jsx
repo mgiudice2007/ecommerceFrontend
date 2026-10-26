@@ -4,9 +4,6 @@ import { precioDesde, textoDescuento } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaDestino.css'
 
-// Tarjeta con foto grande para las secciones del inicio.
-// pais: viene del catalogo de aeropuertos (el vuelo solo trae la ciudad)
-// imagen: la portada del vuelo (la pide el inicio)
 function TarjetaDestino({ vuelo, pais, imagen }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)

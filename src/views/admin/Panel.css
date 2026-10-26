@@ -1,4 +1,3 @@
-/* Estilos compartidos por todas las pantallas del panel de vendedor */
 .panel-numeros {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -102,7 +101,6 @@
   gap: 8px;
 }
 
-/* Selector de estado del vuelo (activo, demorado, pausado, cancelado) */
 .panel-vuelo-estado {
   padding: 9px 10px;
   border: 1px solid var(--borde);
@@ -135,7 +133,6 @@
   color: var(--rojo);
 }
 
-/* Formularios del panel */
 .panel-formulario {
   max-width: 760px;
 }
@@ -195,8 +192,6 @@
   }
 }
 
-
-/* Paginas del listado de vuelos del panel */
 .panel-paginas {
   display: flex;
   align-items: center;

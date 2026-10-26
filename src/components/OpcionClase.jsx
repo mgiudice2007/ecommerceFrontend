@@ -1,10 +1,6 @@
 import { precio } from '../utils/formato'
 import './OpcionClase.css'
 
-// Una tarjeta para elegir clase (como las tarifas Light / Plus / Flex del diseño).
-// disponibilidad: el cupo del vuelo para esa clase (asientos y precio)
-// clase: los datos de la clase del catalogo (descripcion y si incluye bodega)
-// onElegir: funcion del padre que se llama al tocar la tarjeta
 function OpcionClase({ disponibilidad, clase, seleccionada, onElegir }) {
   const conDescuento = disponibilidad.precioConDescuento < disponibilidad.precio
   const pocosAsientos = disponibilidad.hayStock && disponibilidad.asientosDisponibles <= 5
@@ -24,7 +20,6 @@ function OpcionClase({ disponibilidad, clase, seleccionada, onElegir }) {
 
       {clase && <p>{clase.descripcion}</p>}
 
-      {/* equipajeBodega viene de la clase en el backend (GET /api/clases) */}
       <ul>
         <li className={clase?.equipajeBodega ? '' : 'no-incluye'}>
           {clase?.equipajeBodega ? '✓ Valija en bodega incluida' : '✕ Sin valija en bodega'}

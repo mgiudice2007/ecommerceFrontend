@@ -2,24 +2,20 @@ import { useEffect, useState } from 'react'
 import { api, pedirImagen } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 
-const MAXIMO_FOTOS = 5 // el backend no deja subir mas de 5 por vuelo
+const MAXIMO_FOTOS = 5
 const MAXIMO_MB = 5
 
-// Pestaña "Fotos": subir (multipart/form-data) y borrar fotos del vuelo.
 function TabFotos({ vuelo, onCambio }) {
   const [fotos, setFotos] = useState([])
-  const [imagenes, setImagenes] = useState([]) // la imagen (data URL) de cada foto, en el mismo orden
+  const [imagenes, setImagenes] = useState([])
   const [archivo, setArchivo] = useState(null)
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [subiendo, setSubiendo] = useState(false)
-  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
   const [pregunta, setPregunta] = useState(null)
-  // Cada vez que cambia, el useEffect vuelve a pedir las fotos
   const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
-    // Primero la lista de fotos y despues la imagen (en Base64) de cada una
     api(`/api/fotos?vueloId=${vuelo.id}`)
       .then((data) => {
         setFotos(data)
@@ -41,11 +37,10 @@ function TabFotos({ vuelo, onCambio }) {
     setArchivo(elegido)
   }
 
-  // Antes de subir se muestra que archivo se va a subir y se pide confirmacion
   const subir = (e) => {
     e.preventDefault()
     if (!archivo) return
-    const formulario = e.target // para vaciar el <input type="file"> despues de subir
+    const formulario = e.target
     setPregunta({
       titulo: '¿Subir esta foto?',
       mensaje: 'Se va a ver en la página del vuelo.',
@@ -57,8 +52,6 @@ function TabFotos({ vuelo, onCambio }) {
 
   const subirFoto = (formulario) => {
 
-    // Igual que en la clase de subida de imagenes: los datos van en un FormData.
-    // El campo del archivo se tiene que llamar "file", como espera el backend.
     const formData = new FormData()
     formData.append('vueloId', vuelo.id)
     formData.append('file', archivo)
@@ -93,7 +86,7 @@ function TabFotos({ vuelo, onCambio }) {
     setExito('')
     api(`/api/fotos/${foto.id}`, { method: 'DELETE' })
       .then((respuesta) => {
-        setExito(respuesta.mensaje) // "Foto eliminada correctamente"
+        setExito(respuesta.mensaje)
         setRecargar(recargar + 1)
         onCambio()
       })
@@ -119,7 +112,6 @@ function TabFotos({ vuelo, onCambio }) {
           <div className="gestion-fotos">
             {fotos.map((foto, indice) => (
               <figure key={foto.id} className="gestion-foto">
-                {/* Mientras llega la imagen se ve el recuadro gris de fondo */}
                 {imagenes[indice] && <img src={imagenes[indice]} alt={foto.nombreArchivo} />}
                 {indice === 0 && <span className="etiqueta">Portada</span>}
                 <div>
@@ -149,7 +141,6 @@ function TabFotos({ vuelo, onCambio }) {
         )}
       </section>
 
-      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
       {pregunta && (
         <Confirmacion
           titulo={pregunta.titulo}

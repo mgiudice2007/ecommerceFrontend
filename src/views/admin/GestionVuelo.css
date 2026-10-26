@@ -27,7 +27,6 @@
   box-shadow: 0 2px 8px rgba(10, 37, 64, 0.08);
 }
 
-/* Contenido de cada pestaña */
 .gestion-seccion {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -39,7 +38,6 @@
   min-width: 0;
 }
 
-/* La columna de la derecha es angosta: los campos van uno debajo del otro */
 .gestion-seccion .fila-campos {
   grid-template-columns: 1fr;
   gap: 0;
@@ -119,7 +117,7 @@
 
 .gestion-foto {
   position: relative;
-  margin: 0; /* <figure> trae margen por defecto */
+  margin: 0;
   overflow: hidden;
   border-radius: var(--radio);
   border: 1px solid var(--borde);

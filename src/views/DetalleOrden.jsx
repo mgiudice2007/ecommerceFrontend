@@ -8,10 +8,8 @@ import { cancelarOrden, numerosDeVuelo, textoCancelacion } from '../utils/ordene
 import { useAuth } from '../context/AuthContext'
 import './DetalleOrden.css'
 
-// Detalle de una compra (GET /api/ordenes/:id).
-// Si venimos recien de confirmar la compra, muestra el encabezado de "Compra confirmada".
 function DetalleOrden() {
-  const { recargarPerfil } = useAuth() // al cancelar cambian las millas
+  const { recargarPerfil } = useAuth()
   const { id } = useParams()
   const location = useLocation()
   const recienComprada = location.state?.recienComprada === true
@@ -19,7 +17,7 @@ function DetalleOrden() {
   const [orden, setOrden] = useState(null)
   const [error, setError] = useState('')
   const [cancelando, setCancelando] = useState(false)
-  const [preguntando, setPreguntando] = useState(false) // true mientras se muestra el cartel de confirmacion
+  const [preguntando, setPreguntando] = useState(false)
 
   useEffect(() => {
     api(`/api/ordenes/${id}`)
@@ -43,7 +41,7 @@ function DetalleOrden() {
   const cancelada = orden.estado === 'CANCELADA'
 
   const cancelar = () => {
-    setPreguntando(false) // se cierra el cartel
+    setPreguntando(false)
     setCancelando(true)
     cancelarOrden(orden)
       .then((actualizada) => {
@@ -83,7 +81,6 @@ function DetalleOrden() {
             <strong>#{orden.id}</strong>
           </div>
           <div>
-            {/* Los vuelos de la compra, sin repetir (por ejemplo la ida y la vuelta) */}
             <small>{numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°'}</small>
             <strong>{numerosDeVuelo(orden).join(' · ')}</strong>
           </div>
@@ -121,7 +118,6 @@ function DetalleOrden() {
         </ul>
 
         <div className="orden-totales">
-          {/* Los precios de los pasajes ya vienen con las promociones aplicadas */}
           <div className="orden-subtotal">
             <span>Pasajes</span>
             <span>{precio(orden.total + orden.descuentoMillas)}</span>
@@ -158,7 +154,6 @@ function DetalleOrden() {
         <Link to="/" className="boton boton-secundario">
           Volver al inicio
         </Link>
-        {/* El backend dice si todavia se puede cancelar (hasta 24 hs antes del vuelo) */}
         {orden.sePuedeCancelar && (
           <button className="boton boton-peligro" onClick={() => setPreguntando(true)} disabled={cancelando}>
             {cancelando ? 'Cancelando…' : 'Cancelar compra'}

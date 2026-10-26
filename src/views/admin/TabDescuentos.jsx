@@ -6,17 +6,13 @@ import { hoy, precio } from '../../utils/formato'
 
 const fechaCorta = (fecha) => new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR')
 
-// Pestaña "Descuentos": promociones por fecha. El backend aplica solo el que
-// esta vigente hoy y no deja crear dos activos con fechas que se pisen.
 function TabDescuentos({ vuelo, onCambio }) {
   const [descuentos, setDescuentos] = useState([])
   const [nuevo, setNuevo] = useState({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
-  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
   const [pregunta, setPregunta] = useState(null)
-  // Cada vez que cambia, el useEffect vuelve a pedir la lista de descuentos
   const [recargar, setRecargar] = useState(0)
 
   useEffect(() => {
@@ -25,8 +21,6 @@ function TabDescuentos({ vuelo, onCambio }) {
       .catch((err) => setError(err.message))
   }, [vuelo.id, recargar])
 
-  // Manda el pedido y, si sale bien, muestra el mensaje y recarga los descuentos.
-  // Devuelve true o false para saber si salio bien.
   const ejecutar = (url, options, textoExito) => {
     setError('')
     setExito('')
@@ -35,7 +29,7 @@ function TabDescuentos({ vuelo, onCambio }) {
       .then((respuesta) => {
         setExito(textoExito ?? respuesta.mensaje)
         setRecargar(recargar + 1)
-        onCambio() // el precio final del vuelo puede haber cambiado
+        onCambio()
         return true
       })
       .catch((err) => {
@@ -45,7 +39,6 @@ function TabDescuentos({ vuelo, onCambio }) {
       .finally(() => setGuardando(false))
   }
 
-  // Cada accion pide confirmacion antes de mandarse al backend
   const crear = (e) => {
     e.preventDefault()
     if (!nuevo.fechaDesde || !nuevo.fechaHasta) {
@@ -92,7 +85,6 @@ function TabDescuentos({ vuelo, onCambio }) {
     })
   }
 
-  // Prende o apaga un descuento sin borrarlo (PUT con activo cambiado)
   const cambiarActivo = (d) => {
     const body = {
       vueloId: vuelo.id,
@@ -109,8 +101,7 @@ function TabDescuentos({ vuelo, onCambio }) {
     ejecutar(`/api/descuentos/${d.id}`, { method: 'DELETE' })
   }
 
-  // El descuento va de hoy al dia que sale el vuelo (el backend controla lo mismo)
-  const diaDelVuelo = vuelo.fechaSalida.slice(0, 10) // "2026-11-06T07:15:00" -> "2026-11-06"
+  const diaDelVuelo = vuelo.fechaSalida.slice(0, 10)
 
   const textoValor = (d) => (d.tipoDescuento === 'PORCENTAJE' ? `${Number(d.valor)}%` : precio(d.valor))
 
@@ -229,7 +220,6 @@ function TabDescuentos({ vuelo, onCambio }) {
         </form>
       </section>
 
-      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
       {pregunta && (
         <Confirmacion
           titulo={pregunta.titulo}

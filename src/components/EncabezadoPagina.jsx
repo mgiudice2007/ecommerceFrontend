@@ -1,10 +1,5 @@
 import './EncabezadoPagina.css'
 
-// Franja azul de arriba que comparten las paginas.
-// - etiqueta: texto chico arriba del titulo (por ejemplo "Vendedor")
-// - acciones: botones que van a la derecha
-// - imagen: URL de una foto de fondo (opcional)
-// - children: lo que va antes del titulo (por ejemplo, un link para volver)
 function EncabezadoPagina({ etiqueta, titulo, subtitulo, acciones, imagen, children }) {
   const fondo = imagen ? { backgroundImage: `url("${imagen}")` } : undefined
 

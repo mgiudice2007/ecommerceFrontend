@@ -1,5 +1,3 @@
-// Funciones chicas para mostrar los datos que vienen del backend.
-
 const formatoPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
@@ -8,17 +6,14 @@ const formatoPrecio = new Intl.NumberFormat('es-AR', {
 
 export const precio = (valor) => formatoPrecio.format(Number(valor ?? 0))
 
-// Igual que precio, pero si vale 0 dice "Gratis" (por ejemplo, el pasaje de un bebé)
 export const precioOGratis = (valor) => (Number(valor) === 0 ? 'Gratis' : precio(valor))
 
-// El backend manda fechas como "2026-12-15T10:00:00"
 export const hora = (fecha) =>
   new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
 
 export const fechaCorta = (fecha) =>
   new Date(fecha).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })
 
-// "Domingo 1 de noviembre"
 export const fechaConDia = (fecha) => {
   const texto = new Date(fecha)
     .toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -26,7 +21,6 @@ export const fechaConDia = (fecha) => {
   return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
 
-// Cuantos dias despues de la salida llega el vuelo (0 si llega el mismo dia)
 export const diasHastaLlegada = (salida, llegada) => {
   const dia = (fecha) => new Date(fecha.slice(0, 10)).getTime()
   return Math.round((dia(llegada) - dia(salida)) / 86_400_000)
@@ -42,14 +36,10 @@ export const duracion = (minutos) => {
   return m ? `${h}h ${m}m` : `${h}h`
 }
 
-// Para CampoFecha con hora hace falta "2026-12-15T10:00"
 export const paraInputFechaHora = (fecha) => (fecha ? fecha.slice(0, 16) : '')
 
-// Fecha de hoy como "2026-10-01" en horario local (toISOString usaria UTC
-// y a la noche en Argentina ya daria el dia siguiente)
 export const hoy = () => sumarDias(null, 0)
 
-// Suma (o resta) dias a una fecha "2026-10-01" y la devuelve en el mismo formato
 export const sumarDias = (fecha, dias) => {
   const d = fecha ? new Date(`${fecha}T12:00:00`) : new Date()
   d.setDate(d.getDate() + dias)
@@ -57,5 +47,4 @@ export const sumarDias = (fecha, dias) => {
   return `${d.getFullYear()}-${dosDigitos(d.getMonth() + 1)}-${dosDigitos(d.getDate())}`
 }
 
-// Cantidad de millas con separador de miles: 150000 -> "150.000"
 export const millas = (cantidad) => Number(cantidad ?? 0).toLocaleString('es-AR')

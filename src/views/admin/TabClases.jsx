@@ -3,10 +3,7 @@ import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import { precio } from '../../utils/formato'
 
-// Pestaña "Clases y asientos": cada fila es una Disponibilidad del vuelo
-// (una clase con su cantidad de asientos y su precio).
 function TabClases({ vuelo, onCambio }) {
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [clases, setClases] = useState([])
 
   useEffect(() => {
@@ -16,22 +13,17 @@ function TabClases({ vuelo, onCambio }) {
   }, [])
 
   const [nueva, setNueva] = useState({ claseId: '', asientosTotales: '', precio: '' })
-  const [editando, setEditando] = useState(null) // { id, asientosTotales, precio }
+  const [editando, setEditando] = useState(null)
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
-  // El cartel de confirmacion de la accion elegida: { titulo, mensaje, detalle, textoConfirmar, peligro, accion }
   const [pregunta, setPregunta] = useState(null)
 
-  // Solo se pueden agregar las clases que el vuelo todavia no tiene
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
 
-  // Cada clase tiene un minimo y un maximo de asientos por vuelo (vienen del backend, tabla clases)
   const claseDe = (claseId) => clases.find((c) => String(c.id) === String(claseId))
   const claseNueva = claseDe(nueva.claseId)
 
-  // Una clase mejor no puede costar menos que una mas basica (Economica <= Ejecutiva <= Primera).
-  // Devuelve entre que precios tiene que estar, segun las otras clases del vuelo.
   const rangoDePrecio = (claseId, idQueSeEdita) => {
     const nivel = claseDe(claseId)?.nivel
     let desde = null
@@ -46,7 +38,6 @@ function TabClases({ vuelo, onCambio }) {
   }
   const rangoNueva = rangoDePrecio(nueva.claseId, null)
 
-  // "Desde $ 145.900", "Hasta $ 349.000" o "Entre $ 145.900 y $ 349.000"
   const textoRango = ({ desde, hasta }) => {
     if (desde !== null && hasta !== null) return `Entre ${precio(desde)} y ${precio(hasta)}, por las otras clases del vuelo.`
     if (desde !== null) return `Desde ${precio(desde)}: no puede costar menos que una clase más básica.`
@@ -54,7 +45,6 @@ function TabClases({ vuelo, onCambio }) {
     return ''
   }
 
-  // Antes de agregar la clase se muestra lo que se va a cargar y se pide confirmacion
   const agregar = (e) => {
     e.preventDefault()
     const clase = clases.find((c) => String(c.id) === nueva.claseId)
@@ -81,13 +71,12 @@ function TabClases({ vuelo, onCambio }) {
       .then(() => {
         setExito('Clase agregada. Ya se puede comprar.')
         setNueva({ claseId: '', asientosTotales: '', precio: '' })
-        onCambio() // recarga el vuelo para ver los asientos actualizados
+        onCambio()
       })
       .catch((err) => setError(err.message))
       .finally(() => setGuardando(false))
   }
 
-  // Antes de guardar se muestra que cambia (antes -> despues) y se pide confirmacion
   const guardarEdicion = (disponibilidad) => {
     const detalle = []
     if (Number(editando.asientosTotales) !== disponibilidad.asientosTotales) {
@@ -97,7 +86,7 @@ function TabClases({ vuelo, onCambio }) {
       detalle.push(`Precio por pasajero: ${precio(disponibilidad.precio)} → ${precio(editando.precio)}`)
     }
     if (detalle.length === 0) {
-      setEditando(null) // no cambio nada: no hay nada que guardar
+      setEditando(null)
       return
     }
     setPregunta({
@@ -119,7 +108,6 @@ function TabClases({ vuelo, onCambio }) {
     })
   }
 
-  // DELETE /api/disponibilidades/:id (el backend no deja si la clase ya tiene compras)
   const eliminarClase = (disponibilidad) => {
     setError('')
     setExito('')
@@ -329,7 +317,6 @@ function TabClases({ vuelo, onCambio }) {
         )}
       </section>
 
-      {/* Renderizado condicional: el cartel aparece cuando hay una accion esperando confirmacion */}
       {pregunta && (
         <Confirmacion
           titulo={pregunta.titulo}

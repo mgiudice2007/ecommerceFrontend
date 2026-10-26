@@ -10,12 +10,12 @@ import { useAuth } from '../context/AuthContext'
 import './MisCompras.css'
 
 function MisCompras() {
-  const { recargarPerfil } = useAuth() // al cancelar cambian las millas
+  const { recargarPerfil } = useAuth()
   const [ordenes, setOrdenes] = useState(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
-  const [cancelando, setCancelando] = useState(null) // id de la orden que se esta cancelando
-  const [aCancelar, setACancelar] = useState(null) // orden que espera confirmacion (muestra el cartel)
+  const [cancelando, setCancelando] = useState(null)
+  const [aCancelar, setACancelar] = useState(null)
 
   useEffect(() => {
     api('/api/ordenes')
@@ -24,13 +24,12 @@ function MisCompras() {
   }, [])
 
   const cancelar = (orden) => {
-    setACancelar(null) // se cierra el cartel
+    setACancelar(null)
     setError('')
     setMensaje('')
     setCancelando(orden.id)
     cancelarOrden(orden)
       .then((actualizada) => {
-        // Reemplazamos solo la orden que cambio, el resto queda igual
         setOrdenes(ordenes.map((o) => (o.id === actualizada.id ? actualizada : o)))
         recargarPerfil()
         setMensaje(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
@@ -105,7 +104,6 @@ function MisCompras() {
                   <div className="compra-pie">
                     <strong>{precio(orden.total)}</strong>
                     <div className="compra-acciones">
-                      {/* El backend dice si todavia se puede cancelar (hasta 24 hs antes del vuelo) */}
                       {orden.sePuedeCancelar && (
                         <button
                           className="boton boton-peligro"
@@ -130,7 +128,6 @@ function MisCompras() {
         </div>
       </div>
 
-      {/* Renderizado condicional: el cartel aparece solo si hay una compra elegida para cancelar */}
       {aCancelar && (
         <Confirmacion
           titulo={`¿Cancelar la compra #${aCancelar.id}?`}

@@ -12,8 +12,6 @@ const NOMBRES_DE_ROL = {
   ADMIN: 'Administrador',
 }
 
-// GET /api/auth/me trae los datos; PUT /api/auth/me guarda los datos de pasajero.
-// Username, mail y rol no se pueden cambiar (el backend no lo permite).
 function Perfil() {
   const { setPerfil } = useAuth()
   const [usuario, setUsuario] = useState(null)
@@ -22,7 +20,6 @@ function Perfil() {
   const [exito, setExito] = useState('')
   const [guardando, setGuardando] = useState(false)
 
-  // Pasa los datos del backend al formulario (los null se muestran como vacios)
   const cargarFormulario = (datos) => {
     setUsuario(datos)
     setFormData({
@@ -55,14 +52,13 @@ function Perfil() {
       ...formData,
       nombre: formData.nombre.trim(),
       apellido: formData.apellido.trim(),
-      // El backend espera null (no "") si no hay fecha
       fechaNacimiento: formData.fechaNacimiento || null,
     }
 
     api('/api/auth/me', { method: 'PUT', body: datosAEnviar })
       .then((actualizado) => {
         cargarFormulario(actualizado)
-        setPerfil(actualizado) // asi la Navbar muestra el nombre nuevo
+        setPerfil(actualizado)
         setExito('Tus datos se guardaron correctamente.')
       })
       .catch((err) => setError(err.message))

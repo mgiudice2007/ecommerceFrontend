@@ -7,9 +7,6 @@ import './Panel.css'
 
 const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password: '' }
 
-// Solo para administradores. El registro publico no deja crear admins:
-// un admin nuevo solo lo puede dar de alta otro admin con
-// POST /api/auth/registro/administrador (el backend verifica el rol del token).
 function CrearAdmin() {
   const [formData, setFormData] = useState(FORM_VACIO)
   const [error, setError] = useState('')
@@ -26,7 +23,6 @@ function CrearAdmin() {
     setExito('')
     setGuardando(true)
 
-    // El backend fuerza el rol ADMIN en este endpoint
     const datosAEnviar = {
       ...formData,
       nombre: formData.nombre.trim(),

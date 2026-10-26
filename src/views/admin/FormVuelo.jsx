@@ -16,11 +16,8 @@ const FORM_VACIO = {
   fechaLlegada: '',
 }
 
-// Publicar un vuelo nuevo (/panel/vuelos/nuevo). Para cambiar un vuelo que ya existe
-// se usa la pestaña "Datos del vuelo" de la gestion (TabDatos).
 function FormVuelo() {
   const navigate = useNavigate()
-  // Datos del catalogo para los selects (si falla un pedido, ese select queda vacio)
   const [aeropuertos, setAeropuertos] = useState([])
   const [categorias, setCategorias] = useState([])
 
@@ -45,7 +42,6 @@ function FormVuelo() {
 
     setGuardando(true)
     api('/api/vuelos', { method: 'POST', body: cuerpoVuelo(formData) })
-      // Un vuelo nuevo nace sin asientos ni fotos: lo mandamos a su pagina para cargarlos
       .then((vuelo) => navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: true } }))
       .catch((err) => {
         setError(err.message)
