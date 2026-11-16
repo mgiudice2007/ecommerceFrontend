@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, pedirVuelos } from '../api/api'
-import EncabezadoPagina from '../components/EncabezadoPagina'
 import ItemCarrito from '../components/ItemCarrito'
+import EncabezadoPagina from '../components/EncabezadoPagina'
+import ResumenCompra from '../components/carrito/ResumenCompra'
+import SelectorMillas from '../components/carrito/SelectorMillas'
+import Cargando from '../components/comunes/Cargando'
+import EstadoVacio from '../components/comunes/EstadoVacio'
+import Mensaje from '../components/comunes/Mensaje'
 import { useAuth } from '../context/AuthContext'
-import { millas, precio, precioOGratis } from '../utils/formato'
-import { nombreTipo } from '../utils/pasajeros'
+import { calcularMillas, textoCantidadPasajes, vuelosSinAdulto } from '../utils/carrito'
 import './Carrito.css'
-import { sinRuedita } from '../utils/validaciones'
 
 function Carrito() {
   const { actualizarCarrito, recargarPerfil } = useAuth()
@@ -53,10 +56,27 @@ function Carrito() {
       .finally(() => setOcupado(false))
   }
 
+  if (!carrito) {
+    return (
+      <div className="contenedor pagina">
+        {error ? <Mensaje>{error}</Mensaje> : <Cargando texto="Cargando carrito…" />}
+      </div>
+    )
+  }
+
+  const calculo = calcularMillas(carrito, usarMillas, millasElegidas)
+  const sinAdulto = vuelosSinAdulto(carrito.items)
+  const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
+
+  const elegirUsarMillas = (usar) => {
+    setUsarMillas(usar)
+    setMillasElegidas(String(calculo.maximo))
+  }
+
   const confirmarCompra = () => {
     setComprando(true)
     setError('')
-    const opciones = usarMillas ? { method: 'POST', body: { millas: millasAUsar } } : { method: 'POST' }
+    const opciones = usarMillas ? { method: 'POST', body: { millas: calculo.aUsar } } : { method: 'POST' }
     api('/api/carrito/checkout', opciones)
       .then((orden) => {
         actualizarCarrito({ items: [] })
@@ -69,63 +89,19 @@ function Carrito() {
       })
   }
 
-  if (!carrito) {
-    return (
-      <div className="contenedor pagina">
-        {error ? <div className="mensaje mensaje-error">{error}</div> : <p className="texto-suave">Cargando carrito…</p>}
-      </div>
-    )
-  }
-
-  const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
-
-  const vuelosSinAdulto = []
-  carrito.items.forEach((item) => {
-    const hayAdulto = carrito.items.some(
-      (otro) => otro.disponibilidadId === item.disponibilidadId && otro.tipoPasajero === 'ADULTO',
-    )
-    if (!hayAdulto && !vuelosSinAdulto.includes(item.numeroVuelo)) {
-      vuelosSinAdulto.push(item.numeroVuelo)
-    }
-  })
-
-  const maximoMillas = Math.min(carrito.millasDisponibles, Math.floor(carrito.total / carrito.valorMilla))
-  const millasEscritas = Number(millasElegidas) || 0
-  let problemaMillas = ''
-  if (usarMillas && millasEscritas > carrito.millasDisponibles) {
-    problemaMillas = `No tenés tantas millas: tu saldo es de ${millas(carrito.millasDisponibles)}.`
-  } else if (usarMillas && millasEscritas > maximoMillas) {
-    problemaMillas = `Con ${millas(maximoMillas)} millas ya pagás todo: no podés usar más.`
-  } else if (usarMillas && (millasEscritas < 0 || !Number.isInteger(millasEscritas))) {
-    problemaMillas = 'Escribí una cantidad entera de millas.'
-  }
-  const millasAUsar = usarMillas && !problemaMillas ? millasEscritas : 0
-  const descuentoMillas = millasAUsar * carrito.valorMilla
-  const aPagar = carrito.total - descuentoMillas
-  const millasQueSuma = carrito.total > 0 ? Math.floor((carrito.millasAGanar * aPagar) / carrito.total) : 0
-
   return (
     <>
-      <EncabezadoPagina
-        titulo="Mi carrito"
-        subtitulo={
-          cantidadPasajes === 0
-            ? 'Todavía no agregaste pasajes.'
-            : `${cantidadPasajes} ${cantidadPasajes === 1 ? 'pasaje listo' : 'pasajes listos'} para comprar.`
-        }
-      />
+      <EncabezadoPagina titulo="Mi carrito" subtitulo={textoCantidadPasajes(cantidadPasajes)} />
 
       <div className="contenedor sobre-encabezado">
-        {error && <div className="mensaje mensaje-error">{error}</div>}
+        {error && <Mensaje>{error}</Mensaje>}
 
         {carrito.items.length === 0 ? (
-          <div className="tarjeta carrito-vacio">
-            <h2>Tu carrito está vacío</h2>
-            <p className="texto-suave">Buscá un vuelo, elegí la clase y agregalo para comprarlo.</p>
+          <EstadoVacio titulo="Tu carrito está vacío" texto="Buscá un vuelo, elegí la clase y agregalo para comprarlo.">
             <Link to="/" className="boton boton-primario">
               Buscar vuelos
             </Link>
-          </div>
+          </EstadoVacio>
         ) : (
           <div className="carrito-layout">
             <div className="carrito-items">
@@ -139,86 +115,28 @@ function Carrito() {
                   ocupado={ocupado}
                 />
               ))}
-
             </div>
 
-            <aside className="tarjeta carrito-resumen">
-              <h2>Resumen de compra</h2>
-              {carrito.items.map((item) => (
-                <div key={item.id} className="carrito-resumen-fila">
-                  <span>
-                    {item.origen} → {item.destino} · {item.cantidad} × {nombreTipo(item.tipoPasajero).toLowerCase()}
-                  </span>
-                  <span>{precioOGratis(item.subtotal)}</span>
-                </div>
-              ))}
-
-              <div className="carrito-millas">
-                <label className="carrito-millas-casilla">
-                  <input
-                    type="checkbox"
-                    checked={usarMillas}
-                    disabled={carrito.millasDisponibles === 0}
-                    onChange={(e) => {
-                      setUsarMillas(e.target.checked)
-                      setMillasElegidas(String(maximoMillas))
-                    }}
-                  />
-                  <span>
-                    Usar <strong>millas + dinero</strong>
-                    <small>Tenés {millas(carrito.millasDisponibles)} millas · cada milla vale {precio(carrito.valorMilla)}</small>
-                  </span>
-                </label>
-
-                {usarMillas && (
-                  <div className="campo">
-                    <label htmlFor="millas">Millas a usar (máximo {millas(maximoMillas)})</label>
-                    <input
-                      id="millas"
-                      type="number"
-                      onWheel={sinRuedita}
-                      min="0"
-                      max={maximoMillas}
-                      value={millasElegidas}
-                      onChange={(e) => setMillasElegidas(e.target.value)}
-                    />
-                    {problemaMillas && <small className="carrito-millas-error">{problemaMillas}</small>}
-                  </div>
-                )}
-              </div>
-
-              {millasAUsar > 0 && (
-                <div className="carrito-resumen-fila carrito-resumen-ahorro">
-                  <span>Pagás con {millas(millasAUsar)} millas</span>
-                  <span>− {precio(descuentoMillas)}</span>
-                </div>
-              )}
-
-              <div className="carrito-resumen-total">
-                <span>Total a pagar</span>
-                <strong>{precio(aPagar)}</strong>
-              </div>
-              <p className="carrito-millas-gana">✈ Con esta compra sumás {millas(millasQueSuma)} millas</p>
-              <p className="texto-suave carrito-aclaracion">
-                Los precios ya incluyen los descuentos vigentes. Al confirmar, tus asientos quedan reservados.
-              </p>
-              {vuelosSinAdulto.length > 0 && (
-                <div className="mensaje mensaje-error">
-                  Tiene que viajar al menos un adulto en {vuelosSinAdulto.length === 1 ? 'el vuelo' : 'los vuelos'}{' '}
-                  {vuelosSinAdulto.join(', ')}. Agregá un adulto o sacá a los menores del carrito.
-                </div>
-              )}
-              <button
-                className="boton boton-primario boton-ancho"
-                onClick={confirmarCompra}
-                disabled={comprando || ocupado || vuelosSinAdulto.length > 0 || problemaMillas !== ''}
-              >
-                {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(aPagar)}`}
-              </button>
-              <Link to="/" className="carrito-seguir">
-                Seguir buscando vuelos
-              </Link>
-            </aside>
+            <ResumenCompra
+              items={carrito.items}
+              calculo={calculo}
+              selectorMillas={
+                <SelectorMillas
+                  usar={usarMillas}
+                  onUsar={elegirUsarMillas}
+                  disponibles={carrito.millasDisponibles}
+                  valorMilla={carrito.valorMilla}
+                  maximo={calculo.maximo}
+                  elegidas={millasElegidas}
+                  onElegir={setMillasElegidas}
+                  problema={calculo.problema}
+                />
+              }
+              sinAdulto={sinAdulto}
+              comprando={comprando}
+              bloqueado={ocupado || sinAdulto.length > 0 || calculo.problema !== ''}
+              onConfirmar={confirmarCompra}
+            />
           </div>
         )}
       </div>

@@ -1,0 +1,26 @@
+.vuelos-filtros {
+  position: sticky;
+  top: 96px;
+  padding: 20px;
+}
+
+.vuelos-filtros h2 {
+  margin-bottom: 16px;
+  font-size: 17px;
+}
+
+.vuelos-filtros .boton + .boton {
+  margin-top: 8px;
+}
+
+.vuelos-aclaracion {
+  margin: -4px 0 16px;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+@media (max-width: 860px) {
+.vuelos-filtros {
+    position: static;
+  }
+}

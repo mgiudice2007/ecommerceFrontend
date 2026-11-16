@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { api } from '../api/api'
-import { fechaLarga, hora, millas, precio, precioOGratis } from '../utils/formato'
-import { nombreTipo } from '../utils/pasajeros'
 import Confirmacion from '../components/Confirmacion'
-import { cancelarOrden, numerosDeVuelo, textoCancelacion } from '../utils/ordenes'
+import Cargando from '../components/comunes/Cargando'
+import Mensaje from '../components/comunes/Mensaje'
+import Boleto from '../components/ordenes/Boleto'
+import EncabezadoOrden from '../components/ordenes/EncabezadoOrden'
 import { useAuth } from '../context/AuthContext'
+import { cancelarOrden, textoCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 function DetalleOrden() {
@@ -28,14 +30,14 @@ function DetalleOrden() {
   if (error) {
     return (
       <div className="contenedor pagina">
-        <div className="mensaje mensaje-error">{error}</div>
+        <Mensaje>{error}</Mensaje>
         <Link to="/mis-compras">← Volver a mis compras</Link>
       </div>
     )
   }
 
   if (!orden) {
-    return <div className="contenedor pagina texto-suave">Cargando compra…</div>
+    return <Cargando pagina texto="Cargando compra…" />
   }
 
   const cancelada = orden.estado === 'CANCELADA'
@@ -54,98 +56,11 @@ function DetalleOrden() {
 
   return (
     <div className="contenedor pagina orden">
-      {recienComprada && !cancelada ? (
-        <header className="orden-exito">
-          <span className="orden-exito-icono" aria-hidden="true">✓</span>
-          <span className="etiqueta etiqueta-exito">Compra aprobada</span>
-          <h1>¡Compra confirmada!</h1>
-          <p className="texto-suave">Tus asientos quedaron reservados. Podés ver esta compra cuando quieras en Mis compras.</p>
-        </header>
-      ) : (
-        <header className="orden-encabezado">
-          <Link to="/mis-compras">← Mis compras</Link>
-          <h1>Compra #{orden.id}</h1>
-        </header>
-      )}
+      <EncabezadoOrden orden={orden} recienComprada={recienComprada && !cancelada} />
 
-      {cancelada && (
-        <div className="mensaje mensaje-error">
-          Esta compra está cancelada: los asientos se devolvieron al vuelo.
-        </div>
-      )}
+      {cancelada && <Mensaje>Esta compra está cancelada: los asientos se devolvieron al vuelo.</Mensaje>}
 
-      <section className="tarjeta orden-boleto">
-        <div className="orden-boleto-encabezado">
-          <div>
-            <small>Número de compra</small>
-            <strong>#{orden.id}</strong>
-          </div>
-          <div>
-            <small>{numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°'}</small>
-            <strong>{numerosDeVuelo(orden).join(' · ')}</strong>
-          </div>
-          <div>
-            <small>Fecha</small>
-            <strong>
-              {fechaLarga(orden.fecha)} · {hora(orden.fecha)} hs
-            </strong>
-          </div>
-          <span className={`etiqueta ${cancelada ? 'etiqueta-cancelada' : 'etiqueta-exito'}`}>
-            {cancelada ? 'Cancelada' : 'Confirmada'}
-          </span>
-        </div>
-
-        <ul className="orden-items">
-          {orden.items.map((item) => (
-            <li key={item.id}>
-              <div>
-                <strong>
-                  {item.origen} → {item.destino}
-                </strong>
-                <small>
-                  Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad} ×{' '}
-                  {nombreTipo(item.tipoPasajero).toLowerCase()} × {precioOGratis(item.precioUnitario)}
-                </small>
-                {item.asientos?.length > 0 && (
-                  <small>
-                    {item.asientos.length === 1 ? 'Asiento' : 'Asientos'}: <strong>{item.asientos.join(', ')}</strong>
-                  </small>
-                )}
-              </div>
-              <span>{precioOGratis(item.subtotal)}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="orden-totales">
-          <div className="orden-subtotal">
-            <span>Pasajes</span>
-            <span>{precio(orden.total + orden.descuentoMillas)}</span>
-          </div>
-          {orden.millasUsadas > 0 && (
-            <div className="orden-ahorro">
-              <span>Pagaste con {millas(orden.millasUsadas)} millas</span>
-              <span>− {precio(orden.descuentoMillas)}</span>
-            </div>
-          )}
-          <div className="orden-total">
-            <span>Total abonado</span>
-            <strong>{precio(orden.total)}</strong>
-          </div>
-          {orden.descuentoTotal > 0 && (
-            <p className="orden-nota-descuento">
-              🏷 Ahorraste {precio(orden.descuentoTotal)} con la promoción del vuelo (ya está descontado en el precio de cada pasaje).
-            </p>
-          )}
-          {orden.millasGanadas > 0 && (
-            <p className="orden-millas">
-              {cancelada
-                ? `Al cancelar se descontaron las ${millas(orden.millasGanadas)} millas que habías sumado.`
-                : `✈ Sumaste ${millas(orden.millasGanadas)} millas con esta compra.`}
-            </p>
-          )}
-        </div>
-      </section>
+      <Boleto orden={orden} />
 
       <div className="orden-acciones">
         <Link to="/mis-compras" className="boton boton-primario">

@@ -2,13 +2,21 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api, pedirImagen } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
-import OpcionClase from '../components/OpcionClase'
-import SelectorAsientos from '../components/SelectorAsientos'
-import SelectorPasajeros from '../components/SelectorPasajeros'
+import Cargando from '../components/comunes/Cargando'
+import Mensaje from '../components/comunes/Mensaje'
+import AccionesCompra from '../components/detalle/AccionesCompra'
+import AvisoVistaAdmin from '../components/detalle/AvisoVistaAdmin'
+import ElegirAsientos from '../components/detalle/ElegirAsientos'
+import Itinerario from '../components/detalle/Itinerario'
+import ListaClases from '../components/detalle/ListaClases'
+import PanelCompra from '../components/detalle/PanelCompra'
+import PortadaVuelo from '../components/detalle/PortadaVuelo'
+import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
 import { useAuth } from '../context/AuthContext'
-import { duracion, fechaLarga, hora, precio, precioOGratis } from '../utils/formato'
-import { leerPasajeros, TIPOS_PASAJERO, textoPasajeros, totalPasajeros } from '../utils/pasajeros'
-import { estaOperativo, textoDescuento, textoEstado } from '../utils/vuelos'
+import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
+import { urlParaElegirVuelta, urlTrasLogin } from '../utils/viaje'
+import { motivoSinVenta } from '../utils/vuelos'
+import { useCatalogo } from '../hooks/useCatalogo'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
@@ -17,13 +25,7 @@ function DetalleVuelo() {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
-  const [clases, setClases] = useState([])
-
-  useEffect(() => {
-    api('/api/clases')
-      .then((data) => setClases(data))
-      .catch(() => setClases([]))
-  }, [])
+  const clases = useCatalogo('/api/clases')
 
   const [vuelo, setVuelo] = useState(null)
   const [imagenes, setImagenes] = useState([])
@@ -64,19 +66,21 @@ function DetalleVuelo() {
   if (error) {
     return (
       <div className="contenedor pagina">
-        <div className="mensaje mensaje-error">{error}</div>
+        <Mensaje>{error}</Mensaje>
         <Link to="/">← Volver al inicio</Link>
       </div>
     )
   }
 
   if (!vuelo) {
-    return <div className="contenedor pagina texto-suave">Cargando vuelo…</div>
+    return <Cargando pagina texto="Cargando vuelo…" />
   }
 
-  const yaSalio = new Date(vuelo.fechaSalida) < new Date()
-  const sePuedeComprar = estaOperativo(vuelo) && !yaSalio && vuelo.hayStock
-  const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+  const sinVenta = motivoSinVenta(vuelo)
+  const mapaDeLaClase = elegida && mapa.disponibilidadId === elegida.id
+  const faltanAsientos = pasajeros.adultos + pasajeros.ninos - asientos.length
+  const agregado = mensaje?.tipo === 'exito'
+  const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
 
   const elegirClase = (disponibilidad) => {
     setElegida(disponibilidad)
@@ -95,44 +99,10 @@ function DetalleVuelo() {
     setMensaje(null)
   }
 
-  const necesitanAsiento = pasajeros.adultos + pasajeros.ninos
-  const faltanAsientos = necesitanAsiento - asientos.length
-  const agregado = mensaje?.tipo === 'exito'
-
-  const precioPara = (tipo) => (elegida.precioConDescuento * tipo.porcentaje) / 100
-  let total = 0
-  if (elegida) {
-    TIPOS_PASAJERO.forEach((t) => {
-      total = total + precioPara(t) * pasajeros[t.clave]
-    })
-  }
-
-  const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
-
-  const irAElegirVuelta = (pasajerosActuales) => {
-    const params = new URLSearchParams()
-    for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta']) {
-      if (searchParams.get(clave)) params.set(clave, searchParams.get(clave))
-    }
-    params.set('adultos', pasajerosActuales.adultos)
-    params.set('ninos', pasajerosActuales.ninos)
-    params.set('bebes', pasajerosActuales.bebes)
-    params.set('tramo', 'vuelta')
-    navigate(`/vuelos?${params.toString()}`)
-  }
-
   const agregarAlCarrito = (seguirConVuelta = false) => {
     if (!estaLogueado) {
-      const params = new URLSearchParams()
-      params.set('adultos', pasajeros.adultos)
-      params.set('ninos', pasajeros.ninos)
-      params.set('bebes', pasajeros.bebes)
-      if (elegida) params.set('clase', elegida.id)
-      if (asientos.length > 0) params.set('asientos', asientos.join(','))
-      for (const clave of ['viaje', 'origen', 'destino', 'ida', 'vuelta', 'tramo']) {
-        if (searchParams.get(clave)) params.set(clave, searchParams.get(clave))
-      }
-      navigate('/login', { state: { desde: `${location.pathname}?${params.toString()}` } })
+      const desde = urlTrasLogin(location.pathname, searchParams, pasajeros, elegida?.id, asientos)
+      navigate('/login', { state: { desde } })
       return
     }
 
@@ -145,7 +115,7 @@ function DetalleVuelo() {
       .then((carrito) => {
         actualizarCarrito(carrito)
         if (seguirConVuelta) {
-          irAElegirVuelta(pasajeros)
+          navigate(urlParaElegirVuelta(searchParams, pasajeros))
           return
         }
         setMensaje({
@@ -158,114 +128,34 @@ function DetalleVuelo() {
       .finally(() => setAgregando(false))
   }
 
-  const fondoPortada = imagenes.length > 0 ? { backgroundImage: `url("${imagenes[0]}")` } : undefined
-
   return (
     <>
-      {esAdmin && (
-        <div className="detalle-vista-admin">
-          <div className="contenedor">
-            <span>
-              👁 Estás viendo este vuelo <strong>como lo ve un comprador</strong>. Es solo para mirar: como
-              administrador no podés comprar.
-            </span>
-            <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-claro">
-              ← Volver a gestionar el vuelo
-            </Link>
-          </div>
-        </div>
-      )}
+      {esAdmin && <AvisoVistaAdmin vueloId={vuelo.id} />}
 
-      <section className="detalle-portada" style={fondoPortada}>
-        <div className="contenedor">
-          <nav className="detalle-migas">
-            <Link to={`/vuelos?origen=${vuelo.origenIata}&destino=${vuelo.destinoIata}`}>Vuelos</Link> /{' '}
-            {vuelo.origenCiudad} → {vuelo.destinoCiudad}
-          </nav>
-          <div className="detalle-portada-etiquetas">
-            <span>{vuelo.categoriaNombre}</span>
-            {descuento && <span className="oferta">{descuento}</span>}
-            {vuelo.estado !== 'ACTIVO' && (
-              <span className={`estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
-            )}
-          </div>
-          <h1>
-            {vuelo.origenCiudad} → {vuelo.destinoCiudad}
-          </h1>
-          <p>
-            Vuelo {vuelo.numeroVuelo} · Directo · {duracion(vuelo.duracionMinutos)} · {fechaLarga(vuelo.fechaSalida)}
-          </p>
-        </div>
-      </section>
+      <PortadaVuelo vuelo={vuelo} imagen={imagenes[0]} />
 
       <div className="contenedor detalle-cuerpo">
         <div className="detalle-layout">
           <div className="detalle-principal">
-            <section className="tarjeta">
-              <h2 className="detalle-subtitulo">Itinerario</h2>
-              <div className="detalle-itinerario">
-                <div>
-                  <small>Salida · {fechaLarga(vuelo.fechaSalida)}</small>
-                  <strong>{hora(vuelo.fechaSalida)}</strong>
-                  <span>
-                    {vuelo.origenIata} · {vuelo.origenCiudad}
-                  </span>
-                </div>
-                <div className="detalle-duracion">
-                  <span>{duracion(vuelo.duracionMinutos)}</span>
-                  <small>Directo</small>
-                </div>
-                <div className="derecha">
-                  <small>Llegada · {fechaLarga(vuelo.fechaLlegada)}</small>
-                  <strong>{hora(vuelo.fechaLlegada)}</strong>
-                  <span>
-                    {vuelo.destinoIata} · {vuelo.destinoCiudad}
-                  </span>
-                </div>
-              </div>
+            <Itinerario vuelo={vuelo} />
 
-              {vuelo.descripcion && <p className="detalle-descripcion">{vuelo.descripcion}</p>}
-            </section>
+            <ListaClases
+              disponibilidades={vuelo.disponibilidades}
+              clases={clases}
+              elegida={elegida}
+              onElegir={elegirClase}
+            />
 
-            <section>
-              <h2 className="detalle-subtitulo">Seleccioná tu clase</h2>
-              {vuelo.disponibilidades.length === 0 ? (
-                <p className="texto-suave">Todavía no hay asientos a la venta para este vuelo.</p>
-              ) : (
-                <div className="detalle-clases">
-                  {vuelo.disponibilidades.map((d) => (
-                    <OpcionClase
-                      key={d.id}
-                      disponibilidad={d}
-                      clase={clases.find((c) => c.id === d.claseId)}
-                      seleccionada={elegida?.id === d.id}
-                      onElegir={elegirClase}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {sePuedeComprar && elegida && !agregado && (
-              <section>
-                <h2 className="detalle-subtitulo">Elegí tus asientos</h2>
-                <p className="texto-suave detalle-asientos-ayuda">
-                  Es gratis. Tocá un asiento libre o usá "Asiento aleatorio".
-                  {pasajeros.bebes > 0 && ' Los bebés viajan a upa, sin asiento propio.'}
-                </p>
-                <SelectorAsientos
-                  mapa={mapa.disponibilidadId === elegida.id ? mapa.datos : null}
-                  error={mapa.disponibilidadId === elegida.id ? mapa.error : ''}
-                  grupo={{
-                    titulo: `Clase ${elegida.claseNombre}`,
-                    adultos: pasajeros.adultos,
-                    ninos: pasajeros.ninos,
-                    asientos,
-                  }}
-                  onCambio={cambiarAsientos}
-                  ocupado={agregando}
-                />
-              </section>
+            {!sinVenta && elegida && !agregado && (
+              <ElegirAsientos
+                clase={elegida}
+                pasajeros={pasajeros}
+                asientos={asientos}
+                mapa={mapaDeLaClase ? mapa.datos : null}
+                error={mapaDeLaClase ? mapa.error : ''}
+                ocupado={agregando}
+                onCambio={cambiarAsientos}
+              />
             )}
 
             {imagenes.length > 1 && (
@@ -276,102 +166,22 @@ function DetalleVuelo() {
             )}
           </div>
 
-          <aside className="tarjeta detalle-compra">
-            <h2>Tu selección</h2>
+          <PanelCompra motivoSinVenta={sinVenta} hayClase={elegida !== null}>
+            <ResumenSeleccion clase={elegida} pasajeros={pasajeros} onCambiarPasajeros={cambiarPasajeros} />
 
-            {!sePuedeComprar ? (
-              <div className="mensaje mensaje-error">
-                {yaSalio
-                  ? 'Este vuelo ya salió.'
-                  : !estaOperativo(vuelo)
-                    ? `Este vuelo está ${textoEstado(vuelo.estado).toLowerCase()} y no está a la venta.`
-                    : 'No quedan asientos en este vuelo.'}
-              </div>
-            ) : !elegida ? (
-              <p className="texto-suave">Elegí una clase para continuar.</p>
-            ) : (
-              <>
-                <div className="detalle-resumen">
-                  <span>Clase</span>
-                  <strong>{elegida.claseNombre}</strong>
-                </div>
-                <div className="detalle-resumen">
-                  <span>Precio por pasajero</span>
-                  <strong>{precio(elegida.precioConDescuento)}</strong>
-                </div>
+            {mensaje && <Mensaje tipo={mensaje.tipo}>{mensaje.texto}</Mensaje>}
 
-                <h3 className="detalle-pasajeros-titulo">Pasajeros</h3>
-                <SelectorPasajeros
-                  pasajeros={pasajeros}
-                  onChange={cambiarPasajeros}
-                  maximo={elegida.asientosDisponibles}
-                />
-
-                {TIPOS_PASAJERO.filter((t) => pasajeros[t.clave] > 0).map((t) => (
-                  <div key={t.clave} className="detalle-resumen">
-                    <span>
-                      {pasajeros[t.clave]} {pasajeros[t.clave] === 1 ? t.singular : t.titulo.toLowerCase()}
-                      {precioPara(t) > 0 && ` × ${precioOGratis(precioPara(t))}`}
-                    </span>
-                    <strong>{precioOGratis(precioPara(t) * pasajeros[t.clave])}</strong>
-                  </div>
-                ))}
-
-                <div className="detalle-total">
-                  <span>Total · {totalPasajeros(pasajeros)} pasajes</span>
-                  <strong>{precio(total)}</strong>
-                </div>
-
-                {mensaje && <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>}
-
-                {agregado ? (
-                  <>
-                    <Link to="/carrito" className="boton boton-primario boton-ancho">
-                      Ir al carrito →
-                    </Link>
-                    <button
-                      type="button"
-                      className="boton boton-secundario boton-ancho detalle-ir-carrito"
-                      onClick={() => setMensaje(null)}
-                    >
-                      Agregar otros pasajeros a este vuelo
-                    </button>
-                  </>
-                ) : estaLogueado && !esComprador ? (
-                  <p className="texto-suave">Solo las cuentas de comprador pueden comprar pasajes.</p>
-                ) : (
-                  <>
-                    <button
-                      className="boton boton-primario boton-ancho"
-                      onClick={() => agregarAlCarrito(eligiendoIda)}
-                      disabled={agregando || (estaLogueado && faltanAsientos > 0)}
-                    >
-                      {agregando
-                        ? 'Agregando…'
-                        : !estaLogueado
-                          ? 'Iniciá sesión para comprar'
-                          : faltanAsientos > 0
-                            ? `Elegí ${faltanAsientos === 1 ? '1 asiento más' : `${faltanAsientos} asientos más`}`
-                            : eligiendoIda
-                              ? 'Agregar y elegir vuelo de vuelta →'
-                              : 'Agregar al carrito'}
-                    </button>
-                    {eligiendoIda && estaLogueado && faltanAsientos <= 0 && (
-                      <button
-                        type="button"
-                        className="boton boton-secundario boton-ancho"
-                        onClick={() => agregarAlCarrito(false)}
-                        disabled={agregando}
-                      >
-                        Agregar solo este vuelo
-                      </button>
-                    )}
-                  </>
-                )}
-
-              </>
-            )}
-          </aside>
+            <AccionesCompra
+              agregado={agregado}
+              estaLogueado={estaLogueado}
+              esComprador={esComprador}
+              agregando={agregando}
+              faltanAsientos={faltanAsientos}
+              eligiendoIda={eligiendoIda}
+              onAgregar={agregarAlCarrito}
+              onAgregarOtros={() => setMensaje(null)}
+            />
+          </PanelCompra>
         </div>
       </div>
     </>

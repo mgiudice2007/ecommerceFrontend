@@ -48,3 +48,6 @@ export const sumarDias = (fecha, dias) => {
 }
 
 export const millas = (cantidad) => Number(cantidad ?? 0).toLocaleString('es-AR')
+
+// "2026-12-24" -> "24/12/2026" (un dia sin hora).
+export const fechaDeDia = (fecha) => new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR')

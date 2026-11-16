@@ -1,0 +1,50 @@
+.inicio-seccion {
+  padding-top: 64px;
+}
+
+.inicio-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.inicio-titulo h2 {
+  margin-top: 6px;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 800;
+}
+
+.inicio-sobretitulo {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--celeste);
+}
+
+.inicio-grilla {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1060px) {
+.inicio-grilla {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+.inicio-grilla {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .inicio-grilla {
+    grid-template-columns: 1fr;
+  }
+}

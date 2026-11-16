@@ -1,67 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { api, pedirPortadas } from '../api/api'
-import portada from '../assets/portada.jpg'
 import Buscador from '../components/Buscador'
-import TarjetaDestino from '../components/TarjetaDestino'
+import Cargando from '../components/comunes/Cargando'
+import Mensaje from '../components/comunes/Mensaje'
+import AtajosBusqueda from '../components/inicio/AtajosBusqueda'
+import Beneficios from '../components/inicio/Beneficios'
+import Hero from '../components/inicio/Hero'
+import LlamadoRegistro from '../components/inicio/LlamadoRegistro'
+import SeccionDestinos from '../components/inicio/SeccionDestinos'
+import SeccionMundo from '../components/inicio/SeccionMundo'
 import { useAuth } from '../context/AuthContext'
+import { argentinaDe, ATAJOS, destinosMostrados, mundoDe, ofertasDe, REGIONES } from '../utils/destinos'
 import { estaOperativo } from '../utils/vuelos'
+import { useCatalogo } from '../hooks/useCatalogo'
 import './Inicio.css'
-
-const REGIONES = [
-  { categoria: 'Regional', titulo: 'América y el Caribe' },
-  { categoria: 'Internacional', titulo: 'Europa' },
-]
-
-const ATAJOS = [
-  { origen: 'AEP', destino: 'BRC', texto: 'Bariloche' },
-  { origen: 'AEP', destino: 'IGR', texto: 'Iguazú' },
-  { origen: 'EZE', destino: 'MIA', texto: 'Miami' },
-  { origen: 'EZE', destino: 'MAD', texto: 'Madrid' },
-]
-
-const BENEFICIOS = [
-  {
-    titulo: 'Precio final, sin sorpresas',
-    texto: 'Ves el precio con las promociones vigentes ya aplicadas.',
-    icono: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
-  },
-  {
-    titulo: 'Elegí cómo viajar',
-    texto: 'Económica, Ejecutiva o Primera, con o sin valija en bodega.',
-    icono: 'M4 18v3M20 18v3M5 11V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5M3 11h18v7H3z',
-  },
-  {
-    titulo: 'Cancelá desde tu cuenta',
-    texto: 'Si cambian tus planes, cancelás la compra en dos clics.',
-    icono: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5',
-  },
-  {
-    titulo: 'Compra protegida',
-    texto: 'Tus asientos quedan reservados al instante al confirmar.',
-    icono: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  },
-]
-
-const unoPorDestino = (lista) =>
-  lista.filter((vuelo, i) => lista.findIndex((v) => v.destinoIata === vuelo.destinoIata) === i)
-
-const ofertasDe = (vuelos) =>
-  unoPorDestino(vuelos.filter((v) => v.descuentoVigente))
-    .sort((a, b) => b.descuentoVigente.valor - a.descuentoVigente.valor)
-    .slice(0, 4)
-const argentinaDe = (vuelos) => unoPorDestino(vuelos.filter((v) => v.categoriaNombre === 'Cabotaje')).slice(0, 8)
-const mundoDe = (vuelos, region) => unoPorDestino(vuelos.filter((v) => v.categoriaNombre === region)).slice(0, 8)
 
 function Inicio() {
   const { estaLogueado } = useAuth()
-  const [aeropuertos, setAeropuertos] = useState([])
-
-  useEffect(() => {
-    api('/api/aeropuertos')
-      .then((data) => setAeropuertos(data))
-      .catch(() => setAeropuertos([]))
-  }, [])
+  const aeropuertos = useCatalogo('/api/aeropuertos')
 
   const [vuelos, setVuelos] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -74,13 +30,7 @@ function Inicio() {
       .then((pagina) => {
         const operativos = pagina.content.filter((v) => estaOperativo(v) && v.hayStock)
         setVuelos(operativos)
-        const mostrados = [
-          ...ofertasDe(operativos),
-          ...argentinaDe(operativos),
-          ...mundoDe(operativos, REGIONES[0].categoria),
-          ...mundoDe(operativos, REGIONES[1].categoria),
-        ]
-        pedirPortadas(mostrados.map((v) => v.id)).then((datos) => setPortadas(datos))
+        pedirPortadas(destinosMostrados(operativos).map((v) => v.id)).then((datos) => setPortadas(datos))
       })
       .catch((err) => setError(err.message))
       .finally(() => setCargando(false))
@@ -90,136 +40,57 @@ function Inicio() {
 
   const ofertas = ofertasDe(vuelos)
   const argentina = argentinaDe(vuelos)
-  const mundo = mundoDe(vuelos, region)
-
-  const grilla = (lista) => (
-    <div className="inicio-grilla">
-      {lista.map((vuelo) => (
-        <TarjetaDestino
-          key={vuelo.id}
-          vuelo={vuelo}
-          pais={paisDe(vuelo.destinoIata)}
-          imagen={portadas[vuelo.id]}
-        />
-      ))}
-    </div>
-  )
 
   return (
     <>
-      <section className="inicio-hero" style={{ backgroundImage: `url(${portada})` }}>
-        <div className="contenedor inicio-hero-contenido">
-          <span className="inicio-hero-chip">✈ Vuelos a Argentina, América y Europa</span>
-          <h1>
-            Volá alto por toda la <span>Argentina</span> y el mundo
-          </h1>
-          <p>Encontrá tu próximo destino, elegí tu clase y comprá en minutos con el precio final a la vista.</p>
-        </div>
-      </section>
+      <Hero />
 
       <div className="contenedor inicio-buscador">
         <Buscador aeropuertos={aeropuertos} />
-        <div className="inicio-atajos">
-          <span>Búsquedas frecuentes:</span>
-          {ATAJOS.map((a) => (
-            <Link key={a.destino} to={`/vuelos?origen=${a.origen}&destino=${a.destino}`}>
-              {a.texto}
-            </Link>
-          ))}
-        </div>
+        <AtajosBusqueda atajos={ATAJOS} />
       </div>
 
-      <section className="contenedor inicio-beneficios">
-        {BENEFICIOS.map((b) => (
-          <div key={b.titulo} className="inicio-beneficio">
-            <span className="inicio-beneficio-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d={b.icono} />
-              </svg>
-            </span>
-            <div>
-              <strong>{b.titulo}</strong>
-              <p>{b.texto}</p>
-            </div>
-          </div>
-        ))}
-      </section>
+      <Beneficios />
 
       {error && (
         <div className="contenedor">
-          <div className="mensaje mensaje-error">{error}</div>
+          <Mensaje>{error}</Mensaje>
         </div>
       )}
-      {cargando && <p className="contenedor texto-suave">Cargando vuelos…</p>}
+      {cargando && <Cargando texto="Cargando vuelos…" className="contenedor" />}
 
       {ofertas.length > 0 && (
-        <section className="contenedor inicio-seccion">
-          <div className="inicio-titulo">
-            <div>
-              <span className="inicio-sobretitulo">Ofertas por tiempo limitado</span>
-              <h2>Promociones imperdibles</h2>
-            </div>
-          </div>
-          {grilla(ofertas)}
-        </section>
+        <SeccionDestinos
+          sobretitulo="Ofertas por tiempo limitado"
+          titulo="Promociones imperdibles"
+          vuelos={ofertas}
+          paisDe={paisDe}
+          portadas={portadas}
+        />
       )}
 
       {argentina.length > 0 && (
-        <section className="contenedor inicio-seccion">
-          <div className="inicio-titulo">
-            <div>
-              <span className="inicio-sobretitulo">Viajá por el país</span>
-              <h2>Destinos en Argentina</h2>
-            </div>
-          </div>
-          {grilla(argentina)}
-        </section>
+        <SeccionDestinos
+          sobretitulo="Viajá por el país"
+          titulo="Destinos en Argentina"
+          vuelos={argentina}
+          paisDe={paisDe}
+          portadas={portadas}
+        />
       )}
 
       {vuelos.length > 0 && (
-        <section className="inicio-mundo">
-          <div className="contenedor">
-            <div className="inicio-titulo">
-              <div>
-                <span className="inicio-sobretitulo">Explorá el mundo</span>
-                <h2>Vuelos internacionales</h2>
-              </div>
-              <div className="inicio-solapas" role="tablist">
-                {REGIONES.map((r) => (
-                  <button
-                    key={r.categoria}
-                    role="tab"
-                    aria-selected={region === r.categoria}
-                    className={region === r.categoria ? 'activa' : ''}
-                    onClick={() => setRegion(r.categoria)}
-                  >
-                    {r.titulo}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {mundo.length > 0 ? grilla(mundo) : <p className="texto-suave">No hay vuelos publicados en esta región.</p>}
-          </div>
-        </section>
+        <SeccionMundo
+          regiones={REGIONES}
+          region={region}
+          onCambiarRegion={setRegion}
+          vuelos={mundoDe(vuelos, region)}
+          paisDe={paisDe}
+          portadas={portadas}
+        />
       )}
 
-      {!estaLogueado && (
-        <section className="contenedor inicio-seccion">
-          <div className="inicio-cuenta">
-            <div>
-              <span className="inicio-cuenta-chip">Creá tu cuenta gratis</span>
-              <h2>Viajá más fácil con tu cuenta BCA Airlines</h2>
-              <p>
-                Guardá tu carrito, comprá tus pasajes de ida y vuelta en minutos y revisá o cancelá tus compras cuando
-                quieras.
-              </p>
-            </div>
-            <Link to="/registro" className="boton inicio-cuenta-boton">
-              Crear mi cuenta →
-            </Link>
-          </div>
-        </section>
-      )}
+      {!estaLogueado && <LlamadoRegistro />}
     </>
   )
 }

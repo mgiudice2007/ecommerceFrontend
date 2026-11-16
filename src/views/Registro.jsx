@@ -4,6 +4,8 @@ import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { REGLA_NOMBRE, REGLA_USUARIO } from '../utils/validaciones'
 import './Auth.css'
+import Etiqueta from '../components/comunes/Etiqueta'
+import Mensaje from '../components/comunes/Mensaje'
 
 const FORM_VACIO = {
   nombre: '',
@@ -57,13 +59,13 @@ function Registro() {
   return (
     <div className="contenedor pagina auth">
       <section className="tarjeta auth-formulario">
-        <span className="etiqueta">Crear cuenta</span>
+        <Etiqueta>Crear cuenta</Etiqueta>
         <h1>Sumate a BCA Airlines</h1>
         <p className="texto-suave">
           Después podés completar tu DNI y datos de pasajero desde tu perfil.
         </p>
 
-        {error && <div className="mensaje mensaje-error">{error}</div>}
+        {error && <Mensaje>{error}</Mensaje>}
 
         <form onSubmit={handleSubmit}>
           <div className="fila-campos">

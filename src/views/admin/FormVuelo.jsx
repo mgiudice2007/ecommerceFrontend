@@ -1,37 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
-import { cuerpoVuelo, problemaEnVuelo } from '../../utils/vuelos'
-import CamposVuelo from './CamposVuelo'
+import CamposVuelo from '../../components/admin/CamposVuelo'
+import Mensaje from '../../components/comunes/Mensaje'
+import { useCatalogo } from '../../hooks/useCatalogo'
+import { cuerpoVuelo, FORM_VUELO_VACIO, problemaEnVuelo } from '../../utils/vuelos'
 import './Panel.css'
-
-const FORM_VACIO = {
-  tramo: 'ida',
-  numeroVuelo: '',
-  descripcion: '',
-  categoriaId: '',
-  origenIata: '',
-  destinoIata: '',
-  fechaSalida: '',
-  fechaLlegada: '',
-}
 
 function FormVuelo() {
   const navigate = useNavigate()
-  const [aeropuertos, setAeropuertos] = useState([])
-  const [categorias, setCategorias] = useState([])
+  const aeropuertos = useCatalogo('/api/aeropuertos')
+  const categorias = useCatalogo('/api/categorias')
 
-  useEffect(() => {
-    api('/api/aeropuertos')
-      .then((data) => setAeropuertos(data))
-      .catch(() => setAeropuertos([]))
-    api('/api/categorias')
-      .then((data) => setCategorias(data))
-      .catch(() => setCategorias([]))
-  }, [])
-
-  const [formData, setFormData] = useState(FORM_VACIO)
+  const [formData, setFormData] = useState(FORM_VUELO_VACIO)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -62,7 +44,7 @@ function FormVuelo() {
 
       <div className="contenedor sobre-encabezado">
         <section className="tarjeta panel-formulario">
-          {error && <div className="mensaje mensaje-error">{error}</div>}
+          {error && <Mensaje>{error}</Mensaje>}
 
           <form onSubmit={handleSubmit}>
             <CamposVuelo

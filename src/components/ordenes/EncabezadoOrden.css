@@ -1,0 +1,39 @@
+.orden-exito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.orden-exito-icono {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--verde-suave);
+  color: var(--verde);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.orden-exito h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(28px, 4vw, 38px);
+}
+
+.orden-exito p {
+  max-width: 480px;
+  margin: 0;
+}
+
+.orden-encabezado {
+  margin-bottom: 20px;
+}
+
+.orden-encabezado h1 {
+  margin-top: 8px;
+  font-size: 30px;
+}

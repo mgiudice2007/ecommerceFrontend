@@ -1,4 +1,5 @@
-import CampoFecha from '../../components/CampoFecha'
+import './CamposVuelo.css'
+import CampoFecha from '../CampoFecha'
 import { hoy, sumarDias } from '../../utils/formato'
 
 const AEROPUERTOS_BUENOS_AIRES = ['AEP', 'EZE']

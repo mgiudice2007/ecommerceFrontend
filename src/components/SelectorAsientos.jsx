@@ -1,15 +1,17 @@
 import './SelectorAsientos.css'
+import Cargando from './comunes/Cargando'
+import Mensaje from './comunes/Mensaje'
 
 function SelectorAsientos({ mapa, error, grupo, onCambio, ocupado }) {
   const pasajeros = grupo.adultos + grupo.ninos
   const elegidos = grupo.asientos
 
   if (error) {
-    return <div className="mensaje mensaje-error">{error}</div>
+    return <Mensaje>{error}</Mensaje>
   }
 
   if (!mapa) {
-    return <p className="texto-suave">Cargando el mapa de asientos…</p>
+    return <Cargando texto="Cargando el mapa de asientos…" />
   }
 
   const estaOcupado = (codigo) => mapa.ocupados.includes(codigo)

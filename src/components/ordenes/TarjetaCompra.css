@@ -1,0 +1,95 @@
+.compra-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.compra-encabezado div {
+  display: flex;
+  flex-direction: column;
+}
+
+.compra-encabezado strong {
+  font-size: 18px;
+}
+
+.compra-encabezado small,
+.compra-vuelos small {
+  color: var(--texto-suave);
+}
+
+.compra-vuelos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+  list-style: none;
+  font-weight: 600;
+}
+
+.compra-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.compra-pie > strong {
+  color: var(--azul);
+  font-size: 24px;
+}
+
+.compra-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.compra-sin-cancelar {
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.compra-cancelada .compra-pie > strong {
+  color: var(--texto-suave);
+  text-decoration: line-through;
+}
+
+.compra {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  padding: 16px 20px 16px 16px;
+}
+
+.compra-foto {
+  min-height: 150px;
+  overflow: hidden;
+  border-radius: var(--radio);
+}
+
+.compra-contenido {
+  min-width: 0;
+}
+
+.compra-cancelada .compra-foto {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+@media (max-width: 560px) {
+.compra {
+    grid-template-columns: 1fr;
+  }
+
+.compra-foto {
+    min-height: 0;
+    height: 130px;
+  }
+}

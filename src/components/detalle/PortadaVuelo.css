@@ -1,0 +1,58 @@
+.detalle-portada {
+  position: relative;
+  padding: 40px 0 110px;
+  background-color: var(--azul-noche);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  isolation: isolate;
+}
+
+.detalle-portada::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgba(4, 30, 66, 0.95) 0%, rgba(4, 30, 66, 0.45) 55%, rgba(4, 30, 66, 0.25) 100%);
+}
+
+.detalle-migas {
+  margin-bottom: 70px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.detalle-migas a {
+  color: #fff;
+}
+
+.detalle-portada-etiquetas {
+  display: flex;
+  gap: 8px;
+}
+
+.detalle-portada-etiquetas span {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detalle-portada-etiquetas .oferta {
+  background: var(--durazno);
+  color: var(--azul-noche);
+}
+
+.detalle-portada h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+}
+
+.detalle-portada p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 16px;
+}

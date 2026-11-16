@@ -15,3 +15,7 @@ export const numerosDeVuelo = (orden) => {
   })
   return numeros
 }
+
+export const rotuloVuelos = (orden) => (numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°')
+
+export const textoNumerosDeVuelo = (orden) => `${rotuloVuelos(orden)} ${numerosDeVuelo(orden).join(' · ')}`

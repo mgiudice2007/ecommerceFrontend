@@ -1,4 +1,4 @@
-import { hoy } from './formato'
+import { hoy, paraInputFechaHora } from './formato'
 
 export const precioDesde = (vuelo) => {
   const conStock = (vuelo.disponibilidades ?? []).filter((d) => d.hayStock)
@@ -44,3 +44,43 @@ export const cuerpoVuelo = (datos) => {
   delete cuerpo.tramo
   return cuerpo
 }
+
+export const asientosDe = (vuelo) =>
+  vuelo.disponibilidades.reduce(
+    (cuenta, d) => ({
+      totales: cuenta.totales + d.asientosTotales,
+      vendidos: cuenta.vendidos + (d.asientosTotales - d.asientosDisponibles),
+    }),
+    { totales: 0, vendidos: 0 },
+  )
+
+// Por que un vuelo no se puede comprar ('' si se puede).
+export const motivoSinVenta = (vuelo) => {
+  if (new Date(vuelo.fechaSalida) < new Date()) return 'Este vuelo ya salió.'
+  if (!estaOperativo(vuelo)) return `Este vuelo está ${textoEstado(vuelo.estado).toLowerCase()} y no está a la venta.`
+  if (!vuelo.hayStock) return 'No quedan asientos en este vuelo.'
+  return ''
+}
+
+export const FORM_VUELO_VACIO = {
+  tramo: 'ida',
+  numeroVuelo: '',
+  descripcion: '',
+  categoriaId: '',
+  origenIata: '',
+  destinoIata: '',
+  fechaSalida: '',
+  fechaLlegada: '',
+}
+
+// Los datos de un vuelo existente, con la forma que usa el formulario.
+export const datosDeVuelo = (vuelo) => ({
+  tramo: ['AEP', 'EZE'].includes(vuelo.origenIata) ? 'ida' : 'vuelta',
+  numeroVuelo: vuelo.numeroVuelo,
+  descripcion: vuelo.descripcion ?? '',
+  categoriaId: String(vuelo.categoriaId),
+  origenIata: vuelo.origenIata,
+  destinoIata: vuelo.destinoIata,
+  fechaSalida: paraInputFechaHora(vuelo.fechaSalida),
+  fechaLlegada: paraInputFechaHora(vuelo.fechaLlegada),
+})

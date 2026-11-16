@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Auth.css'
+import Etiqueta from '../components/comunes/Etiqueta'
+import Mensaje from '../components/comunes/Mensaje'
 
 function Login() {
   const { login } = useAuth()
@@ -35,14 +37,14 @@ function Login() {
   return (
     <div className="contenedor pagina auth">
       <section className="tarjeta auth-formulario">
-        <span className="etiqueta">Pasajeros</span>
+        <Etiqueta>Pasajeros</Etiqueta>
         <h1>¡Hola de nuevo! Ingresá a tu cuenta</h1>
         <p className="texto-suave">Gestioná tus pasajes, tu carrito y tus próximos viajes.</p>
 
         {location.state?.sesionVencida && !error && (
-          <div className="mensaje mensaje-error">Tu sesión venció. Iniciá sesión de nuevo para seguir.</div>
+          <Mensaje>Tu sesión venció. Iniciá sesión de nuevo para seguir.</Mensaje>
         )}
-        {error && <div className="mensaje mensaje-error">{error}</div>}
+        {error && <Mensaje>{error}</Mensaje>}
 
         <form onSubmit={handleSubmit}>
           <div className="campo">

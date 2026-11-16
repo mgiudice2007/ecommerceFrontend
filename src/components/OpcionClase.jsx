@@ -1,5 +1,6 @@
 import { precio } from '../utils/formato'
 import './OpcionClase.css'
+import Etiqueta from './comunes/Etiqueta'
 
 function OpcionClase({ disponibilidad, clase, seleccionada, onElegir }) {
   const conDescuento = disponibilidad.precioConDescuento < disponibilidad.precio
@@ -15,7 +16,7 @@ function OpcionClase({ disponibilidad, clase, seleccionada, onElegir }) {
     >
       <div className="opcion-clase-encabezado">
         <strong>{disponibilidad.claseNombre}</strong>
-        {seleccionada && <span className="etiqueta">Elegida</span>}
+        {seleccionada && <Etiqueta>Elegida</Etiqueta>}
       </div>
 
       {clase && <p>{clase.descripcion}</p>}

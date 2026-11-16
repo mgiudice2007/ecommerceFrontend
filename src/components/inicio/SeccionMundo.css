@@ -1,0 +1,44 @@
+.inicio-mundo {
+  margin-top: 72px;
+  padding: 64px 0;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(31, 162, 224, 0.35), transparent 45%),
+    var(--azul-noche);
+}
+
+.inicio-mundo .inicio-titulo h2 {
+  color: #fff;
+}
+
+.inicio-mundo .inicio-sobretitulo {
+  color: #7fd0f7;
+}
+
+.inicio-mundo .texto-suave {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.inicio-solapas {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.inicio-solapas button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+.inicio-solapas button.activa {
+  background: #fff;
+  color: var(--azul);
+}

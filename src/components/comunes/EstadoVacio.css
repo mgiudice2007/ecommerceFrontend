@@ -1,0 +1,12 @@
+.estado-vacio {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.estado-vacio p {
+  margin: 8px 0 20px;
+}
+
+.estado-vacio p:last-child {
+  margin-bottom: 0;
+}

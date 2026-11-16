@@ -3,6 +3,7 @@ import { fechaLarga, hora, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
+import Etiqueta from './comunes/Etiqueta'
 
 function ItemCarrito({ item, vuelo, onCambiarCantidad, onEliminar, ocupado }) {
   const disponibilidad = vuelo?.disponibilidades.find((d) => d.id === item.disponibilidadId)
@@ -15,7 +16,7 @@ function ItemCarrito({ item, vuelo, onCambiarCantidad, onEliminar, ocupado }) {
       </Link>
 
       <div className="item-carrito-info">
-        <span className="etiqueta">Vuelo {item.numeroVuelo}</span>
+        <Etiqueta>Vuelo {item.numeroVuelo}</Etiqueta>
         <h3>
           <Link to={`/vuelos/${item.vueloId}`}>
             {item.origen} → {item.destino}

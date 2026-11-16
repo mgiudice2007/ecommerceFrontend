@@ -1,0 +1,35 @@
+.gestion-pestanias {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+  overflow-x: auto;
+}
+
+.gestion-pestanias button {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gestion-pestanias button.activa {
+  background: var(--superficie);
+  color: var(--azul);
+  box-shadow: 0 2px 8px rgba(10, 37, 64, 0.08);
+}
+
+@media (max-width: 480px) {
+.gestion-pestanias button {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+}

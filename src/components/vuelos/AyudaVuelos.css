@@ -1,0 +1,9 @@
+.vuelos-ayuda {
+  margin: 0 0 8px;
+  padding: 12px 16px;
+  border-radius: var(--radio);
+  background: var(--celeste-suave);
+  color: var(--azul);
+  font-size: 14px;
+  font-weight: 600;
+}

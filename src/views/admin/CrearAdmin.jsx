@@ -4,6 +4,7 @@ import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import { REGLA_NOMBRE, REGLA_USUARIO } from '../../utils/validaciones'
 import './Panel.css'
+import Mensaje from '../../components/comunes/Mensaje'
 
 const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password: '' }
 
@@ -51,8 +52,8 @@ function CrearAdmin() {
 
       <div className="contenedor sobre-encabezado">
         <section className="tarjeta panel-formulario">
-          {error && <div className="mensaje mensaje-error">{error}</div>}
-          {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+          {error && <Mensaje>{error}</Mensaje>}
+          {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
           <form onSubmit={handleSubmit}>
             <div className="fila-campos">

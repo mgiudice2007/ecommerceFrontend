@@ -6,6 +6,9 @@ import { fechaLarga, hoy, millas } from '../utils/formato'
 import CampoFecha from '../components/CampoFecha'
 import { REGLA_NOMBRE } from '../utils/validaciones'
 import './Perfil.css'
+import Cargando from '../components/comunes/Cargando'
+import Etiqueta from '../components/comunes/Etiqueta'
+import Mensaje from '../components/comunes/Mensaje'
 
 const NOMBRES_DE_ROL = {
   COMPRADOR: 'Comprador',
@@ -68,7 +71,7 @@ function Perfil() {
   if (!usuario) {
     return (
       <div className="contenedor pagina">
-        {error ? <div className="mensaje mensaje-error">{error}</div> : <p className="texto-suave">Cargando perfil…</p>}
+        {error ? <Mensaje>{error}</Mensaje> : <Cargando texto="Cargando perfil…" />}
       </div>
     )
   }
@@ -88,7 +91,7 @@ function Perfil() {
             <h2>
               {usuario.nombre} {usuario.apellido}
             </h2>
-            <span className="etiqueta">{NOMBRES_DE_ROL[usuario.rol]}</span>
+            <Etiqueta>{NOMBRES_DE_ROL[usuario.rol]}</Etiqueta>
 
             <dl>
               <dt>Usuario</dt>
@@ -115,10 +118,12 @@ function Perfil() {
             </p>
 
             {faltanDatos && (
-              <div className="mensaje perfil-aviso">Te falta completar tu DNI y fecha de nacimiento.</div>
+              <Mensaje tipo={null} className="perfil-aviso">
+                Te falta completar tu DNI y fecha de nacimiento.
+              </Mensaje>
             )}
-            {error && <div className="mensaje mensaje-error">{error}</div>}
-            {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+            {error && <Mensaje>{error}</Mensaje>}
+            {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
             <form onSubmit={handleSubmit}>
               <div className="fila-campos">

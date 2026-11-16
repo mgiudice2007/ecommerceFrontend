@@ -1,0 +1,31 @@
+.fila-resumen {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.fila-resumen span:first-child {
+  color: var(--texto-suave);
+}
+
+.fila-resumen-ahorro {
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.fila-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.fila-total span {
+  font-weight: 700;
+}
+
+.fila-total strong {
+  color: var(--azul);
+  font-size: 30px;
+}

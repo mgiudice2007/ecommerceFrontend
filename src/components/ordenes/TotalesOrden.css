@@ -1,0 +1,16 @@
+.orden-totales {
+  padding-top: 16px;
+}
+
+.orden-nota-descuento {
+  margin: 4px 0 0;
+  color: var(--verde);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.orden-millas {
+  margin: 12px 0 0;
+  color: var(--azul);
+  font-weight: 700;
+}

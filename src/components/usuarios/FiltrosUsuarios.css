@@ -1,0 +1,13 @@
+.usuarios-filtros {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 560px) {
+.usuarios-filtros {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

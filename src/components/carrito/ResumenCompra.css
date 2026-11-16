@@ -1,0 +1,40 @@
+.carrito-resumen {
+  position: sticky;
+  top: 96px;
+}
+
+.carrito-resumen h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.carrito-resumen-total {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--borde);
+}
+
+.carrito-aclaracion {
+  margin: 8px 0 16px;
+  font-size: 13px;
+}
+
+.carrito-seguir {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 960px) {
+.carrito-resumen {
+    position: static;
+  }
+}
+
+.carrito-millas-gana {
+  margin: 6px 0 0;
+  color: var(--azul);
+  font-size: 14px;
+  font-weight: 700;
+}

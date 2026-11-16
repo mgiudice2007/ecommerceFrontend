@@ -1,0 +1,7 @@
+.sin-datos {
+  padding: 24px;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  color: var(--texto-suave);
+  text-align: center;
+}

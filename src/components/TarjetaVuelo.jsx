@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { diasHastaLlegada, duracion, fechaConDia, hora, precio } from '../utils/formato'
-import { estaOperativo, precioDesde, textoDescuento, textoEstado } from '../utils/vuelos'
+import { estaOperativo, precioDesde, textoDescuento } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaVuelo.css'
+import Etiqueta from './comunes/Etiqueta'
+import EtiquetaEstado from './comunes/EtiquetaEstado'
 
 function TarjetaVuelo({ vuelo, pasajeros = '' }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
@@ -26,9 +28,9 @@ function TarjetaVuelo({ vuelo, pasajeros = '' }) {
               Vuelo {vuelo.numeroVuelo} · {vuelo.categoriaNombre}
             </small>
           </div>
-          {descuento && <span className="etiqueta etiqueta-descuento">{descuento}</span>}
+          {descuento && <Etiqueta tipo="descuento">{descuento}</Etiqueta>}
           {vuelo.estado !== 'ACTIVO' && (
-            <span className={`etiqueta estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
+            <EtiquetaEstado estado={vuelo.estado} />
           )}
         </div>
 

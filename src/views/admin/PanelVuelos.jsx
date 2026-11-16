@@ -3,21 +3,17 @@ import { Link, useLocation } from 'react-router-dom'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
-import FotoVuelo from '../../components/FotoVuelo'
-import { fechaCorta, hora, precio } from '../../utils/formato'
-import { ESTADOS_VUELO, textoDescuento, textoEstado } from '../../utils/vuelos'
+import FilaVueloPanel from '../../components/admin/FilaVueloPanel'
+import Campo from '../../components/comunes/Campo'
+import Cargando from '../../components/comunes/Cargando'
+import EstadoVacio from '../../components/comunes/EstadoVacio'
+import GrillaNumeros from '../../components/comunes/GrillaNumeros'
+import Mensaje from '../../components/comunes/Mensaje'
+import Paginador from '../../components/comunes/Paginador'
+import { asientosDe, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
 
 const POR_PAGINA = 20
-
-const asientosDe = (vuelo) =>
-  vuelo.disponibilidades.reduce(
-    (cuenta, d) => ({
-      totales: cuenta.totales + d.asientosTotales,
-      vendidos: cuenta.vendidos + (d.asientosTotales - d.asientosDisponibles),
-    }),
-    { totales: 0, vendidos: 0 },
-  )
 
 function PanelVuelos() {
   const [busqueda, setBusqueda] = useState('')
@@ -86,7 +82,6 @@ function PanelVuelos() {
     cambiarEstado(vuelo, 'ELIMINADO')
   }
 
-
   return (
     <>
       <EncabezadoPagina
@@ -107,37 +102,30 @@ function PanelVuelos() {
 
       <div className="contenedor sobre-encabezado">
         {resumen && (
-          <div className="panel-numeros">
-            <div className="tarjeta">
-              <small>Vuelos publicados</small>
-              <strong>{resumen.vuelos}</strong>
-            </div>
-            <div className="tarjeta">
-              <small>Asientos vendidos</small>
-              <strong>{resumen.asientosVendidos}</strong>
-            </div>
-            <div className="tarjeta">
-              <small>Asientos cargados</small>
-              <strong>{resumen.asientosTotales}</strong>
-            </div>
-          </div>
+          <GrillaNumeros
+            numeros={[
+              { rotulo: 'Vuelos publicados', valor: resumen.vuelos },
+              { rotulo: 'Asientos vendidos', valor: resumen.asientosVendidos },
+              { rotulo: 'Asientos cargados', valor: resumen.asientosTotales },
+            ]}
+          />
         )}
 
-        {error && <div className="mensaje mensaje-error">{error}</div>}
-        {mensaje && <div className="mensaje mensaje-exito">{mensaje}</div>}
+        {error && <Mensaje>{error}</Mensaje>}
+        {mensaje && <Mensaje tipo="exito">{mensaje}</Mensaje>}
         {resumen?.vuelos === 0 && (
-          <div className="tarjeta panel-vacio">
-            <h2>Todavía no publicaste vuelos</h2>
-            <p className="texto-suave">Creá tu primer vuelo y después cargale las clases con asientos y precio.</p>
+          <EstadoVacio
+            titulo="Todavía no publicaste vuelos"
+            texto="Creá tu primer vuelo y después cargale las clases con asientos y precio."
+          >
             <Link to="/panel/vuelos/nuevo" className="boton boton-primario">
               Publicar mi primer vuelo
             </Link>
-          </div>
+          </EstadoVacio>
         )}
 
         {resumen?.vuelos > 0 && (
-          <div className="campo panel-buscar">
-            <label htmlFor="buscarVuelo">Buscar en el panel</label>
+          <Campo id="buscarVuelo" etiqueta="Buscar en el panel" className="panel-buscar">
             <input
               id="buscarVuelo"
               type="search"
@@ -148,93 +136,26 @@ function PanelVuelos() {
               }}
               placeholder="Ciudad, código de aeropuerto o número de vuelo"
             />
-          </div>
+          </Campo>
         )}
 
-        {cargando && !error && <p className="texto-suave">Cargando vuelos…</p>}
+        {cargando && !error && <Cargando texto="Cargando vuelos…" />}
         {!cargando && texto && vuelos.length === 0 && (
           <p className="texto-suave">No hay vuelos que coincidan con "{texto}".</p>
         )}
 
         <div className="panel-lista">
-          {vuelos.map((vuelo) => {
-            const asientos = asientosDe(vuelo)
-            const descuento = textoDescuento(vuelo.descuentoVigente, precio)
-            const sinClases = vuelo.disponibilidades.length === 0
-
-            return (
-              <article key={vuelo.id} className="tarjeta panel-vuelo">
-                <div className="panel-vuelo-foto" aria-hidden="true">
-                  <FotoVuelo destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
-                </div>
-                <div className="panel-vuelo-info">
-                  <div className="panel-vuelo-titulo">
-                    <strong>
-                      {vuelo.origenCiudad} → {vuelo.destinoCiudad}
-                    </strong>
-                    <span className="texto-suave">
-                      Vuelo {vuelo.numeroVuelo} · {fechaCorta(vuelo.fechaSalida)} {hora(vuelo.fechaSalida)} hs
-                    </span>
-                  </div>
-                  <div className="panel-vuelo-etiquetas">
-                    <span className="etiqueta">{vuelo.categoriaNombre}</span>
-                    {descuento && <span className="etiqueta etiqueta-exito">{descuento}</span>}
-                    {sinClases && <span className="etiqueta etiqueta-aviso">Sin clases cargadas</span>}
-                    {vuelo.estado !== 'ACTIVO' && (
-                      <span className={`etiqueta estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="panel-vuelo-asientos">
-                  <small>Vendidos</small>
-                  <strong>
-                    {asientos.vendidos} / {asientos.totales}
-                  </strong>
-                </div>
-
-                <div className="panel-vuelo-acciones">
-                  <select
-                    className="panel-vuelo-estado"
-                    value={vuelo.estado}
-                    onChange={(e) => setNuevoEstado({ vuelo, estado: e.target.value })}
-                    aria-label={`Estado del vuelo ${vuelo.numeroVuelo}`}
-                  >
-                    {ESTADOS_VUELO.map((e) => (
-                      <option key={e.valor} value={e.valor}>
-                        {e.texto}
-                      </option>
-                    ))}
-                  </select>
-                  <Link to={`/panel/vuelos/${vuelo.id}`} className="boton boton-primario">
-                    Gestionar
-                  </Link>
-                  <button className="boton boton-peligro" onClick={() => setAEliminar(vuelo)}>
-                    Eliminar
-                  </button>
-                </div>
-              </article>
-            )
-          })}
+          {vuelos.map((vuelo) => (
+            <FilaVueloPanel
+              key={vuelo.id}
+              vuelo={vuelo}
+              onCambiarEstado={(v, estado) => setNuevoEstado({ vuelo: v, estado })}
+              onEliminar={setAEliminar}
+            />
+          ))}
         </div>
 
-        {totalPaginas > 1 && (
-          <nav className="panel-paginas" aria-label="Páginas del panel">
-            <button className="boton boton-secundario" disabled={pagina === 0} onClick={() => setPagina(pagina - 1)}>
-              ← Anterior
-            </button>
-            <span>
-              Página {pagina + 1} de {totalPaginas}
-            </span>
-            <button
-              className="boton boton-secundario"
-              disabled={pagina + 1 >= totalPaginas}
-              onClick={() => setPagina(pagina + 1)}
-            >
-              Siguiente →
-            </button>
-          </nav>
-        )}
+        <Paginador pagina={pagina} totalPaginas={totalPaginas} onCambiar={setPagina} etiqueta="Páginas del panel" />
       </div>
 
       {nuevoEstado && (

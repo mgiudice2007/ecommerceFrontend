@@ -3,18 +3,15 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
+import Cargando from '../../components/comunes/Cargando'
+import GrillaNumeros from '../../components/comunes/GrillaNumeros'
+import Mensaje from '../../components/comunes/Mensaje'
+import SinDatos from '../../components/comunes/SinDatos'
+import FiltrosUsuarios from '../../components/usuarios/FiltrosUsuarios'
+import TablaUsuarios from '../../components/usuarios/TablaUsuarios'
 import { useAuth } from '../../context/AuthContext'
-import { fechaLarga } from '../../utils/formato'
+import { nombreDeRol, ROLES } from '../../utils/roles'
 import './Panel.css'
-import './Usuarios.css'
-
-const ROLES = [
-  { valor: 'COMPRADOR', nombre: 'Comprador', plural: 'Compradores' },
-  { valor: 'ADMIN', nombre: 'Administrador', plural: 'Administradores' },
-]
-
-const nombreDeRol = (valor) =>
-  ROLES.find((r) => r.valor === valor)?.nombre ?? valor
 
 function Usuarios() {
   const { usuario: yo } = useAuth()
@@ -87,107 +84,37 @@ function Usuarios() {
 
       <div className="contenedor sobre-encabezado">
         {usuarios && (
-          <div className="panel-numeros usuarios-numeros">
-            {ROLES.map((r) => (
-              <div key={r.valor} className="tarjeta">
-                <small>{r.plural}</small>
-                <strong>{cantidadPorRol(r.valor)}</strong>
-              </div>
-            ))}
-          </div>
+          <GrillaNumeros
+            columnas={ROLES.length}
+            numeros={ROLES.map((r) => ({ rotulo: r.plural, valor: cantidadPorRol(r.valor) }))}
+          />
         )}
 
-        {error && <div className="mensaje mensaje-error">{error}</div>}
-        {exito && <div className="mensaje mensaje-exito">{exito}</div>}
+        {error && <Mensaje>{error}</Mensaje>}
+        {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
         <section className="tarjeta">
-          <div className="usuarios-filtros">
-            <div className="campo">
-              <label htmlFor="busqueda">Buscar</label>
-              <input
-                id="busqueda"
-                type="search"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Usuario, nombre o mail"
-              />
-            </div>
-            <div className="campo">
-              <label htmlFor="filtroRol">Rol</label>
-              <select id="filtroRol" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
-                <option value="">Todos</option>
-                {ROLES.map((r) => (
-                  <option key={r.valor} value={r.valor}>
-                    {r.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <FiltrosUsuarios
+            busqueda={busqueda}
+            onBusqueda={setBusqueda}
+            filtroRol={filtroRol}
+            onFiltroRol={setFiltroRol}
+            roles={ROLES}
+          />
 
-          {!usuarios && !error && <p className="texto-suave">Cargando usuarios…</p>}
-          {usuarios && visibles.length === 0 && <div className="gestion-vacio">Ningún usuario coincide con la búsqueda.</div>}
+          {!usuarios && !error && <Cargando texto="Cargando usuarios…" />}
+          {usuarios && visibles.length === 0 && <SinDatos>Ningún usuario coincide con la búsqueda.</SinDatos>}
 
           {visibles.length > 0 && (
-            <div className="usuarios-tabla-contenedor">
-              <table className="usuarios-tabla">
-                <thead>
-                  <tr>
-                    <th>Usuario</th>
-                    <th>Nombre</th>
-                    <th>Registrado</th>
-                    <th>Rol</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibles.map((u) => {
-                    const soyYo = u.username === yo.username
-                    const rolElegido = cambios[u.id] ?? u.rol
-
-                    return (
-                      <tr key={u.id} className={cambios[u.id] ? 'con-cambios' : ''}>
-                        <td>
-                          <strong>{u.username}</strong>
-                          <small>{u.mail}</small>
-                        </td>
-                        <td>
-                          {u.nombre} {u.apellido}
-                        </td>
-                        <td>{u.fechaRegistro ? fechaLarga(u.fechaRegistro) : '—'}</td>
-                        <td>
-                          <select
-                            value={rolElegido}
-                            onChange={(e) => elegirRol(u, e.target.value)}
-                            disabled={soyYo}
-                            aria-label={`Rol de ${u.username}`}
-                            title={soyYo ? 'No podés cambiar tu propio rol' : undefined}
-                          >
-                            {ROLES.map((r) => (
-                              <option key={r.valor} value={r.valor}>
-                                {r.nombre}
-                              </option>
-                            ))}
-                          </select>
-                          {soyYo && <small>Sos vos</small>}
-                        </td>
-                        <td className="acciones">
-                          {cambios[u.id] && (
-                            <button
-                              className="boton boton-primario"
-                              onClick={() => setAGuardar(u)}
-                              disabled={guardando === u.id}
-                            >
-                              {guardando === u.id ? 'Guardando…' : 'Guardar'}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <TablaUsuarios
+              usuarios={visibles}
+              miUsername={yo.username}
+              roles={ROLES}
+              cambios={cambios}
+              guardando={guardando}
+              onElegirRol={elegirRol}
+              onGuardar={setAGuardar}
+            />
           )}
         </section>
       </div>

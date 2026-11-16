@@ -1,0 +1,26 @@
+.buscador-viaje {
+  display: flex;
+  gap: 8px;
+}
+
+.buscador-viaje label {
+  padding: 7px 16px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.buscador-viaje label.activo {
+  border-color: var(--azul);
+  background: rgba(0, 87, 184, 0.1);
+  color: var(--azul);
+}
+
+.buscador-viaje input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}

@@ -1,0 +1,47 @@
+.gestion-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.gestion-tabla th {
+  padding: 0 10px 10px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gestion-tabla td {
+  padding: 12px 10px;
+  border-top: 1px solid var(--borde);
+  vertical-align: middle;
+}
+
+.gestion-tabla td input {
+  width: 100px;
+  padding: 8px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.gestion-tabla .acciones {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.gestion-tabla .acciones .boton {
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.gestion-tabla .acciones .boton + .boton {
+  margin-left: 6px;
+}
+
+.gestion-tabla-contenedor {
+  overflow-x: auto;
+}

@@ -29,3 +29,8 @@ export const nombreTipo = (tipo) => {
   const encontrado = TIPOS_PASAJERO.find((t) => t.tipo === tipo) ?? TIPOS_PASAJERO[0]
   return encontrado.singular.charAt(0).toUpperCase() + encontrado.singular.slice(1)
 }
+
+export const precioPorTipo = (precioBase, tipo) => (precioBase * tipo.porcentaje) / 100
+
+export const totalSeleccion = (precioBase, pasajeros) =>
+  TIPOS_PASAJERO.reduce((total, tipo) => total + precioPorTipo(precioBase, tipo) * pasajeros[tipo.clave], 0)

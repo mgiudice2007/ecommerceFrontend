@@ -1,0 +1,41 @@
+.detalle-compra {
+  position: sticky;
+  top: 96px;
+  box-shadow: var(--sombra-fuerte);
+}
+
+.detalle-compra h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.detalle-resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.detalle-resumen span {
+  color: var(--texto-suave);
+}
+
+.detalle-total {
+  margin: 16px 0;
+}
+
+.detalle-ir-carrito {
+  margin-top: 8px;
+}
+
+@media (max-width: 960px) {
+.detalle-compra {
+    position: static;
+  }
+}
+
+.detalle-pasajeros-titulo {
+  margin: 8px 0 0;
+  font-size: 15px;
+}
