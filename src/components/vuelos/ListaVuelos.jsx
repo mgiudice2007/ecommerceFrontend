@@ -1,8 +1,11 @@
 import EstadoVacio from '../comunes/EstadoVacio'
 import TarjetaVuelo from '../TarjetaVuelo'
+import { usePortadas } from '../../hooks/usePortadas'
 import './ListaVuelos.css'
 
 function ListaVuelos({ pagina, consulta }) {
+  const portadas = usePortadas(pagina.content)
+
   return (
     <>
       {pagina.content.length === 0 && (
@@ -14,7 +17,7 @@ function ListaVuelos({ pagina, consulta }) {
       )}
       <div className="vuelos-lista">
         {pagina.content.map((vuelo) => (
-          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consulta} />
+          <TarjetaVuelo key={vuelo.id} vuelo={vuelo} pasajeros={consulta} imagen={portadas[vuelo.id]} />
         ))}
       </div>
     </>

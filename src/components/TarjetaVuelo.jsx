@@ -6,7 +6,7 @@ import './TarjetaVuelo.css'
 import Etiqueta from './comunes/Etiqueta'
 import EtiquetaEstado from './comunes/EtiquetaEstado'
 
-function TarjetaVuelo({ vuelo, pasajeros = '' }) {
+function TarjetaVuelo({ vuelo, pasajeros = '', imagen }) {
   const descuento = textoDescuento(vuelo.descuentoVigente, precio)
   const desde = precioDesde(vuelo)
   const diasDespues = diasHastaLlegada(vuelo.fechaSalida, vuelo.fechaLlegada)
@@ -14,7 +14,7 @@ function TarjetaVuelo({ vuelo, pasajeros = '' }) {
   return (
     <article className="tarjeta tarjeta-vuelo">
       <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="tarjeta-vuelo-foto" tabIndex={-1} aria-hidden="true">
-        <FotoVuelo destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
+        <FotoVuelo imagen={imagen} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
       </Link>
 
       <div className="tarjeta-vuelo-info">
