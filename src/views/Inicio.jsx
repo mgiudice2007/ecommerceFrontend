@@ -9,6 +9,7 @@ import Hero from '../components/inicio/Hero'
 import LlamadoRegistro from '../components/inicio/LlamadoRegistro'
 import SeccionDestinos from '../components/inicio/SeccionDestinos'
 import SeccionMundo from '../components/inicio/SeccionMundo'
+import TableroPartidas from '../components/inicio/TableroPartidas'
 import { useAuth } from '../context/AuthContext'
 import { argentinaDe, ATAJOS, destinosMostrados, mundoDe, ofertasDe, REGIONES } from '../utils/destinos'
 import { estaOperativo } from '../utils/vuelos'
@@ -64,6 +65,8 @@ function Inicio() {
         </div>
       )}
       {cargando && <Cargando texto="Cargando vuelos…" className="contenedor" />}
+
+      {vuelos.length > 0 && <TableroPartidas vuelos={vuelos} />}
 
       {ofertas.length > 0 && (
         <SeccionDestinos
