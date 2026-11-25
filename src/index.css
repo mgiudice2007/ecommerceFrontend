@@ -92,7 +92,15 @@ h3 {
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.boton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .boton:disabled {
@@ -118,6 +126,7 @@ h3 {
 
 .boton-accion:hover:not(:disabled) {
   background: var(--naranja-hover);
+  box-shadow: 0 10px 24px rgba(242, 96, 12, 0.38);
   text-decoration: none;
 }
 
@@ -323,4 +332,77 @@ h3 {
 .etiqueta-cancelada {
   background: var(--rojo-suave);
   color: var(--rojo);
+}
+
+/* ---------- Animaciones ---------- */
+
+/* Cada pantalla entra subiendo un poquito */
+main {
+  animation: aparecer 0.45s ease-out;
+}
+
+/* Las tarjetas de las grillas y listas entran una atrás de la otra */
+.inicio-grilla > *,
+.vuelos-lista > *,
+.inicio-beneficio {
+  animation: aparecer 0.5s ease-out backwards;
+}
+
+.inicio-grilla > :nth-child(2),
+.vuelos-lista > :nth-child(2),
+.inicio-beneficio:nth-child(2) {
+  animation-delay: 0.07s;
+}
+
+.inicio-grilla > :nth-child(3),
+.vuelos-lista > :nth-child(3),
+.inicio-beneficio:nth-child(3) {
+  animation-delay: 0.14s;
+}
+
+.inicio-grilla > :nth-child(n + 4),
+.vuelos-lista > :nth-child(n + 4),
+.inicio-beneficio:nth-child(n + 4) {
+  animation-delay: 0.21s;
+}
+
+/* Las tarjetas que se pueden clickear se levantan al pasar el mouse */
+.tarjeta-destino,
+.tarjeta-vuelo {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tarjeta-destino:hover,
+.tarjeta-vuelo:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.tarjeta-vuelo .foto-vuelo {
+  transition: transform 0.5s ease;
+}
+
+.tarjeta-vuelo:hover .foto-vuelo {
+  transform: scale(1.06);
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Si la persona pidio menos movimiento en su sistema, no se anima nada */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
