@@ -1,7 +1,8 @@
 import { fechaLarga, hora, precioOGratis } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
-import { numerosDeVuelo, rotuloVuelos } from '../../utils/ordenes'
+import { numerosDeVuelo, rotuloVuelos, textoQr } from '../../utils/ordenes'
 import { textoMedioPago } from '../../utils/pagos'
+import CodigoQr from './CodigoQr'
 import EtiquetaOrden from './EtiquetaOrden'
 import TotalesOrden from './TotalesOrden'
 import './Boleto.css'
@@ -56,6 +57,14 @@ function Boleto({ orden }) {
           </li>
         ))}
       </ul>
+
+      {!cancelada && (
+        <CodigoQr
+          valor={textoQr(orden)}
+          rotulo={`Código de la compra #${orden.id}`}
+          ayuda="Escaneándolo se ve el número de compra, los vuelos y los asientos. Mostralo al embarcar."
+        />
+      )}
 
       <TotalesOrden orden={orden} cancelada={cancelada} />
     </section>
