@@ -22,6 +22,7 @@ import FormVuelo from './views/admin/FormVuelo'
 import GestionVuelo from './views/admin/GestionVuelo'
 import PanelVuelos from './views/admin/PanelVuelos'
 import Usuarios from './views/admin/Usuarios'
+import ValidarEmbarque from './views/admin/ValidarEmbarque'
 
 function App() {
   return (
@@ -113,6 +114,14 @@ function App() {
               }
             />
 
+            <Route
+              path="/panel/embarque"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <ValidarEmbarque />
+                </RutaProtegida>
+              }
+            />
             <Route
               path="/panel/usuarios"
               element={

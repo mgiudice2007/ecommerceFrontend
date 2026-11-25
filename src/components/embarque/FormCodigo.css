@@ -1,0 +1,15 @@
+.form-codigo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.form-codigo .campo {
+  flex: 1 1 260px;
+  margin: 0;
+}
+
+.form-codigo .boton {
+  margin-top: 26px;
+}

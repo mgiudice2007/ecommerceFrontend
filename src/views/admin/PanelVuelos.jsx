@@ -89,6 +89,9 @@ function PanelVuelos() {
         subtitulo="Publicá vuelos y manejá su estado, asientos, promociones y fotos."
         acciones={
           <>
+            <Link to="/panel/embarque" className="boton boton-contorno">
+              Validar embarque
+            </Link>
             <Link to="/panel/usuarios" className="boton boton-contorno">
               Usuarios y permisos
             </Link>

@@ -1,0 +1,52 @@
+.resultado-embarque {
+  margin-top: 20px;
+  border-left: 6px solid var(--borde);
+}
+
+.resultado-valido {
+  border-left-color: var(--verde);
+}
+
+.resultado-embarcado {
+  border-left-color: var(--durazno);
+}
+
+.resultado-anulado {
+  border-left-color: var(--rojo);
+}
+
+.resultado-embarque header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.resultado-embarque h2 {
+  margin: 0;
+}
+
+.resultado-motivo {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+.resultado-embarque dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 24px;
+  margin: 16px 0;
+}
+
+.resultado-embarque dt {
+  color: var(--texto-suave);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.resultado-embarque dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+}
