@@ -41,7 +41,7 @@ function CompraExitosa() {
 
   return (
     <div className="contenedor pagina orden">
-      <PasosCompra actual={3} />
+      <PasosCompra actual={4} />
       <PagoAprobado orden={orden} />
       <Boleto orden={orden} />
 

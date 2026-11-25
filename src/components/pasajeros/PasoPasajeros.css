@@ -1,0 +1,17 @@
+.form-pasajero {
+  margin: 0 0 16px;
+  padding: 16px 18px 6px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.form-pasajero legend {
+  padding: 0 8px;
+  font-weight: 800;
+  color: var(--azul-noche);
+}
+
+.form-pasajero-vuelos {
+  margin: 0 0 12px;
+  font-size: 13px;
+}

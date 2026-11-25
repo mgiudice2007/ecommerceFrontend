@@ -17,3 +17,18 @@
   margin: 24px 0 0;
   font-size: 13px;
 }
+
+.checkout-editar-pasajeros {
+  margin: 0 0 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--azul);
+  cursor: pointer;
+}
+
+.checkout-editar-pasajeros:hover {
+  text-decoration: underline;
+}

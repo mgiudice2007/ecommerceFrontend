@@ -1,6 +1,6 @@
 import './PasosCompra.css'
 
-const PASOS = ['Carrito', 'Pago', 'Listo']
+const PASOS = ['Carrito', 'Pasajeros', 'Pago', 'Listo']
 
 function PasosCompra({ actual }) {
   return (

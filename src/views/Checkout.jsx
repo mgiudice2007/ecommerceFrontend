@@ -10,8 +10,10 @@ import Mensaje from '../components/comunes/Mensaje'
 import DetallePago from '../components/pago/DetallePago'
 import PasosCompra from '../components/pago/PasosCompra'
 import SelectorMedioPago from '../components/pago/SelectorMedioPago'
+import PasoPasajeros from '../components/pasajeros/PasoPasajeros'
 import { useAuth } from '../context/AuthContext'
 import { calcularMillas, vuelosSinAdulto } from '../utils/carrito'
+import { armarPersonas, pedidoDePasajeros, validarPersonas } from '../utils/datosPasajeros'
 import {
   MEDIOS_PAGO,
   TARJETA_INICIAL,
@@ -34,10 +36,16 @@ function Checkout() {
   const [usarMillas, setUsarMillas] = useState(false)
   const [millasElegidas, setMillasElegidas] = useState('')
   const [pagando, setPagando] = useState(false)
+  const [paso, setPaso] = useState('pasajeros')
+  const [personas, setPersonas] = useState([])
+  const [intentoPasajeros, setIntentoPasajeros] = useState(false)
 
   useEffect(() => {
     api('/api/carrito')
-      .then(setCarrito)
+      .then((datos) => {
+        setCarrito(datos)
+        setPersonas(armarPersonas(datos.items))
+      })
       .catch((err) => setError(err.message))
   }, [])
 
@@ -67,6 +75,21 @@ function Checkout() {
   const errores = !millasCubrenTodo && esTarjeta(medio) ? validarTarjeta(tarjeta) : {}
   const hayErrores = Object.keys(errores).length > 0
 
+  const erroresPasajeros = validarPersonas(personas, carrito.items)
+
+  const cambiarPersona = (clave, campo, valor) =>
+    setPersonas(personas.map((persona) => (persona.clave === clave ? { ...persona, [campo]: valor } : persona)))
+
+  const continuar = () => {
+    setIntentoPasajeros(true)
+    if (Object.keys(erroresPasajeros).length > 0) {
+      setError('Revisá los datos de los pasajeros: hay campos para corregir.')
+      return
+    }
+    setError('')
+    setPaso('pago')
+  }
+
   const elegirUsarMillas = (usar) => {
     setUsarMillas(usar)
     setMillasElegidas(String(calculo.maximo))
@@ -82,7 +105,7 @@ function Checkout() {
     if (hayErrores) return
 
     // Del pago solo viaja el medio y, si es tarjeta, los ultimos 4 digitos: el numero completo nunca sale del navegador
-    const pedido = { medioPago: millasCubrenTodo ? 'MILLAS' : medio }
+    const pedido = { medioPago: millasCubrenTodo ? 'MILLAS' : medio, pasajeros: pedidoDePasajeros(personas, carrito.items) }
     if (usarMillas) pedido.millas = calculo.aUsar
     if (esTarjeta(pedido.medioPago)) pedido.ultimosDigitos = ultimosCuatro(tarjeta.numero)
 
@@ -102,40 +125,59 @@ function Checkout() {
 
   return (
     <>
-      <EncabezadoPagina titulo="Pago" subtitulo="Elegí cómo pagar y confirmá tu compra." />
+      <EncabezadoPagina
+        titulo={paso === 'pasajeros' ? 'Pasajeros' : 'Pago'}
+        subtitulo={
+          paso === 'pasajeros'
+            ? 'Antes de pagar, cargá los datos de cada persona que viaja.'
+            : 'Elegí cómo pagar y confirmá tu compra.'
+        }
+      />
 
       <div className="contenedor sobre-encabezado">
-        <PasosCompra actual={1} />
+        <PasosCompra actual={paso === 'pasajeros' ? 1 : 2} />
         {error && <Mensaje>{error}</Mensaje>}
 
         <div className="carrito-layout">
-          <section className="tarjeta checkout-medios">
-            {millasCubrenTodo ? (
-              <>
-                <h2>Pagás todo con millas</h2>
-                <p className="texto-suave">
-                  Con {calculo.aUsar.toLocaleString('es-AR')} millas cubrís el total de la compra: no hace falta elegir otro
-                  medio de pago.
-                </p>
-              </>
-            ) : (
-              <>
-                <SelectorMedioPago medios={MEDIOS_PAGO} elegido={medio} onElegir={setMedio} />
-                <div className="checkout-detalle">
-                  <DetallePago
-                    medio={medio}
-                    tarjeta={tarjeta}
-                    errores={intento ? errores : {}}
-                    total={calculo.aPagar}
-                    onCambiarTarjeta={cambiarTarjeta}
-                  />
-                </div>
-              </>
-            )}
-            <p className="texto-suave checkout-simulado">
-              Pago simulado: no se realiza ningún cobro ni se guardan los datos de tu tarjeta.
-            </p>
-          </section>
+          {paso === 'pasajeros' ? (
+            <PasoPasajeros
+              personas={personas}
+              items={carrito.items}
+              errores={intentoPasajeros ? erroresPasajeros : {}}
+              onCambiar={cambiarPersona}
+            />
+          ) : (
+            <section className="tarjeta checkout-medios">
+              <button type="button" className="checkout-editar-pasajeros" onClick={() => setPaso('pasajeros')}>
+                ← Editar datos de los pasajeros
+              </button>
+              {millasCubrenTodo ? (
+                <>
+                  <h2>Pagás todo con millas</h2>
+                  <p className="texto-suave">
+                    Con {calculo.aUsar.toLocaleString('es-AR')} millas cubrís el total de la compra: no hace falta elegir otro
+                    medio de pago.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <SelectorMedioPago medios={MEDIOS_PAGO} elegido={medio} onElegir={setMedio} />
+                  <div className="checkout-detalle">
+                    <DetallePago
+                      medio={medio}
+                      tarjeta={tarjeta}
+                      errores={intento ? errores : {}}
+                      total={calculo.aPagar}
+                      onCambiarTarjeta={cambiarTarjeta}
+                    />
+                  </div>
+                </>
+              )}
+              <p className="texto-suave checkout-simulado">
+                Pago simulado: no se realiza ningún cobro ni se guardan los datos de tu tarjeta.
+              </p>
+            </section>
+          )}
 
           <ResumenCompra
             items={carrito.items}
@@ -156,10 +198,10 @@ function Checkout() {
             sinAdulto={sinAdulto}
             procesando={pagando}
             bloqueado={sinAdulto.length > 0 || calculo.problema !== ''}
-            textoBoton="Pagar"
+            textoBoton={paso === 'pasajeros' ? 'Continuar al pago' : 'Pagar'}
             textoProcesando="Procesando pago…"
             enlace={{ to: '/carrito', texto: 'Volver al carrito' }}
-            onConfirmar={pagar}
+            onConfirmar={paso === 'pasajeros' ? continuar : pagar}
           />
         </div>
       </div>
