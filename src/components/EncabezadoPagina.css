@@ -2,10 +2,34 @@
   position: relative;
   padding: 40px 0 92px;
   color: #fff;
+  overflow: hidden;
+  /* Foto del ala con un velo azul noche y un brillo naranja de atardecer abajo a la derecha */
   background:
-    radial-gradient(circle at 90% 0%, rgba(31, 162, 224, 0.45), transparent 50%),
+    radial-gradient(ellipse at 88% 120%, rgba(255, 122, 47, 0.5), transparent 50%),
+    linear-gradient(100deg, rgba(4, 30, 66, 0.97) 0%, rgba(4, 30, 66, 0.88) 45%, rgba(4, 30, 66, 0.6) 100%),
+    url('../assets/portada.jpg') center 35% / cover,
     var(--azul-noche);
   isolation: isolate;
+}
+
+/* Ruta de vuelo punteada de adorno (solo en los encabezados sin foto propia) */
+.encabezado-pagina:not(.con-imagen)::after {
+  content: '';
+  position: absolute;
+  right: 6%;
+  top: 28px;
+  z-index: -1;
+  width: 320px;
+  height: 120px;
+  background: url('../assets/ruta-vuelo.svg') no-repeat center / contain;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .encabezado-pagina:not(.con-imagen)::after {
+    display: none;
+  }
 }
 
 .encabezado-pagina.con-imagen {
@@ -45,8 +69,8 @@
   margin-bottom: 10px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #7fd0f7;
+  background: rgba(255, 154, 60, 0.18);
+  color: #ffb066;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.06em;
