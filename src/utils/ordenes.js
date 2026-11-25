@@ -1,7 +1,4 @@
-import { api } from '../api/api'
 import { fechaLarga, hora } from './formato'
-
-export const cancelarOrden = (orden) => api(`/api/ordenes/${orden.id}/cancelar`, { method: 'POST' })
 
 export const textoCancelacion = (orden) =>
   orden.sePuedeCancelar

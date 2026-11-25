@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { api, borrarToken, guardarToken, obtenerToken } from '../api/api'
 import { fetchCarrito, vaciarCarrito } from '../redux/carritoSlice'
+import { vaciarOrdenes } from '../redux/ordenesSlice'
 
 const AuthContext = createContext(null)
 
@@ -51,6 +52,7 @@ export function AuthProvider({ children }) {
       setUsuario(null)
       setPerfil(null)
       dispatch(vaciarCarrito())
+      dispatch(vaciarOrdenes())
       navigate('/login', { state: { sesionVencida: true } })
     }
     const timer = setTimeout(cerrarSesionVencida, usuario.vence - Date.now())
@@ -73,6 +75,7 @@ export function AuthProvider({ children }) {
         setUsuario(null)
         setPerfil(null)
         dispatch(vaciarCarrito())
+        dispatch(vaciarOrdenes())
       })
 
   const valor = {

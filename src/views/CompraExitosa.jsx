@@ -1,28 +1,29 @@
-import { useEffect, useState } from 'react'
-import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
-import { api } from '../api/api'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
 import Boleto from '../components/ordenes/Boleto'
 import PagoAprobado from '../components/pago/PagoAprobado'
 import PasosCompra from '../components/pago/PasosCompra'
+import { fetchOrden } from '../redux/ordenesSlice'
 import './DetalleOrden.css'
 
 function CompraExitosa() {
   const { id } = useParams()
-  const ordenRecibida = useLocation().state?.orden
-  const [orden, setOrden] = useState(ordenRecibida ?? null)
-  const [error, setError] = useState('')
+  const dispatch = useDispatch()
+  const { ordenActual, error } = useSelector((state) => state.ordenes)
 
-  // Al llegar desde el pago la orden ya viene en la navegacion; al recargar la pagina hay que pedirla
+  const orden = ordenActual?.id === Number(id) ? ordenActual : null
+
+  // Al llegar desde el pago la orden ya está en el store; al recargar la página hay que pedirla
   useEffect(() => {
-    if (ordenRecibida) return
-    api(`/api/ordenes/${id}`)
-      .then(setOrden)
-      .catch((err) => setError(err.message))
-  }, [id, ordenRecibida])
+    if (!orden) {
+      dispatch(fetchOrden(id))
+    }
+  }, [id, orden, dispatch])
 
-  if (error) {
+  if (error && !orden) {
     return (
       <div className="contenedor pagina">
         <Mensaje>{error}</Mensaje>
