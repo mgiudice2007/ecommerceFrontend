@@ -1,28 +1,8 @@
+/* Fondo blanco fijo: el QR tiene que contrastar siempre para que la cámara lo lea */
 .codigo-qr {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px 20px;
-  padding: 16px 0;
-  border-bottom: 1px dashed var(--borde);
-}
-
-/* Fondo blanco fijo: el QR tiene que contrastar siempre para que la cámara lo lea */
-.codigo-qr-imagen {
-  display: flex;
-  padding: 10px;
+  padding: 8px;
   background: #ffffff;
   border: 1px solid var(--borde);
   border-radius: var(--radio);
-}
-
-.codigo-qr-texto {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 360px;
-}
-
-.codigo-qr-texto small {
-  color: var(--texto-suave);
 }
