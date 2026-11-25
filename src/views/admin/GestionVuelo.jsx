@@ -13,7 +13,8 @@ import TablaDescuentos from '../../components/admin/TablaDescuentos'
 import Cargando from '../../components/comunes/Cargando'
 import Mensaje from '../../components/comunes/Mensaje'
 import { useAvisos } from '../../context/AvisosContext'
-import { useCatalogo } from '../../hooks/useCatalogo'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchAeropuertos, fetchCategorias, fetchClases } from '../../redux/catalogoSlice'
 import { useDescuentosVuelo } from '../../hooks/useDescuentosVuelo'
 import { useDisponibilidades } from '../../hooks/useDisponibilidades'
 import { useFotosVuelo } from '../../hooks/useFotosVuelo'
@@ -58,9 +59,14 @@ function GestionVuelo() {
   const recargarVuelo = () => setRecargar((veces) => veces + 1)
   const opciones = { avisar, onCambio: recargarVuelo }
 
-  const clases = useCatalogo('/api/clases')
-  const aeropuertos = useCatalogo('/api/aeropuertos')
-  const categorias = useCatalogo('/api/categorias')
+  const dispatch = useDispatch()
+  const { clases, aeropuertos, categorias } = useSelector((state) => state.catalogo)
+
+  useEffect(() => {
+    dispatch(fetchClases())
+    dispatch(fetchAeropuertos())
+    dispatch(fetchCategorias())
+  }, [dispatch])
   const disponibilidades = useDisponibilidades(vuelo, opciones)
   const descuentos = useDescuentosVuelo(vueloId, opciones)
   const fotos = useFotosVuelo(vueloId, opciones)

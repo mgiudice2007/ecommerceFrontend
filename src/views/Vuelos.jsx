@@ -18,7 +18,8 @@ import {
   esIdaYVuelta,
 } from '../utils/busqueda'
 import { leerPasajeros } from '../utils/pasajeros'
-import { useCatalogo } from '../hooks/useCatalogo'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchAeropuertos } from '../redux/catalogoSlice'
 import './Vuelos.css'
 
 function Vuelos() {
@@ -32,7 +33,12 @@ function Vuelos() {
   const resultado = cargando ? null : respuesta.datos
   const error = cargando ? '' : respuesta.error
 
-  const aeropuertos = useCatalogo('/api/aeropuertos')
+  const dispatch = useDispatch()
+  const { aeropuertos } = useSelector((state) => state.catalogo)
+
+  useEffect(() => {
+    dispatch(fetchAeropuertos())
+  }, [dispatch])
 
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',

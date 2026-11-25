@@ -12,12 +12,18 @@ import SeccionMundo from '../components/inicio/SeccionMundo'
 import { useAuth } from '../context/AuthContext'
 import { argentinaDe, ATAJOS, destinosMostrados, mundoDe, ofertasDe, REGIONES } from '../utils/destinos'
 import { estaOperativo } from '../utils/vuelos'
-import { useCatalogo } from '../hooks/useCatalogo'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchAeropuertos } from '../redux/catalogoSlice'
 import './Inicio.css'
 
 function Inicio() {
   const { estaLogueado } = useAuth()
-  const aeropuertos = useCatalogo('/api/aeropuertos')
+  const dispatch = useDispatch()
+  const { aeropuertos } = useSelector((state) => state.catalogo)
+
+  useEffect(() => {
+    dispatch(fetchAeropuertos())
+  }, [dispatch])
 
   const [vuelos, setVuelos] = useState([])
   const [cargando, setCargando] = useState(true)

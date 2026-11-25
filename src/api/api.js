@@ -6,7 +6,7 @@ export const obtenerToken = () => localStorage.getItem(TOKEN_KEY)
 export const guardarToken = (token) => localStorage.setItem(TOKEN_KEY, token)
 export const borrarToken = () => localStorage.removeItem(TOKEN_KEY)
 
-const mensajeDeError = (data, status) => {
+export const mensajeDeError = (data, status) => {
   if (data?.fields) {
     return Object.values(data.fields).join('. ')
   }
