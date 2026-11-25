@@ -1,48 +1,20 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { textoDeError, URL } from './conexion'
+import { clienteApi } from './conexion'
 
-// Cada lista se pide una sola vez: si ya está cargada, el thunk no vuelve a llamar al backend (condition)
-const yaCargada = (lista) => (_, { getState }) => getState().catalogo[lista].length === 0
+export const fetchAeropuertos = createAsyncThunk('catalogo/fetchAeropuertos', async () => {
+  const { data } = await clienteApi.get('/api/aeropuertos')
+  return data
+})
 
-export const fetchAeropuertos = createAsyncThunk(
-  'catalogo/fetchAeropuertos',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`${URL}/api/aeropuertos`)
-      return data
-    } catch (error) {
-      return rejectWithValue(textoDeError(error))
-    }
-  },
-  { condition: yaCargada('aeropuertos') },
-)
+export const fetchCategorias = createAsyncThunk('catalogo/fetchCategorias', async () => {
+  const { data } = await clienteApi.get('/api/categorias')
+  return data
+})
 
-export const fetchCategorias = createAsyncThunk(
-  'catalogo/fetchCategorias',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`${URL}/api/categorias`)
-      return data
-    } catch (error) {
-      return rejectWithValue(textoDeError(error))
-    }
-  },
-  { condition: yaCargada('categorias') },
-)
-
-export const fetchClases = createAsyncThunk(
-  'catalogo/fetchClases',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`${URL}/api/clases`)
-      return data
-    } catch (error) {
-      return rejectWithValue(textoDeError(error))
-    }
-  },
-  { condition: yaCargada('clases') },
-)
+export const fetchClases = createAsyncThunk('catalogo/fetchClases', async () => {
+  const { data } = await clienteApi.get('/api/clases')
+  return data
+})
 
 const catalogoSlice = createSlice({
   name: 'catalogo',
@@ -57,7 +29,7 @@ const catalogoSlice = createSlice({
         state.aeropuertos = action.payload
       })
       .addCase(fetchAeropuertos.rejected, (state, action) => {
-        state.error = action.payload
+        state.error = action.error.message
       })
       .addCase(fetchCategorias.pending, (state) => {
         state.error = null
@@ -66,7 +38,7 @@ const catalogoSlice = createSlice({
         state.categorias = action.payload
       })
       .addCase(fetchCategorias.rejected, (state, action) => {
-        state.error = action.payload
+        state.error = action.error.message
       })
       .addCase(fetchClases.pending, (state) => {
         state.error = null
@@ -75,7 +47,7 @@ const catalogoSlice = createSlice({
         state.clases = action.payload
       })
       .addCase(fetchClases.rejected, (state, action) => {
-        state.error = action.payload
+        state.error = action.error.message
       })
   },
 })
