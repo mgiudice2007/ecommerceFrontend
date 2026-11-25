@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
@@ -5,6 +7,7 @@ import RutaProtegida from './components/RutaProtegida'
 import VolverArriba from './components/VolverArriba'
 import { AuthProvider } from './context/AuthContext'
 import { AvisosProvider } from './context/AvisosContext'
+import { fetchAeropuertos, fetchCategorias, fetchClases } from './redux/catalogoSlice'
 import Carrito from './views/Carrito'
 import Checkout from './views/Checkout'
 import CompraExitosa from './views/CompraExitosa'
@@ -25,6 +28,15 @@ import Usuarios from './views/admin/Usuarios'
 import ValidarEmbarque from './views/admin/ValidarEmbarque'
 
 function App() {
+  const dispatch = useDispatch()
+
+  // El catálogo (aeropuertos, categorías y clases) se pide una sola vez al abrir la app; las vistas solo lo leen del store
+  useEffect(() => {
+    dispatch(fetchAeropuertos())
+    dispatch(fetchCategorias())
+    dispatch(fetchClases())
+  }, [dispatch])
+
   return (
     <AuthProvider>
       <AvisosProvider>

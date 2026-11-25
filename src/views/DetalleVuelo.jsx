@@ -16,8 +16,7 @@ import { useAuth } from '../context/AuthContext'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
 import { urlParaElegirVuelta, urlTrasLogin } from '../utils/viaje'
 import { motivoSinVenta } from '../utils/vuelos'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchClases } from '../redux/catalogoSlice'
+import { useSelector } from 'react-redux'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
@@ -26,12 +25,7 @@ function DetalleVuelo() {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
-  const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
-
-  useEffect(() => {
-    dispatch(fetchClases())
-  }, [dispatch])
 
   const [vuelo, setVuelo] = useState(null)
   const [imagenes, setImagenes] = useState([])

@@ -1,23 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import CamposVuelo from '../../components/admin/CamposVuelo'
 import Mensaje from '../../components/comunes/Mensaje'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAeropuertos, fetchCategorias } from '../../redux/catalogoSlice'
+import { useSelector } from 'react-redux'
 import { cuerpoVuelo, FORM_VUELO_VACIO, problemaEnVuelo } from '../../utils/vuelos'
 import './Panel.css'
 
 function FormVuelo() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
   const { aeropuertos, categorias } = useSelector((state) => state.catalogo)
-
-  useEffect(() => {
-    dispatch(fetchAeropuertos())
-    dispatch(fetchCategorias())
-  }, [dispatch])
 
   const [formData, setFormData] = useState(FORM_VUELO_VACIO)
   const [guardando, setGuardando] = useState(false)

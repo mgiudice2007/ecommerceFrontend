@@ -18,8 +18,7 @@ import {
   esIdaYVuelta,
 } from '../utils/busqueda'
 import { leerPasajeros } from '../utils/pasajeros'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAeropuertos } from '../redux/catalogoSlice'
+import { useSelector } from 'react-redux'
 import './Vuelos.css'
 
 function Vuelos() {
@@ -33,12 +32,7 @@ function Vuelos() {
   const resultado = cargando ? null : respuesta.datos
   const error = cargando ? '' : respuesta.error
 
-  const dispatch = useDispatch()
   const { aeropuertos } = useSelector((state) => state.catalogo)
-
-  useEffect(() => {
-    dispatch(fetchAeropuertos())
-  }, [dispatch])
 
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',
