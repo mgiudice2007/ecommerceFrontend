@@ -1,10 +1,49 @@
 .footer {
+  position: relative;
   margin-top: 64px;
-  padding: 56px 0 28px;
-  border-top: 4px solid transparent;
-  border-image: var(--degradado-cielo) 1;
+  padding: 76px 0 28px;
   background: #021530;
   color: rgba(255, 255, 255, 0.72);
+}
+
+/* Arriba del footer hay una pista de aterrizaje: asfalto, linea central
+   que corre y luces de borde que se prenden en secuencia */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.85) 0 44px, transparent 44px) 0 50% / 88px 3px repeat-x,
+    #1a2433;
+  border-bottom: 2px solid #ffcf7a;
+  animation: pista 2.4s linear infinite;
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: radial-gradient(circle, #ffcf7a 0 2px, transparent 2.5px) 0 0 / 40px 4px repeat-x;
+  filter: drop-shadow(0 0 4px #ffb066);
+  animation: luces 1.2s steps(2) infinite;
+}
+
+@keyframes pista {
+  to {
+    background-position: 88px 50%, 0 0;
+  }
+}
+
+@keyframes luces {
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .footer-interior {
@@ -39,7 +78,7 @@
 }
 
 .footer a:hover {
-  color: #7fd0f7;
+  color: #ffb066;
   text-decoration: none;
 }
 

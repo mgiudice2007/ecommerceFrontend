@@ -1,0 +1,31 @@
+.cargando {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.cargando-orbita {
+  position: relative;
+  flex: 0 0 34px;
+  height: 34px;
+  border: 2px dashed #b9c8da;
+  border-radius: 50%;
+  animation: orbitar 1.4s linear infinite;
+}
+
+.cargando-orbita span {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  margin-left: -8px;
+  color: var(--naranja);
+  font-size: 16px;
+  line-height: 1;
+}
+
+@keyframes orbitar {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -12,8 +12,22 @@
 }
 
 .inicio-atajos a {
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--celeste-suave);
+  padding: 5px 12px 5px 10px;
+  border: 1.5px dashed #9fb8d6;
+  border-radius: 8px;
+  background: var(--superficie);
   font-size: 13px;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.inicio-atajos a::before {
+  content: '✈ ';
+  color: var(--naranja);
+}
+
+.inicio-atajos a:hover {
+  border-color: var(--naranja);
+  color: var(--naranja-oscuro);
+  text-decoration: none;
+  transform: translateY(-2px) rotate(-2deg);
 }

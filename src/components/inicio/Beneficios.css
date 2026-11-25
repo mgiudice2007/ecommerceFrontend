@@ -5,10 +5,73 @@
   padding-top: 48px;
 }
 
+.inicio-beneficios {
+  padding-top: 56px;
+}
+
+/* Cada beneficio es una etiqueta de equipaje: agujerito con hilo, borde
+   naranja a la izquierda y un leve balanceo al pasar el mouse */
 .inicio-beneficio {
+  position: relative;
   display: flex;
   gap: 14px;
   align-items: flex-start;
+  padding: 18px 16px 16px 30px;
+  border-radius: 6px 16px 16px 6px;
+  border-left: 5px solid var(--naranja);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  transform: rotate(-1.2deg);
+  transform-origin: 18px 50%;
+}
+
+.inicio-beneficio:nth-child(even) {
+  transform: rotate(1.2deg);
+}
+
+/* Agujerito de la etiqueta */
+.inicio-beneficio::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--fondo);
+  box-shadow: inset 0 1px 2px rgba(4, 30, 66, 0.35);
+}
+
+/* Hilo que sale del agujerito */
+.inicio-beneficio::after {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 50%;
+  width: 40px;
+  height: 2px;
+  border-radius: 2px;
+  background: #c9a46a;
+  transform: rotate(-24deg);
+  transform-origin: right center;
+}
+
+.inicio-beneficio:hover {
+  animation: balancear 0.9s ease-in-out;
+}
+
+@keyframes balancear {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  30% {
+    transform: rotate(4deg);
+  }
+  60% {
+    transform: rotate(-3deg);
+  }
 }
 
 .inicio-beneficio-icono {
@@ -17,7 +80,7 @@
   flex: 0 0 44px;
   height: 44px;
   border-radius: 12px;
-  background: var(--degradado-cielo);
+  background: var(--degradado-atardecer);
   color: #fff;
 }
 

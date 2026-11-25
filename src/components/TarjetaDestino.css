@@ -3,6 +3,10 @@
   display: block;
   height: 340px;
   overflow: hidden;
+  /* Postal de correo aereo: el borde tiene las rayas rojas y azules de los sobres */
+  border: 6px solid transparent;
+  background:
+    repeating-linear-gradient(135deg, #d0342c 0 12px, #fff 12px 22px, #0057b8 22px 34px, #fff 34px 44px) border-box;
   border-radius: var(--radio-grande);
   box-shadow: var(--sombra);
   color: #fff;
@@ -17,6 +21,8 @@
 .tarjeta-destino-foto {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  border-radius: 13px;
   z-index: -2;
   transition: transform 0.5s ease;
 }
@@ -30,6 +36,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
+  border-radius: 13px;
   background: linear-gradient(180deg, rgba(4, 30, 66, 0) 35%, rgba(4, 30, 66, 0.55) 60%, rgba(4, 30, 66, 0.92) 100%);
 }
 
@@ -50,6 +57,33 @@
   text-transform: uppercase;
   transform: rotate(-8deg);
   animation: sellar 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) 0.5s backwards;
+}
+
+/* Matasellos redondo arriba a la derecha */
+.tarjeta-destino::before {
+  content: 'BCA ✈ AIR MAIL';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  padding: 8px;
+  border: 2px dashed rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-align: center;
+  transform: rotate(14deg);
+  transition: transform 0.5s ease;
+}
+
+.tarjeta-destino:hover::before {
+  transform: rotate(-20deg) scale(1.08);
 }
 
 .tarjeta-destino-texto {
