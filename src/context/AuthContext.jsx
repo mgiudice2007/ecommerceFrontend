@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { api, borrarToken, guardarToken, obtenerToken } from '../api/api'
+import { fetchCarrito, vaciarCarrito } from '../redux/carritoSlice'
 
 const AuthContext = createContext(null)
 
@@ -20,13 +22,9 @@ const leerToken = (token) => {
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(leerToken(obtenerToken()))
-  const [cantidadCarrito, setCantidadCarrito] = useState(0)
   const [perfil, setPerfil] = useState(null)
   const navigate = useNavigate()
-
-  const actualizarCarrito = (carrito) => {
-    setCantidadCarrito(carrito.items.reduce((total, item) => total + item.cantidad, 0))
-  }
+  const dispatch = useDispatch()
 
   const recargarPerfil = () => {
     api('/api/auth/me')
@@ -42,11 +40,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (usuario?.rol === 'COMPRADOR') {
-      api('/api/carrito')
-        .then(actualizarCarrito)
-        .catch(() => setCantidadCarrito(0))
+      dispatch(fetchCarrito())
     }
-  }, [usuario])
+  }, [usuario, dispatch])
 
   useEffect(() => {
     if (!usuario) return
@@ -54,12 +50,12 @@ export function AuthProvider({ children }) {
       borrarToken()
       setUsuario(null)
       setPerfil(null)
-      setCantidadCarrito(0)
+      dispatch(vaciarCarrito())
       navigate('/login', { state: { sesionVencida: true } })
     }
     const timer = setTimeout(cerrarSesionVencida, usuario.vence - Date.now())
     return () => clearTimeout(timer)
-  }, [usuario, navigate])
+  }, [usuario, navigate, dispatch])
 
   const login = (username, password) =>
     api('/api/auth/login', { method: 'POST', body: { username, password } }).then((data) => {
@@ -76,7 +72,7 @@ export function AuthProvider({ children }) {
         borrarToken()
         setUsuario(null)
         setPerfil(null)
-        setCantidadCarrito(0)
+        dispatch(vaciarCarrito())
       })
 
   const valor = {
@@ -89,8 +85,6 @@ export function AuthProvider({ children }) {
     perfil,
     setPerfil,
     recargarPerfil,
-    cantidadCarrito,
-    actualizarCarrito,
   }
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

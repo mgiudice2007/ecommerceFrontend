@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { millas } from '../utils/formato'
@@ -6,7 +7,8 @@ import Logo from './Logo'
 import './Navbar.css'
 
 function Navbar() {
-  const { usuario, perfil, estaLogueado, esComprador, esAdmin, logout, cantidadCarrito } = useAuth()
+  const { usuario, perfil, estaLogueado, esComprador, esAdmin, logout } = useAuth()
+  const carrito = useSelector((state) => state.carrito.carrito)
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [cuentaAbierta, setCuentaAbierta] = useState(false)
   const navigate = useNavigate()
@@ -23,6 +25,7 @@ function Navbar() {
     })
   }
 
+  const cantidadCarrito = carrito ? carrito.items.reduce((total, item) => total + item.cantidad, 0) : 0
   const nombre = perfil?.nombre || usuario?.username || ''
   const nombreCompleto = perfil?.nombre ? `${perfil.nombre} ${perfil.apellido ?? ''}` : nombre
 

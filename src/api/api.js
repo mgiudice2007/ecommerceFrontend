@@ -53,15 +53,3 @@ export const api = (url, opciones = {}) => {
     )
 }
 
-const pedirPorId = (ids, pedir) => {
-  const unicos = ids.filter((id, i) => ids.indexOf(id) === i)
-  return Promise.all(unicos.map((id) => pedir(id).catch(() => null))).then((respuestas) => {
-    const porId = {}
-    unicos.forEach((id, i) => {
-      porId[id] = respuestas[i]
-    })
-    return porId
-  })
-}
-
-export const pedirVuelos = (vueloIds) => pedirPorId(vueloIds, (id) => api(`/api/vuelos/${id}`))

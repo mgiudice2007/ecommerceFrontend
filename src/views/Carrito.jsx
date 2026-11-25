@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { api, pedirVuelos } from '../api/api'
 import ItemCarrito from '../components/ItemCarrito'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ResumenCompra from '../components/carrito/ResumenCompra'
@@ -8,50 +8,30 @@ import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import PasosCompra from '../components/pago/PasosCompra'
-import { useAuth } from '../context/AuthContext'
+import { cambiarCantidad, eliminarItem, fetchCarrito, fetchVuelosDelCarrito } from '../redux/carritoSlice'
 import { calcularMillas, textoCantidadPasajes, vuelosSinAdulto } from '../utils/carrito'
 import './Carrito.css'
 
 function Carrito() {
-  const { actualizarCarrito } = useAuth()
   const navigate = useNavigate()
-  const [carrito, setCarrito] = useState(null)
-  const [error, setError] = useState('')
-  const [ocupado, setOcupado] = useState(false)
-  const [vuelos, setVuelos] = useState({})
+  const dispatch = useDispatch()
+  const { carrito, vuelosDelCarrito, guardando, error } = useSelector((state) => state.carrito)
 
   useEffect(() => {
-    api('/api/carrito')
-      .then((data) => {
-        setCarrito(data)
-        const ids = data.items.map((item) => item.vueloId)
-        pedirVuelos(ids).then((datos) => setVuelos(datos))
-      })
-      .catch((err) => setError(err.message))
-  }, [])
+    dispatch(fetchCarrito())
+  }, [dispatch])
 
-  const mostrarCarrito = (actualizado) => {
-    setCarrito(actualizado)
-    actualizarCarrito(actualizado)
-  }
+  // Se piden solo los vuelos que todavía no están en el store
+  const vueloIdsFaltantes = (carrito?.items ?? [])
+    .map((item) => item.vueloId)
+    .filter((vueloId) => !(vueloId in vuelosDelCarrito))
+  const faltantes = [...new Set(vueloIdsFaltantes)].join(',')
 
-  const cambiarCantidad = (item, cantidad) => {
-    setOcupado(true)
-    setError('')
-    api(`/api/carrito/items/${item.id}`, { method: 'PUT', body: { cantidad } })
-      .then(mostrarCarrito)
-      .catch((err) => setError(err.message))
-      .finally(() => setOcupado(false))
-  }
-
-  const eliminar = (item) => {
-    setOcupado(true)
-    setError('')
-    api(`/api/carrito/items/${item.id}`, { method: 'DELETE' })
-      .then(mostrarCarrito)
-      .catch((err) => setError(err.message))
-      .finally(() => setOcupado(false))
-  }
+  useEffect(() => {
+    if (faltantes) {
+      dispatch(fetchVuelosDelCarrito(faltantes.split(',').map(Number)))
+    }
+  }, [faltantes, dispatch])
 
   if (!carrito) {
     return (
@@ -87,10 +67,10 @@ function Carrito() {
                   <ItemCarrito
                     key={item.id}
                     item={item}
-                    vuelo={vuelos[item.vueloId]}
-                    onCambiarCantidad={cambiarCantidad}
-                    onEliminar={eliminar}
-                    ocupado={ocupado}
+                    vuelo={vuelosDelCarrito[item.vueloId]}
+                    onCambiarCantidad={(pasaje, cantidad) => dispatch(cambiarCantidad({ itemId: pasaje.id, cantidad }))}
+                    onEliminar={(pasaje) => dispatch(eliminarItem(pasaje.id))}
+                    ocupado={guardando}
                   />
                 ))}
               </div>
@@ -101,7 +81,7 @@ function Carrito() {
                 aclaracion="Los precios ya incluyen los descuentos vigentes. En el próximo paso elegís cómo pagar."
                 sinAdulto={sinAdulto}
                 procesando={false}
-                bloqueado={ocupado || sinAdulto.length > 0}
+                bloqueado={guardando || sinAdulto.length > 0}
                 textoBoton="Continuar al pago"
                 enlace={{ to: '/', texto: 'Seguir buscando vuelos' }}
                 onConfirmar={() => navigate('/checkout')}
