@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, pedirPortadas } from '../api/api'
+import { useDispatch, useSelector } from 'react-redux'
 import Buscador from '../components/Buscador'
 import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
@@ -10,31 +10,27 @@ import LlamadoRegistro from '../components/inicio/LlamadoRegistro'
 import SeccionDestinos from '../components/inicio/SeccionDestinos'
 import SeccionMundo from '../components/inicio/SeccionMundo'
 import { useAuth } from '../context/AuthContext'
+import { fetchPortadas, fetchVuelosDestacados } from '../redux/vuelosSlice'
 import { argentinaDe, ATAJOS, destinosMostrados, mundoDe, ofertasDe, REGIONES } from '../utils/destinos'
-import { estaOperativo } from '../utils/vuelos'
-import { useSelector } from 'react-redux'
 import './Inicio.css'
 
 function Inicio() {
   const { estaLogueado } = useAuth()
+  const dispatch = useDispatch()
   const { aeropuertos } = useSelector((state) => state.catalogo)
+  const { vuelosDestacados: vuelos, portadas, loading, error } = useSelector((state) => state.vuelos)
 
-  const [vuelos, setVuelos] = useState([])
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
   const [region, setRegion] = useState(REGIONES[0].categoria)
-  const [portadas, setPortadas] = useState({})
 
   useEffect(() => {
-    api('/api/vuelos?page=0&size=60')
-      .then((pagina) => {
-        const operativos = pagina.content.filter((v) => estaOperativo(v) && v.hayStock)
-        setVuelos(operativos)
-        pedirPortadas(destinosMostrados(operativos).map((v) => v.id)).then((datos) => setPortadas(datos))
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setCargando(false))
-  }, [])
+    dispatch(fetchVuelosDestacados())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (vuelos.length > 0) {
+      dispatch(fetchPortadas(destinosMostrados(vuelos).map((vuelo) => vuelo.id)))
+    }
+  }, [vuelos, dispatch])
 
   const paisDe = (iata) => aeropuertos.find((a) => a.codigoIata === iata)?.pais
 
@@ -57,7 +53,7 @@ function Inicio() {
           <Mensaje>{error}</Mensaje>
         </div>
       )}
-      {cargando && <Cargando texto="Cargando vuelos…" className="contenedor" />}
+      {loading && vuelos.length === 0 && <Cargando texto="Cargando vuelos…" className="contenedor" />}
 
       {ofertas.length > 0 && (
         <SeccionDestinos

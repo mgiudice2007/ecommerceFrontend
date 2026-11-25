@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api, pedirImagen } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
@@ -13,10 +14,10 @@ import PanelCompra from '../components/detalle/PanelCompra'
 import PortadaVuelo from '../components/detalle/PortadaVuelo'
 import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
 import { useAuth } from '../context/AuthContext'
+import { fetchVuelo } from '../redux/vuelosSlice'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
 import { urlParaElegirVuelta, urlTrasLogin } from '../utils/viaje'
 import { motivoSinVenta } from '../utils/vuelos'
-import { useSelector } from 'react-redux'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
@@ -25,13 +26,15 @@ function DetalleVuelo() {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
+  const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
+  const { vueloActual, error } = useSelector((state) => state.vuelos)
 
-  const [vuelo, setVuelo] = useState(null)
+  // El store guarda el último vuelo que se pidió: solo sirve si es el de esta página
+  const vuelo = vueloActual?.id === Number(id) ? vueloActual : null
   const [imagenes, setImagenes] = useState([])
-  const [error, setError] = useState('')
 
-  const [elegida, setElegida] = useState(null)
+  const [claseElegidaId, setClaseElegidaId] = useState(null)
   const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams))
   const [claseInicial] = useState(searchParams.get('clase'))
   const [asientos, setAsientos] = useState(searchParams.get('asientos') ? searchParams.get('asientos').split(',') : [])
@@ -39,19 +42,21 @@ function DetalleVuelo() {
   const [mensaje, setMensaje] = useState(null)
 
   useEffect(() => {
-    api(`/api/vuelos/${id}`)
-      .then((data) => {
-        setVuelo(data)
-        const deLaUrl = data.disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
-        setElegida(deLaUrl ?? data.disponibilidades.find((d) => d.hayStock) ?? null)
-      })
-      .catch((err) => setError(err.message))
+    dispatch(fetchVuelo(id))
+  }, [id, dispatch])
 
+  useEffect(() => {
     api(`/api/fotos?vueloId=${id}`)
       .then((fotos) => Promise.all(fotos.map((foto) => pedirImagen(foto.id))))
       .then((data) => setImagenes(data))
       .catch(() => setImagenes([]))
-  }, [id, claseInicial])
+  }, [id])
+
+  // La clase elegida es la que tocó el usuario; si no tocó ninguna, la de la URL o la primera con lugar
+  const disponibilidades = vuelo?.disponibilidades ?? []
+  const claseDeLaUrl = disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
+  const elegida =
+    disponibilidades.find((d) => d.id === claseElegidaId) ?? claseDeLaUrl ?? disponibilidades.find((d) => d.hayStock) ?? null
 
   const [mapa, setMapa] = useState({ disponibilidadId: null, datos: null, error: '' })
   const elegidaId = elegida?.id
@@ -63,7 +68,7 @@ function DetalleVuelo() {
       .catch((err) => setMapa({ disponibilidadId: elegidaId, datos: null, error: err.message }))
   }, [elegidaId])
 
-  if (error) {
+  if (error && !vuelo) {
     return (
       <div className="contenedor pagina">
         <Mensaje>{error}</Mensaje>
@@ -83,7 +88,7 @@ function DetalleVuelo() {
   const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
 
   const elegirClase = (disponibilidad) => {
-    setElegida(disponibilidad)
+    setClaseElegidaId(disponibilidad.id)
     setAsientos([])
     setMensaje(null)
   }

@@ -56,9 +56,6 @@ export const api = (url, opciones = {}) => {
 export const pedirImagen = (fotoId) =>
   api(`/api/fotos/${fotoId}`).then((imagen) => `data:${imagen.tipo};base64,${imagen.file}`)
 
-export const pedirPortada = (vueloId) =>
-  api(`/api/fotos?vueloId=${vueloId}`).then((fotos) => (fotos.length > 0 ? pedirImagen(fotos[0].id) : null))
-
 const pedirPorId = (ids, pedir) => {
   const unicos = ids.filter((id, i) => ids.indexOf(id) === i)
   return Promise.all(unicos.map((id) => pedir(id).catch(() => null))).then((respuestas) => {
@@ -70,5 +67,4 @@ const pedirPorId = (ids, pedir) => {
   })
 }
 
-export const pedirPortadas = (vueloIds) => pedirPorId(vueloIds, pedirPortada)
 export const pedirVuelos = (vueloIds) => pedirPorId(vueloIds, (id) => api(`/api/vuelos/${id}`))

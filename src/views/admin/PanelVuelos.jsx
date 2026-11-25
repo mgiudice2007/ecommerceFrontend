@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FilaVueloPanel from '../../components/admin/FilaVueloPanel'
@@ -11,70 +11,49 @@ import GrillaNumeros from '../../components/comunes/GrillaNumeros'
 import Mensaje from '../../components/comunes/Mensaje'
 import Paginador from '../../components/comunes/Paginador'
 import { useAvisos } from '../../context/AvisosContext'
-import { asientosDe, textoEstado } from '../../utils/vuelos'
+import {
+  cambiarEstadoVuelo,
+  fetchResumenPanel,
+  fetchVuelosPanel,
+  limpiarMensaje,
+} from '../../redux/vuelosSlice'
+import { textoEstado } from '../../utils/vuelos'
 import './Panel.css'
 
-const POR_PAGINA = 20
-
 function PanelVuelos() {
+  const dispatch = useDispatch()
+  const { vuelosPanel, resumenPanel: resumen, mensaje, loading, error } = useSelector((state) => state.vuelos)
+  const { avisar } = useAvisos()
+
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
-  const [respuesta, setRespuesta] = useState({ clave: null, datos: null })
-  const [resumen, setResumen] = useState(null)
-  const [error, setError] = useState('')
-  const { avisar } = useAvisos()
   const [aEliminar, setAEliminar] = useState(null)
   const [nuevoEstado, setNuevoEstado] = useState(null)
 
   const texto = busqueda.trim()
-  const clave = `${pagina}|${texto}`
-  const cargando = respuesta.clave !== clave
-  const datos = cargando ? null : respuesta.datos
-  const vuelos = datos?.content ?? []
-  const totalPaginas = datos?.totalPages ?? 0
+  // La lista guardada en el store es la de la última página y búsqueda que se pidieron: hasta que llegue la de ahora, se espera
+  const esDeEstaPagina = vuelosPanel.pagina === pagina && vuelosPanel.texto === texto
+  const cargando = loading || !esDeEstaPagina
+  const vuelos = esDeEstaPagina ? (vuelosPanel.datos?.content ?? []) : []
+  const totalPaginas = esDeEstaPagina ? (vuelosPanel.datos?.totalPages ?? 0) : 0
 
   useEffect(() => {
-    api('/api/vuelos/resumen')
-      .then((data) => setResumen(data))
-      .catch((err) => setError(err.message))
-  }, [])
+    dispatch(fetchResumenPanel())
+  }, [dispatch])
 
   useEffect(() => {
-    const params = new URLSearchParams({ page: pagina, size: POR_PAGINA })
-    if (texto) params.set('texto', texto)
-    api(`/api/vuelos?${params.toString()}`)
-      .then((data) => setRespuesta({ clave: `${pagina}|${texto}`, datos: data }))
-      .catch((err) => setError(err.message))
-  }, [pagina, texto])
+    dispatch(fetchVuelosPanel({ pagina, texto }))
+  }, [pagina, texto, dispatch])
 
-  const cambiarLista = (nuevaLista, menos = 0) =>
-    setRespuesta({
-      clave: respuesta.clave,
-      datos: { ...respuesta.datos, content: nuevaLista, totalElements: respuesta.datos.totalElements - menos },
-    })
+  // El backend responde con un mensaje al cambiar el estado de un vuelo: se muestra como aviso y se limpia del store
+  useEffect(() => {
+    if (mensaje) {
+      avisar(mensaje)
+      dispatch(limpiarMensaje())
+    }
+  }, [mensaje, avisar, dispatch])
 
-  const cambiarEstado = (vuelo, estado) => {
-    setError('')
-    api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
-      .then((respuesta) => {
-        if (estado === 'ELIMINADO') {
-          cambiarLista(
-            vuelos.filter((v) => v.id !== vuelo.id),
-            1,
-          )
-          const asientos = asientosDe(vuelo)
-          setResumen({
-            vuelos: resumen.vuelos - 1,
-            asientosVendidos: resumen.asientosVendidos - asientos.vendidos,
-            asientosTotales: resumen.asientosTotales - asientos.totales,
-          })
-        } else {
-          cambiarLista(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
-        }
-        avisar(respuesta.mensaje)
-      })
-      .catch((err) => setError(err.message))
-  }
+  const cambiarEstado = (vuelo, estado) => dispatch(cambiarEstadoVuelo({ id: vuelo.id, estado }))
 
   const eliminar = (vuelo) => {
     setAEliminar(null)
