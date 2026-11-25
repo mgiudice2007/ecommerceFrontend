@@ -1,0 +1,76 @@
+.pasos-compra {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 0 auto 24px;
+  padding: 10px 24px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  list-style: none;
+}
+
+@media (max-width: 480px) {
+  .pasos-compra {
+    gap: 4px;
+    padding: 10px 14px;
+  }
+
+  .pasos-compra li + li::before {
+    width: 16px;
+    margin-right: 4px;
+  }
+}
+
+.pasos-compra li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pasos-compra li + li::before {
+  content: '';
+  width: 40px;
+  height: 2px;
+  margin-right: 8px;
+  background: var(--borde);
+}
+
+.pasos-compra li span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--superficie-2);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pasos-compra .paso-actual {
+  color: var(--texto);
+}
+
+.pasos-compra .paso-actual span {
+  background: var(--azul);
+  color: #fff;
+}
+
+.pasos-compra .paso-hecho {
+  color: var(--verde);
+}
+
+.pasos-compra .paso-hecho span {
+  background: var(--verde-suave);
+}
+
+.pasos-compra .paso-hecho + li::before,
+.pasos-compra .paso-actual::before {
+  background: var(--verde);
+}

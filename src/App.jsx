@@ -4,7 +4,10 @@ import Navbar from './components/Navbar'
 import RutaProtegida from './components/RutaProtegida'
 import VolverArriba from './components/VolverArriba'
 import { AuthProvider } from './context/AuthContext'
+import { AvisosProvider } from './context/AvisosContext'
 import Carrito from './views/Carrito'
+import Checkout from './views/Checkout'
+import CompraExitosa from './views/CompraExitosa'
 import DetalleOrden from './views/DetalleOrden'
 import DetalleVuelo from './views/DetalleVuelo'
 import Inicio from './views/Inicio'
@@ -23,98 +26,116 @@ import Usuarios from './views/admin/Usuarios'
 function App() {
   return (
     <AuthProvider>
-      <VolverArriba />
-      <Navbar />
+      <AvisosProvider>
+        <VolverArriba />
+        <Navbar />
 
-      <main>
-        <Routes>
-          <Route path="/" element={<Inicio />} />
-          <Route path="/vuelos" element={<Vuelos />} />
-          <Route path="/vuelos/:id" element={<DetalleVuelo />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
+        <main>
+          <Routes>
+            <Route path="/" element={<Inicio />} />
+            <Route path="/vuelos" element={<Vuelos />} />
+            <Route path="/vuelos/:id" element={<DetalleVuelo />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
 
-          <Route
-            path="/carrito"
-            element={
-              <RutaProtegida roles={['COMPRADOR']}>
-                <Carrito />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/mis-compras"
-            element={
-              <RutaProtegida roles={['COMPRADOR']}>
-                <MisCompras />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/mis-compras/:id"
-            element={
-              <RutaProtegida roles={['COMPRADOR']}>
-                <DetalleOrden />
-              </RutaProtegida>
-            }
-          />
+            <Route
+              path="/carrito"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <Carrito />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <Checkout />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/compra-exitosa/:id"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <CompraExitosa />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/mis-compras"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <MisCompras />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/mis-compras/:id"
+              element={
+                <RutaProtegida roles={['COMPRADOR']}>
+                  <DetalleOrden />
+                </RutaProtegida>
+              }
+            />
 
-          <Route
-            path="/perfil"
-            element={
-              <RutaProtegida>
-                <Perfil />
-              </RutaProtegida>
-            }
-          />
+            <Route
+              path="/perfil"
+              element={
+                <RutaProtegida>
+                  <Perfil />
+                </RutaProtegida>
+              }
+            />
 
-          <Route
-            path="/panel"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <PanelVuelos />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/panel/vuelos/nuevo"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <FormVuelo />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/panel/vuelos/:id"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <GestionVuelo />
-              </RutaProtegida>
-            }
-          />
+            <Route
+              path="/panel"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <PanelVuelos />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/panel/vuelos/nuevo"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <FormVuelo />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/panel/vuelos/:id"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <GestionVuelo />
+                </RutaProtegida>
+              }
+            />
 
-          <Route
-            path="/panel/usuarios"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <Usuarios />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/panel/administradores"
-            element={
-              <RutaProtegida roles={['ADMIN']}>
-                <CrearAdmin />
-              </RutaProtegida>
-            }
-          />
+            <Route
+              path="/panel/usuarios"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <Usuarios />
+                </RutaProtegida>
+              }
+            />
+            <Route
+              path="/panel/administradores"
+              element={
+                <RutaProtegida roles={['ADMIN']}>
+                  <CrearAdmin />
+                </RutaProtegida>
+              }
+            />
 
-          <Route path="*" element={<NoEncontrada />} />
-        </Routes>
-      </main>
+            <Route path="*" element={<NoEncontrada />} />
+          </Routes>
+        </main>
 
-      <Footer />
+        <Footer />
+      </AvisosProvider>
     </AuthProvider>
   )
 }

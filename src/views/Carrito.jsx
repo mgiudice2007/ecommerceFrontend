@@ -4,23 +4,20 @@ import { api, pedirVuelos } from '../api/api'
 import ItemCarrito from '../components/ItemCarrito'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ResumenCompra from '../components/carrito/ResumenCompra'
-import SelectorMillas from '../components/carrito/SelectorMillas'
 import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
+import PasosCompra from '../components/pago/PasosCompra'
 import { useAuth } from '../context/AuthContext'
 import { calcularMillas, textoCantidadPasajes, vuelosSinAdulto } from '../utils/carrito'
 import './Carrito.css'
 
 function Carrito() {
-  const { actualizarCarrito, recargarPerfil } = useAuth()
+  const { actualizarCarrito } = useAuth()
   const navigate = useNavigate()
   const [carrito, setCarrito] = useState(null)
-  const [comprando, setComprando] = useState(false)
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
-  const [usarMillas, setUsarMillas] = useState(false)
-  const [millasElegidas, setMillasElegidas] = useState('')
   const [vuelos, setVuelos] = useState({})
 
   useEffect(() => {
@@ -64,30 +61,9 @@ function Carrito() {
     )
   }
 
-  const calculo = calcularMillas(carrito, usarMillas, millasElegidas)
+  const calculo = calcularMillas(carrito, false, '')
   const sinAdulto = vuelosSinAdulto(carrito.items)
   const cantidadPasajes = carrito.items.reduce((total, item) => total + item.cantidad, 0)
-
-  const elegirUsarMillas = (usar) => {
-    setUsarMillas(usar)
-    setMillasElegidas(String(calculo.maximo))
-  }
-
-  const confirmarCompra = () => {
-    setComprando(true)
-    setError('')
-    const opciones = usarMillas ? { method: 'POST', body: { millas: calculo.aUsar } } : { method: 'POST' }
-    api('/api/carrito/checkout', opciones)
-      .then((orden) => {
-        actualizarCarrito({ items: [] })
-        recargarPerfil()
-        navigate(`/mis-compras/${orden.id}`, { replace: true, state: { recienComprada: true } })
-      })
-      .catch((err) => {
-        setError(err.message)
-        setComprando(false)
-      })
-  }
 
   return (
     <>
@@ -103,41 +79,35 @@ function Carrito() {
             </Link>
           </EstadoVacio>
         ) : (
-          <div className="carrito-layout">
-            <div className="carrito-items">
-              {carrito.items.map((item) => (
-                <ItemCarrito
-                  key={item.id}
-                  item={item}
-                  vuelo={vuelos[item.vueloId]}
-                  onCambiarCantidad={cambiarCantidad}
-                  onEliminar={eliminar}
-                  ocupado={ocupado}
-                />
-              ))}
-            </div>
+          <>
+            <PasosCompra actual={0} />
+            <div className="carrito-layout">
+              <div className="carrito-items">
+                {carrito.items.map((item) => (
+                  <ItemCarrito
+                    key={item.id}
+                    item={item}
+                    vuelo={vuelos[item.vueloId]}
+                    onCambiarCantidad={cambiarCantidad}
+                    onEliminar={eliminar}
+                    ocupado={ocupado}
+                  />
+                ))}
+              </div>
 
-            <ResumenCompra
-              items={carrito.items}
-              calculo={calculo}
-              selectorMillas={
-                <SelectorMillas
-                  usar={usarMillas}
-                  onUsar={elegirUsarMillas}
-                  disponibles={carrito.millasDisponibles}
-                  valorMilla={carrito.valorMilla}
-                  maximo={calculo.maximo}
-                  elegidas={millasElegidas}
-                  onElegir={setMillasElegidas}
-                  problema={calculo.problema}
-                />
-              }
-              sinAdulto={sinAdulto}
-              comprando={comprando}
-              bloqueado={ocupado || sinAdulto.length > 0 || calculo.problema !== ''}
-              onConfirmar={confirmarCompra}
-            />
-          </div>
+              <ResumenCompra
+                items={carrito.items}
+                calculo={calculo}
+                aclaracion="Los precios ya incluyen los descuentos vigentes. En el próximo paso elegís cómo pagar."
+                sinAdulto={sinAdulto}
+                procesando={false}
+                bloqueado={ocupado || sinAdulto.length > 0}
+                textoBoton="Continuar al pago"
+                enlace={{ to: '/', texto: 'Seguir buscando vuelos' }}
+                onConfirmar={() => navigate('/checkout')}
+              />
+            </div>
+          </>
         )}
       </div>
     </>

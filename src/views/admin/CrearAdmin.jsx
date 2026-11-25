@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
+import { useAvisos } from '../../context/AvisosContext'
 import { REGLA_NOMBRE, REGLA_USUARIO } from '../../utils/validaciones'
 import './Panel.css'
 import Mensaje from '../../components/comunes/Mensaje'
@@ -11,7 +12,7 @@ const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password:
 function CrearAdmin() {
   const [formData, setFormData] = useState(FORM_VACIO)
   const [error, setError] = useState('')
-  const [exito, setExito] = useState('')
+  const { avisar } = useAvisos()
   const [guardando, setGuardando] = useState(false)
 
   const handleChange = (e) => {
@@ -21,7 +22,6 @@ function CrearAdmin() {
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
-    setExito('')
     setGuardando(true)
 
     const datosAEnviar = {
@@ -33,7 +33,7 @@ function CrearAdmin() {
     }
     api('/api/auth/registro/administrador', { method: 'POST', body: datosAEnviar })
       .then((creado) => {
-        setExito(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
+        avisar(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
         setFormData(FORM_VACIO)
       })
       .catch((err) => setError(err.message))
@@ -53,7 +53,6 @@ function CrearAdmin() {
       <div className="contenedor sobre-encabezado">
         <section className="tarjeta panel-formulario">
           {error && <Mensaje>{error}</Mensaje>}
-          {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
           <form onSubmit={handleSubmit}>
             <div className="fila-campos">

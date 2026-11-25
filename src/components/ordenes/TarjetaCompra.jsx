@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { fechaLarga, hora, precio } from '../../utils/formato'
 import { textoNumerosDeVuelo } from '../../utils/ordenes'
+import { textoMedioPago } from '../../utils/pagos'
 import FotoVuelo from '../FotoVuelo'
 import EtiquetaOrden from './EtiquetaOrden'
 import './TarjetaCompra.css'
@@ -24,6 +25,7 @@ function TarjetaCompra({ orden, cancelando, onCancelar }) {
             <small>
               {fechaLarga(orden.fecha)} · {hora(orden.fecha)} hs · {pasajes} {pasajes === 1 ? 'pasaje' : 'pasajes'}
             </small>
+            {orden.medioPago && <small>Pagado con {textoMedioPago(orden).toLowerCase()}</small>}
           </div>
           <EtiquetaOrden cancelada={cancelada} />
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/api'
 import Confirmacion from '../components/Confirmacion'
 import Cargando from '../components/comunes/Cargando'
@@ -7,14 +7,14 @@ import Mensaje from '../components/comunes/Mensaje'
 import Boleto from '../components/ordenes/Boleto'
 import EncabezadoOrden from '../components/ordenes/EncabezadoOrden'
 import { useAuth } from '../context/AuthContext'
+import { useAvisos } from '../context/AvisosContext'
 import { cancelarOrden, textoCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 function DetalleOrden() {
   const { recargarPerfil } = useAuth()
+  const { avisar } = useAvisos()
   const { id } = useParams()
-  const location = useLocation()
-  const recienComprada = location.state?.recienComprada === true
 
   const [orden, setOrden] = useState(null)
   const [error, setError] = useState('')
@@ -49,6 +49,7 @@ function DetalleOrden() {
       .then((actualizada) => {
         setOrden(actualizada)
         recargarPerfil()
+        avisar(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
       })
       .catch((err) => setError(err.message))
       .finally(() => setCancelando(false))
@@ -56,7 +57,7 @@ function DetalleOrden() {
 
   return (
     <div className="contenedor pagina orden">
-      <EncabezadoOrden orden={orden} recienComprada={recienComprada && !cancelada} />
+      <EncabezadoOrden orden={orden} />
 
       {cancelada && <Mensaje>Esta compra está cancelada: los asientos se devolvieron al vuelo.</Mensaje>}
 

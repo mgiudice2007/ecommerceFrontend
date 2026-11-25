@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/api'
 import { useAuth } from '../context/AuthContext'
+import { useAvisos } from '../context/AvisosContext'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import { fechaLarga, hoy, millas } from '../utils/formato'
 import CampoFecha from '../components/CampoFecha'
@@ -20,7 +21,7 @@ function Perfil() {
   const [usuario, setUsuario] = useState(null)
   const [formData, setFormData] = useState(null)
   const [error, setError] = useState('')
-  const [exito, setExito] = useState('')
+  const { avisar } = useAvisos()
   const [guardando, setGuardando] = useState(false)
 
   const cargarFormulario = (datos) => {
@@ -42,13 +43,11 @@ function Perfil() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
-    setExito('')
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
-    setExito('')
     setGuardando(true)
 
     const datosAEnviar = {
@@ -62,7 +61,7 @@ function Perfil() {
       .then((actualizado) => {
         cargarFormulario(actualizado)
         setPerfil(actualizado)
-        setExito('Tus datos se guardaron correctamente.')
+        avisar('Tus datos se guardaron correctamente.')
       })
       .catch((err) => setError(err.message))
       .finally(() => setGuardando(false))
@@ -123,7 +122,6 @@ function Perfil() {
               </Mensaje>
             )}
             {error && <Mensaje>{error}</Mensaje>}
-            {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
             <form onSubmit={handleSubmit}>
               <div className="fila-campos">
@@ -166,7 +164,6 @@ function Perfil() {
                     value={formData.fechaNacimiento}
                     onChange={(valor) => {
                       setFormData({ ...formData, fechaNacimiento: valor })
-                      setExito('')
                     }}
                   />
                 </div>

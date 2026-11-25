@@ -1,6 +1,7 @@
 import { fechaLarga, hora, precioOGratis } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
 import { numerosDeVuelo, rotuloVuelos } from '../../utils/ordenes'
+import { textoMedioPago } from '../../utils/pagos'
 import EtiquetaOrden from './EtiquetaOrden'
 import TotalesOrden from './TotalesOrden'
 import './Boleto.css'
@@ -25,6 +26,12 @@ function Boleto({ orden }) {
             {fechaLarga(orden.fecha)} · {hora(orden.fecha)} hs
           </strong>
         </div>
+        {orden.medioPago && (
+          <div>
+            <small>Medio de pago</small>
+            <strong>{textoMedioPago(orden)}</strong>
+          </div>
+        )}
         <EtiquetaOrden cancelada={cancelada} />
       </div>
 

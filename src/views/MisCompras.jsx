@@ -8,6 +8,7 @@ import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
 import { useAuth } from '../context/AuthContext'
+import { useAvisos } from '../context/AvisosContext'
 import { cancelarOrden } from '../utils/ordenes'
 import './MisCompras.css'
 
@@ -15,7 +16,7 @@ function MisCompras() {
   const { recargarPerfil } = useAuth()
   const [ordenes, setOrdenes] = useState(null)
   const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const { avisar } = useAvisos()
   const [cancelando, setCancelando] = useState(null)
   const [aCancelar, setACancelar] = useState(null)
 
@@ -28,13 +29,12 @@ function MisCompras() {
   const cancelar = (orden) => {
     setACancelar(null)
     setError('')
-    setMensaje('')
     setCancelando(orden.id)
     cancelarOrden(orden)
       .then((actualizada) => {
         setOrdenes(ordenes.map((o) => (o.id === actualizada.id ? actualizada : o)))
         recargarPerfil()
-        setMensaje(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
+        avisar(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
       })
       .catch((err) => setError(err.message))
       .finally(() => setCancelando(null))
@@ -46,7 +46,6 @@ function MisCompras() {
 
       <div className="contenedor sobre-encabezado">
         {error && <Mensaje>{error}</Mensaje>}
-        {mensaje && <Mensaje tipo="exito">{mensaje}</Mensaje>}
 
         {!ordenes && !error && <Cargando texto="Cargando compras…" />}
 

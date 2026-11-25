@@ -184,6 +184,17 @@ h3 {
   background: var(--superficie);
 }
 
+.campo-con-error input,
+.campo-con-error select {
+  border-color: var(--rojo);
+}
+
+.campo-error {
+  color: var(--rojo);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .fila-campos {
   display: grid;
   grid-template-columns: 1fr 1fr;

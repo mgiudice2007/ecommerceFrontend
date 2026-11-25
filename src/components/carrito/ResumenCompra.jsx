@@ -6,7 +6,19 @@ import FilaTotal from '../comunes/FilaTotal'
 import Mensaje from '../comunes/Mensaje'
 import './ResumenCompra.css'
 
-function ResumenCompra({ items, calculo, selectorMillas, sinAdulto, comprando, bloqueado, onConfirmar }) {
+function ResumenCompra({
+  items,
+  calculo,
+  selectorMillas,
+  aclaracion,
+  sinAdulto,
+  procesando,
+  bloqueado,
+  textoBoton,
+  textoProcesando,
+  enlace,
+  onConfirmar,
+}) {
   return (
     <aside className="tarjeta carrito-resumen">
       <h2>Resumen de compra</h2>
@@ -26,9 +38,7 @@ function ResumenCompra({ items, calculo, selectorMillas, sinAdulto, comprando, b
 
       <FilaTotal className="carrito-resumen-total" rotulo="Total a pagar" valor={precio(calculo.aPagar)} />
       <p className="carrito-millas-gana">✈ Con esta compra sumás {millas(calculo.queSuma)} millas</p>
-      <p className="texto-suave carrito-aclaracion">
-        Los precios ya incluyen los descuentos vigentes. Al confirmar, tus asientos quedan reservados.
-      </p>
+      <p className="texto-suave carrito-aclaracion">{aclaracion}</p>
 
       {sinAdulto.length > 0 && (
         <Mensaje>
@@ -37,11 +47,11 @@ function ResumenCompra({ items, calculo, selectorMillas, sinAdulto, comprando, b
         </Mensaje>
       )}
 
-      <button className="boton boton-primario boton-ancho" onClick={onConfirmar} disabled={comprando || bloqueado}>
-        {comprando ? 'Confirmando…' : `Confirmar compra · ${precio(calculo.aPagar)}`}
+      <button className="boton boton-primario boton-ancho" onClick={onConfirmar} disabled={procesando || bloqueado}>
+        {procesando ? textoProcesando : `${textoBoton} · ${precio(calculo.aPagar)}`}
       </button>
-      <Link to="/" className="carrito-seguir">
-        Seguir buscando vuelos
+      <Link to={enlace.to} className="carrito-seguir">
+        {enlace.texto}
       </Link>
     </aside>
   )

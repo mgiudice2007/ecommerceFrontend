@@ -12,6 +12,7 @@ import TablaClases from '../../components/admin/TablaClases'
 import TablaDescuentos from '../../components/admin/TablaDescuentos'
 import Cargando from '../../components/comunes/Cargando'
 import Mensaje from '../../components/comunes/Mensaje'
+import { useAvisos } from '../../context/AvisosContext'
 import { useCatalogo } from '../../hooks/useCatalogo'
 import { useDescuentosVuelo } from '../../hooks/useDescuentosVuelo'
 import { useDisponibilidades } from '../../hooks/useDisponibilidades'
@@ -43,7 +44,17 @@ function GestionVuelo() {
   const [guardando, setGuardando] = useState(false)
   const [recargar, setRecargar] = useState(0)
 
-  const avisar = (tipo, texto) => setAviso(tipo ? { tipo, texto } : null)
+  const { avisar: mostrarAviso } = useAvisos()
+
+  // El exito sale como aviso flotante; los errores quedan arriba de la pestania, junto al formulario
+  const avisar = (tipo, texto) => {
+    if (tipo === 'exito') {
+      setAviso(null)
+      mostrarAviso(texto)
+      return
+    }
+    setAviso(tipo ? { tipo, texto } : null)
+  }
   const recargarVuelo = () => setRecargar((veces) => veces + 1)
   const opciones = { avisar, onCambio: recargarVuelo }
 
@@ -69,9 +80,10 @@ function GestionVuelo() {
     setGuardando(true)
     avisar(null)
     api(`/api/vuelos/${vuelo.id}`, { method: 'PUT', body: cuerpoVuelo(formData) })
-      .then((actualizado) =>
-        navigate('/panel', { state: { mensaje: `Se guardaron los cambios del vuelo ${actualizado.numeroVuelo}.` } }),
-      )
+      .then((actualizado) => {
+        mostrarAviso(`Se guardaron los cambios del vuelo ${actualizado.numeroVuelo}.`)
+        navigate('/panel')
+      })
       .catch((err) => {
         avisar('error', err.message)
         setGuardando(false)

@@ -1,0 +1,19 @@
+.checkout-medios {
+  min-width: 0;
+}
+
+.checkout-medios h2 {
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.checkout-detalle {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--borde);
+}
+
+.checkout-simulado {
+  margin: 24px 0 0;
+  font-size: 13px;
+}

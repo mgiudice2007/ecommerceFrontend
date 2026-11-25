@@ -1,9 +1,15 @@
-function Campo({ id, etiqueta, ayuda, className = '', children }) {
+function Campo({ id, etiqueta, ayuda, error, className = '', children }) {
   return (
-    <div className={`campo ${className}`.trim()}>
+    <div className={`campo ${error ? 'campo-con-error' : ''} ${className}`.trim()}>
       <label htmlFor={id}>{etiqueta}</label>
       {children}
-      {ayuda && <small className="texto-suave">{ayuda}</small>}
+      {error ? (
+        <small className="campo-error" id={`${id}-error`} role="alert">
+          {error}
+        </small>
+      ) : (
+        ayuda && <small className="texto-suave">{ayuda}</small>
+      )}
     </div>
   )
 }
