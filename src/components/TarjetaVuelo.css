@@ -1,8 +1,24 @@
+/* ---------- Pase de abordar ----------
+   La sombra va en el contenedor (.pase-vuelo) porque la tarjeta tiene una
+   mascara que le recorta las muescas, y la mascara tambien cortaria la sombra. */
+.pase-vuelo {
+  --talon: 230px;
+  filter: drop-shadow(0 10px 22px rgba(4, 30, 66, 0.12));
+}
+
 .tarjeta-vuelo {
   display: grid;
-  grid-template-columns: 180px 1fr 220px;
+  grid-template-columns: 180px 1fr var(--talon);
   gap: 24px;
-  padding: 16px 24px 16px 16px;
+  padding: 16px 0 16px 16px;
+  box-shadow: none;
+  /* Dos muescas redondas arriba y abajo, justo en la linea de corte del talon */
+  -webkit-mask:
+    radial-gradient(circle at calc(100% - var(--talon)) 0, #0000 13px, #000 13.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - var(--talon)) 100%, #0000 13px, #000 13.5px) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle at calc(100% - var(--talon)) 0, #0000 13px, #000 13.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - var(--talon)) 100%, #0000 13px, #000 13.5px) bottom / 100% 51% no-repeat;
 }
 
 .tarjeta-vuelo-foto {
@@ -51,10 +67,6 @@
   font-size: 18px;
 }
 
-.etiqueta-descuento {
-  background: var(--naranja-suave);
-  color: var(--naranja-oscuro);
-}
 
 .tarjeta-vuelo-fecha {
   margin: 14px 0 0;
@@ -124,7 +136,23 @@
   width: 100%;
   height: 2px;
   margin: 6px 0;
-  background: var(--borde);
+  background: repeating-linear-gradient(90deg, #b9c8da 0 6px, transparent 6px 11px);
+}
+
+/* El avioncito vuela por la ruta cuando pasas el mouse por el pase */
+.tarjeta-vuelo-linea i {
+  position: absolute;
+  top: -11px;
+  left: 6px;
+  color: var(--naranja);
+  font-size: 18px;
+  font-style: normal;
+  line-height: 1;
+  transition: left 0.9s cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.pase-vuelo:hover .tarjeta-vuelo-linea i {
+  left: calc(100% - 22px);
 }
 
 .tarjeta-vuelo-linea span::before,
@@ -169,14 +197,50 @@
 }
 
 .tarjeta-vuelo-precio {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
   gap: 2px;
-  padding-left: 24px;
-  border-left: 1px dashed var(--borde);
+  margin: -16px 0;
+  padding: 18px 22px 16px 24px;
+  border-left: 2px dashed #c9d6e6;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 154, 60, 0.16), transparent 55%),
+    #fffaf5;
   text-align: right;
+}
+
+.tarjeta-vuelo-talon {
+  align-self: stretch;
+  margin-bottom: auto;
+  padding-bottom: 8px;
+  color: var(--naranja-oscuro);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+/* Codigo de barras del talon */
+.tarjeta-vuelo-barras {
+  align-self: stretch;
+  height: 26px;
+  margin-top: 12px;
+  opacity: 0.75;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--azul-noche) 0 2px,
+    transparent 2px 4px,
+    var(--azul-noche) 4px 5px,
+    transparent 5px 8px,
+    var(--azul-noche) 8px 11px,
+    transparent 11px 13px,
+    var(--azul-noche) 13px 14px,
+    transparent 14px 17px
+  );
 }
 
 .tarjeta-vuelo-precio small {
@@ -206,6 +270,14 @@
 @media (max-width: 1180px) {
   .tarjeta-vuelo {
     grid-template-columns: 170px 1fr;
+    padding-right: 16px;
+    -webkit-mask: none;
+    mask: none;
+  }
+
+  .tarjeta-vuelo-talon,
+  .tarjeta-vuelo-barras {
+    display: none;
   }
 
   .tarjeta-vuelo-precio {
@@ -215,9 +287,10 @@
     align-items: center;
     justify-content: flex-end;
     gap: 4px 12px;
-    padding: 14px 0 0;
+    margin: 0 -16px -16px -16px;
+    padding: 14px 16px;
     border-left: none;
-    border-top: 1px dashed var(--borde);
+    border-top: 2px dashed #c9d6e6;
   }
 
   .tarjeta-vuelo-precio .boton {
@@ -240,9 +313,8 @@
 
   .tarjeta-vuelo-precio {
     align-items: stretch;
-    padding: 16px 0 0;
+    padding: 16px;
     border-left: none;
-    border-top: 1px dashed var(--borde);
     text-align: left;
   }
 

@@ -17,11 +17,6 @@
   min-width: 0;
 }
 
-.etiqueta-descuento {
-  background: var(--verde-suave);
-  color: var(--verde);
-}
-
 .detalle-subtitulo {
   margin-bottom: 16px;
   font-size: 22px;
