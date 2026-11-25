@@ -2,43 +2,22 @@ import { useState } from 'react'
 import { claseDe, rangoDePrecio } from '../../utils/clases'
 import { precio } from '../../utils/formato'
 import { sinRuedita } from '../../utils/validaciones'
-import ConfirmarPregunta from '../ConfirmarPregunta'
+import BotonConfirmar from '../comunes/BotonConfirmar'
 import SinDatos from '../comunes/SinDatos'
 import TablaGestion from '../comunes/TablaGestion'
 
 function TablaClases({ vuelo, clases, guardando, onGuardar, onEliminar }) {
   const [editando, setEditando] = useState(null)
-  const [pregunta, setPregunta] = useState(null)
 
   const guardarEdicion = (disponibilidad) => {
-    const detalle = []
-    if (Number(editando.asientosTotales) !== disponibilidad.asientosTotales) {
-      detalle.push(`Asientos: ${disponibilidad.asientosTotales} → ${editando.asientosTotales}`)
-    }
-    if (Number(editando.precio) !== Number(disponibilidad.precio)) {
-      detalle.push(`Precio por pasajero: ${precio(disponibilidad.precio)} → ${precio(editando.precio)}`)
-    }
-    if (detalle.length === 0) {
+    const sinCambios =
+      Number(editando.asientosTotales) === disponibilidad.asientosTotales &&
+      Number(editando.precio) === Number(disponibilidad.precio)
+    if (sinCambios) {
       setEditando(null)
       return
     }
-    setPregunta({
-      titulo: `¿Guardar los cambios de la clase ${disponibilidad.claseNombre}?`,
-      detalle,
-      textoConfirmar: 'Sí, guardar',
-      accion: () => onGuardar(disponibilidad, editando).then((ok) => ok && setEditando(null)),
-    })
-  }
-
-  const preguntarEliminar = (disponibilidad) => {
-    setPregunta({
-      titulo: `¿Eliminar la clase ${disponibilidad.claseNombre} de este vuelo?`,
-      mensaje:
-        'Si estaba en el carrito de algún pasajero, se saca de su carrito. Si ya tiene compras, no se puede eliminar.',
-      textoConfirmar: 'Sí, eliminar',
-      peligro: true,
-      accion: () => onEliminar(disponibilidad),
-    })
+    onGuardar(disponibilidad, editando).then((ok) => ok && setEditando(null))
   }
 
   return (
@@ -119,9 +98,7 @@ function TablaClases({ vuelo, clases, guardando, onGuardar, onEliminar }) {
                       >
                         Editar
                       </button>
-                      <button className="boton boton-peligro" onClick={() => preguntarEliminar(d)} disabled={guardando}>
-                        Eliminar
-                      </button>
+                      <BotonConfirmar texto="Eliminar" disabled={guardando} onConfirmar={() => onEliminar(d)} />
                     </>
                   )}
                 </td>
@@ -130,8 +107,6 @@ function TablaClases({ vuelo, clases, guardando, onGuardar, onEliminar }) {
           })}
         </TablaGestion>
       )}
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

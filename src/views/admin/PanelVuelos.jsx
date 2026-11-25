@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
 import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
@@ -10,6 +10,7 @@ import EstadoVacio from '../../components/comunes/EstadoVacio'
 import GrillaNumeros from '../../components/comunes/GrillaNumeros'
 import Mensaje from '../../components/comunes/Mensaje'
 import Paginador from '../../components/comunes/Paginador'
+import { useAvisos } from '../../context/AvisosContext'
 import { asientosDe, textoEstado } from '../../utils/vuelos'
 import './Panel.css'
 
@@ -21,8 +22,7 @@ function PanelVuelos() {
   const [respuesta, setRespuesta] = useState({ clave: null, datos: null })
   const [resumen, setResumen] = useState(null)
   const [error, setError] = useState('')
-  const location = useLocation()
-  const [mensaje, setMensaje] = useState(location.state?.mensaje ?? '')
+  const { avisar } = useAvisos()
   const [aEliminar, setAEliminar] = useState(null)
   const [nuevoEstado, setNuevoEstado] = useState(null)
 
@@ -55,7 +55,6 @@ function PanelVuelos() {
 
   const cambiarEstado = (vuelo, estado) => {
     setError('')
-    setMensaje('')
     api(`/api/vuelos/${vuelo.id}/estado`, { method: 'PATCH', body: { estado } })
       .then((respuesta) => {
         if (estado === 'ELIMINADO') {
@@ -72,7 +71,7 @@ function PanelVuelos() {
         } else {
           cambiarLista(vuelos.map((v) => (v.id === vuelo.id ? { ...v, estado: respuesta.estado } : v)))
         }
-        setMensaje(respuesta.mensaje)
+        avisar(respuesta.mensaje)
       })
       .catch((err) => setError(err.message))
   }
@@ -112,7 +111,6 @@ function PanelVuelos() {
         )}
 
         {error && <Mensaje>{error}</Mensaje>}
-        {mensaje && <Mensaje tipo="exito">{mensaje}</Mensaje>}
         {resumen?.vuelos === 0 && (
           <EstadoVacio
             titulo="Todavía no publicaste vuelos"
@@ -149,7 +147,9 @@ function PanelVuelos() {
             <FilaVueloPanel
               key={vuelo.id}
               vuelo={vuelo}
-              onCambiarEstado={(v, estado) => setNuevoEstado({ vuelo: v, estado })}
+              onCambiarEstado={(v, estado) =>
+                estado === 'CANCELADO' ? setNuevoEstado({ vuelo: v, estado }) : cambiarEstado(v, estado)
+              }
               onEliminar={setAEliminar}
             />
           ))}
@@ -160,10 +160,10 @@ function PanelVuelos() {
 
       {nuevoEstado && (
         <Confirmacion
-          titulo={`¿Cambiar el vuelo ${nuevoEstado.vuelo.numeroVuelo} a ${textoEstado(nuevoEstado.estado)}?`}
+          titulo={`¿Cancelar el vuelo ${nuevoEstado.vuelo.numeroVuelo}?`}
           detalle={[`Estado: ${textoEstado(nuevoEstado.vuelo.estado)} → ${textoEstado(nuevoEstado.estado)}`]}
-          textoConfirmar="Sí, cambiar"
-          peligro={nuevoEstado.estado === 'CANCELADO'}
+          textoConfirmar="Sí, cancelar vuelo"
+          peligro
           onConfirmar={() => {
             cambiarEstado(nuevoEstado.vuelo, nuevoEstado.estado)
             setNuevoEstado(null)

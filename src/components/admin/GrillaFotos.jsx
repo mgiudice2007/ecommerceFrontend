@@ -1,22 +1,9 @@
-import { useState } from 'react'
-import ConfirmarPregunta from '../ConfirmarPregunta'
+import BotonConfirmar from '../comunes/BotonConfirmar'
 import Etiqueta from '../comunes/Etiqueta'
 import SinDatos from '../comunes/SinDatos'
 import './GrillaFotos.css'
 
 function GrillaFotos({ fotos, imagenes, maximo, onEliminar }) {
-  const [pregunta, setPregunta] = useState(null)
-
-  const preguntarEliminar = (foto) => {
-    setPregunta({
-      titulo: '¿Eliminar esta foto?',
-      mensaje: 'Deja de mostrarse en la página del vuelo.',
-      textoConfirmar: 'Sí, eliminar',
-      peligro: true,
-      accion: () => onEliminar(foto),
-    })
-  }
-
   return (
     <section className="tarjeta">
       <h2>
@@ -34,14 +21,12 @@ function GrillaFotos({ fotos, imagenes, maximo, onEliminar }) {
               {indice === 0 && <Etiqueta>Portada</Etiqueta>}
               <div>
                 <span className="texto-suave">{Math.round(foto.tamano / 1024)} KB</span>
-                <button onClick={() => preguntarEliminar(foto)}>Eliminar</button>
+                <BotonConfirmar texto="Eliminar" className="gestion-foto-eliminar" onConfirmar={() => onEliminar(foto)} />
               </div>
             </figure>
           ))}
         </div>
       )}
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

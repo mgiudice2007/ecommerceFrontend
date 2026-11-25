@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api/api'
-import Confirmacion from '../../components/Confirmacion'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import Cargando from '../../components/comunes/Cargando'
 import GrillaNumeros from '../../components/comunes/GrillaNumeros'
@@ -10,6 +9,7 @@ import SinDatos from '../../components/comunes/SinDatos'
 import FiltrosUsuarios from '../../components/usuarios/FiltrosUsuarios'
 import TablaUsuarios from '../../components/usuarios/TablaUsuarios'
 import { useAuth } from '../../context/AuthContext'
+import { useAvisos } from '../../context/AvisosContext'
 import { nombreDeRol, ROLES } from '../../utils/roles'
 import './Panel.css'
 
@@ -21,9 +21,8 @@ function Usuarios() {
   const [busqueda, setBusqueda] = useState('')
   const [filtroRol, setFiltroRol] = useState('')
   const [error, setError] = useState('')
-  const [exito, setExito] = useState('')
+  const { avisar } = useAvisos()
   const [guardando, setGuardando] = useState(null)
-  const [aGuardar, setAGuardar] = useState(null)
 
   useEffect(() => {
     api('/api/usuarios')
@@ -32,7 +31,6 @@ function Usuarios() {
   }, [])
 
   const elegirRol = (usuario, rol) => {
-    setExito('')
     const nuevos = { ...cambios }
     if (rol === usuario.rol) delete nuevos[usuario.id]
     else nuevos[usuario.id] = rol
@@ -42,9 +40,7 @@ function Usuarios() {
   const guardar = (usuario) => {
     const rol = cambios[usuario.id]
     const nombreRol = nombreDeRol(rol)
-    setAGuardar(null)
     setError('')
-    setExito('')
     setGuardando(usuario.id)
     api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
       .then((actualizado) => {
@@ -52,7 +48,7 @@ function Usuarios() {
         const pendientes = { ...cambios }
         delete pendientes[usuario.id]
         setCambios(pendientes)
-        setExito(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
+        avisar(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
       })
       .catch((err) => setError(err.message))
       .finally(() => setGuardando(null))
@@ -91,7 +87,6 @@ function Usuarios() {
         )}
 
         {error && <Mensaje>{error}</Mensaje>}
-        {exito && <Mensaje tipo="exito">{exito}</Mensaje>}
 
         <section className="tarjeta">
           <FiltrosUsuarios
@@ -113,21 +108,11 @@ function Usuarios() {
               cambios={cambios}
               guardando={guardando}
               onElegirRol={elegirRol}
-              onGuardar={setAGuardar}
+              onGuardar={guardar}
             />
           )}
         </section>
       </div>
-
-      {aGuardar && (
-        <Confirmacion
-          titulo="¿Cambiar el rol?"
-          mensaje={`${aGuardar.username} va a pasar a ser ${nombreDeRol(cambios[aGuardar.id])}.`}
-          textoConfirmar="Sí, cambiar"
-          onConfirmar={() => guardar(aGuardar)}
-          onCancelar={() => setAGuardar(null)}
-        />
-      )}
     </>
   )
 }

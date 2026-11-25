@@ -1,28 +1,20 @@
 import { useState } from 'react'
 import { claseDe, rangoDePrecio, textoRango } from '../../utils/clases'
-import { precio } from '../../utils/formato'
 import { sinRuedita } from '../../utils/validaciones'
-import ConfirmarPregunta from '../ConfirmarPregunta'
 import Campo from '../comunes/Campo'
 
 const FORM_VACIO = { claseId: '', asientosTotales: '', precio: '' }
 
 function FormClase({ vuelo, clases, guardando, onAgregar }) {
   const [nueva, setNueva] = useState(FORM_VACIO)
-  const [pregunta, setPregunta] = useState(null)
 
   const clasesLibres = clases.filter((c) => !vuelo.disponibilidades.some((d) => d.claseId === c.id))
   const claseNueva = claseDe(clases, nueva.claseId)
   const rango = rangoDePrecio(vuelo, clases, nueva.claseId, null)
 
-  const pedirConfirmacion = (e) => {
+  const agregar = (e) => {
     e.preventDefault()
-    setPregunta({
-      titulo: `¿Agregar la clase ${claseNueva?.nombre ?? ''}?`,
-      detalle: [`Asientos: ${nueva.asientosTotales}`, `Precio por pasajero: ${precio(nueva.precio)}`],
-      textoConfirmar: 'Sí, agregar',
-      accion: () => onAgregar(nueva).then((ok) => ok && setNueva(FORM_VACIO)),
-    })
+    onAgregar(nueva).then((ok) => ok && setNueva(FORM_VACIO))
   }
 
   return (
@@ -31,7 +23,7 @@ function FormClase({ vuelo, clases, guardando, onAgregar }) {
       {clasesLibres.length === 0 ? (
         <p className="texto-suave">El vuelo ya tiene todas las clases cargadas.</p>
       ) : (
-        <form onSubmit={pedirConfirmacion}>
+        <form onSubmit={agregar}>
           <Campo id="claseId" etiqueta="Clase">
             <select
               id="claseId"
@@ -84,8 +76,6 @@ function FormClase({ vuelo, clases, guardando, onAgregar }) {
           </button>
         </form>
       )}
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

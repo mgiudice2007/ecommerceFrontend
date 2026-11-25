@@ -1,33 +1,21 @@
 import { useState } from 'react'
-import { textoValorDescuento } from '../../utils/descuentos'
-import { fechaDeDia, hoy } from '../../utils/formato'
+import { hoy } from '../../utils/formato'
 import { sinRuedita } from '../../utils/validaciones'
 import CampoFecha from '../CampoFecha'
-import ConfirmarPregunta from '../ConfirmarPregunta'
 import Campo from '../comunes/Campo'
 
 const formVacio = () => ({ tipoDescuento: 'PORCENTAJE', valor: '', fechaDesde: hoy(), fechaHasta: '' })
 
 function FormDescuento({ diaDelVuelo, guardando, onCrear, onError }) {
   const [nuevo, setNuevo] = useState(formVacio)
-  const [pregunta, setPregunta] = useState(null)
 
-  const pedirConfirmacion = (e) => {
+  const crear = (e) => {
     e.preventDefault()
     if (!nuevo.fechaDesde || !nuevo.fechaHasta) {
       onError('Completá las fechas del descuento')
       return
     }
-    setPregunta({
-      titulo: '¿Crear este descuento?',
-      detalle: [
-        `Descuento: ${textoValorDescuento({ ...nuevo, valor: Number(nuevo.valor) })} OFF`,
-        `Desde: ${fechaDeDia(nuevo.fechaDesde)}`,
-        `Hasta: ${fechaDeDia(nuevo.fechaHasta)}`,
-      ],
-      textoConfirmar: 'Sí, crear',
-      accion: () => onCrear(nuevo).then((ok) => ok && setNuevo(formVacio())),
-    })
+    onCrear(nuevo).then((ok) => ok && setNuevo(formVacio()))
   }
 
   const esPorcentaje = nuevo.tipoDescuento === 'PORCENTAJE'
@@ -35,7 +23,7 @@ function FormDescuento({ diaDelVuelo, guardando, onCrear, onError }) {
   return (
     <section className="tarjeta">
       <h2>Nuevo descuento</h2>
-      <form onSubmit={pedirConfirmacion}>
+      <form onSubmit={crear}>
         <Campo id="tipoDescuento" etiqueta="Tipo">
           <select
             id="tipoDescuento"
@@ -86,8 +74,6 @@ function FormDescuento({ diaDelVuelo, guardando, onCrear, onError }) {
           Crear descuento
         </button>
       </form>
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

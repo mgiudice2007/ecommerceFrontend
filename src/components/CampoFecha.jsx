@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import './CampoFecha.css'
 
 const dosDigitos = (n) => String(n).padStart(2, '0')
@@ -26,6 +26,7 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
   const minutos = conHora && value ? value.slice(14, 16) : '00'
   const opcionesMinutos = MINUTOS.includes(minutos) ? MINUTOS : [...MINUTOS, minutos].sort()
 
+  const calendario = useRef(null)
   const [escrito, setEscrito] = useState(null)
   const [problema, setProblema] = useState('')
 
@@ -59,7 +60,7 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     avisar(e.target.value, hora, minutos)
   }
 
-  const abrirCalendario = () => document.getElementById(`${id}-calendario`).showPicker()
+  const abrirCalendario = () => calendario.current.showPicker()
 
   return (
     <div className="campo-fecha">
@@ -82,7 +83,7 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
           </svg>
         </button>
         <input
-          id={`${id}-calendario`}
+          ref={calendario}
           className="campo-fecha-nativo"
           type="date"
           tabIndex={-1}

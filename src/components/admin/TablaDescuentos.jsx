@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { fechaDeDia, hoy } from '../../utils/formato'
 import { textoValorDescuento } from '../../utils/descuentos'
-import ConfirmarPregunta from '../ConfirmarPregunta'
+import BotonConfirmar from '../comunes/BotonConfirmar'
 import Etiqueta from '../comunes/Etiqueta'
 import SinDatos from '../comunes/SinDatos'
 import TablaGestion from '../comunes/TablaGestion'
@@ -14,29 +13,6 @@ function EstadoDescuento({ descuento }) {
 }
 
 function TablaDescuentos({ descuentos, guardando, onAlternar, onEliminar }) {
-  const [pregunta, setPregunta] = useState(null)
-
-  const preguntarAlternar = (d) => {
-    setPregunta({
-      titulo: `¿${d.activo ? 'Pausar' : 'Activar'} el descuento de ${textoValorDescuento(d)}?`,
-      mensaje: d.activo
-        ? 'Mientras esté pausado no se aplica al precio del vuelo.'
-        : 'Vuelve a aplicarse al precio del vuelo en sus fechas.',
-      textoConfirmar: d.activo ? 'Sí, pausar' : 'Sí, activar',
-      accion: () => onAlternar(d),
-    })
-  }
-
-  const preguntarEliminar = (d) => {
-    setPregunta({
-      titulo: '¿Eliminar este descuento?',
-      mensaje: 'Las compras ya hechas mantienen su precio.',
-      textoConfirmar: 'Sí, eliminar',
-      peligro: true,
-      accion: () => onEliminar(d),
-    })
-  }
-
   return (
     <section className="tarjeta">
       <h2>Descuentos del vuelo</h2>
@@ -59,19 +35,15 @@ function TablaDescuentos({ descuentos, guardando, onAlternar, onEliminar }) {
                 <EstadoDescuento descuento={d} />
               </td>
               <td className="acciones">
-                <button className="boton boton-secundario" onClick={() => preguntarAlternar(d)} disabled={guardando}>
+                <button className="boton boton-secundario" onClick={() => onAlternar(d)} disabled={guardando}>
                   {d.activo ? 'Pausar' : 'Activar'}
                 </button>
-                <button className="boton boton-peligro" onClick={() => preguntarEliminar(d)} disabled={guardando}>
-                  Eliminar
-                </button>
+                <BotonConfirmar texto="Eliminar" disabled={guardando} onConfirmar={() => onEliminar(d)} />
               </td>
             </tr>
           ))}
         </TablaGestion>
       )}
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

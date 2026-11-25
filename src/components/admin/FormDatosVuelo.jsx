@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { datosDeVuelo, problemaEnVuelo } from '../../utils/vuelos'
-import ConfirmarPregunta from '../ConfirmarPregunta'
 import Mensaje from '../comunes/Mensaje'
 import CamposVuelo from './CamposVuelo'
 
@@ -9,7 +8,6 @@ const fechaHora = (valor) => `${valor.slice(8, 10)}/${valor.slice(5, 7)}/${valor
 function FormDatosVuelo({ vuelo, aeropuertos, categorias, guardando, onGuardar }) {
   const original = datosDeVuelo(vuelo)
   const [formData, setFormData] = useState(original)
-  const [pregunta, setPregunta] = useState(null)
   const [error, setError] = useState('')
 
   const nombreAeropuerto = (iata) => {
@@ -28,39 +26,35 @@ function FormDatosVuelo({ vuelo, aeropuertos, categorias, guardando, onGuardar }
     { clave: 'descripcion', nombre: 'Descripción', mostrar: (v) => (v ? `"${v}"` : '(vacía)') },
   ]
 
-  const pedirConfirmacion = (e) => {
+  // El resumen de lo que se modificó se ve en la misma tarjeta, sin pedir confirmación aparte
+  const cambios = CAMPOS.filter((c) => String(formData[c.clave]) !== String(original[c.clave])).map(
+    (c) => `${c.nombre}: ${c.mostrar(original[c.clave])} → ${c.mostrar(formData[c.clave])}`,
+  )
+
+  const guardar = (e) => {
     e.preventDefault()
     const problema = problemaEnVuelo(formData)
     setError(problema)
     if (problema) return
 
-    const cambios = CAMPOS.filter((c) => String(formData[c.clave]) !== String(original[c.clave])).map(
-      (c) => `${c.nombre}: ${c.mostrar(original[c.clave])} → ${c.mostrar(formData[c.clave])}`,
-    )
     if (cambios.length === 0) {
       setError('No hay cambios para guardar.')
       return
     }
-    setPregunta({
-      titulo: `¿Guardar los cambios del vuelo ${vuelo.numeroVuelo}?`,
-      mensaje: 'Esto es lo que va a cambiar:',
-      detalle: cambios,
-      textoConfirmar: 'Sí, guardar',
-      accion: () => onGuardar(formData),
-    })
+    onGuardar(formData)
   }
 
   return (
     <section className="tarjeta panel-formulario">
       <h2>Datos del vuelo</h2>
       <p className="texto-suave">
-        Cambiá solo lo que necesites. Antes de guardar vas a ver un resumen de los cambios. Las compras ya hechas no
+        Cambiá solo lo que necesites. Abajo ves un resumen de lo que modificaste antes de guardar. Las compras ya hechas no
         cambian.
       </p>
 
       {error && <Mensaje>{error}</Mensaje>}
 
-      <form onSubmit={pedirConfirmacion}>
+      <form onSubmit={guardar}>
         <CamposVuelo
           formData={formData}
           setFormData={(datos) => {
@@ -70,6 +64,17 @@ function FormDatosVuelo({ vuelo, aeropuertos, categorias, guardando, onGuardar }
           aeropuertos={aeropuertos}
           categorias={categorias}
         />
+
+        {cambios.length > 0 && (
+          <div className="panel-cambios">
+            <strong>Cambios sin guardar:</strong>
+            <ul>
+              {cambios.map((cambio) => (
+                <li key={cambio}>{cambio}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="panel-botones">
           <button className="boton boton-primario" disabled={guardando}>
@@ -87,8 +92,6 @@ function FormDatosVuelo({ vuelo, aeropuertos, categorias, guardando, onGuardar }
           </button>
         </div>
       </form>
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

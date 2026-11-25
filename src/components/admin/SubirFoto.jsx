@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import ConfirmarPregunta from '../ConfirmarPregunta'
 import Campo from '../comunes/Campo'
 
 const MAXIMO_MB = 5
 
 function SubirFoto({ lleno, maximo, subiendo, onSubir, onError }) {
   const [archivo, setArchivo] = useState(null)
-  const [pregunta, setPregunta] = useState(null)
 
   const elegirArchivo = (e) => {
     const elegido = e.target.files[0] ?? null
@@ -19,21 +17,14 @@ function SubirFoto({ lleno, maximo, subiendo, onSubir, onError }) {
     setArchivo(elegido)
   }
 
-  const pedirConfirmacion = (e) => {
+  const subir = (e) => {
     e.preventDefault()
     if (!archivo) return
     const formulario = e.target
-    setPregunta({
-      titulo: '¿Subir esta foto?',
-      mensaje: 'Se va a ver en la página del vuelo.',
-      detalle: [`Archivo: ${archivo.name}`, `Tamaño: ${Math.round(archivo.size / 1024)} KB`],
-      textoConfirmar: 'Sí, subir',
-      accion: () =>
-        onSubir(archivo).then((ok) => {
-          if (!ok) return
-          setArchivo(null)
-          formulario.reset()
-        }),
+    onSubir(archivo).then((ok) => {
+      if (!ok) return
+      setArchivo(null)
+      formulario.reset()
     })
   }
 
@@ -43,7 +34,7 @@ function SubirFoto({ lleno, maximo, subiendo, onSubir, onError }) {
       {lleno ? (
         <p className="texto-suave">Llegaste al máximo de {maximo} fotos. Eliminá una para subir otra.</p>
       ) : (
-        <form onSubmit={pedirConfirmacion}>
+        <form onSubmit={subir}>
           <Campo id="archivo" etiqueta={`Imagen (JPG, PNG o WEBP, hasta ${MAXIMO_MB} MB)`}>
             <input id="archivo" type="file" accept="image/*" onChange={elegirArchivo} />
           </Campo>
@@ -52,8 +43,6 @@ function SubirFoto({ lleno, maximo, subiendo, onSubir, onError }) {
           </button>
         </form>
       )}
-
-      <ConfirmarPregunta pregunta={pregunta} onCerrar={() => setPregunta(null)} />
     </section>
   )
 }

@@ -1,0 +1,28 @@
+.boton-confirmar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.boton-confirmar button {
+  padding: 6px 12px;
+  border-radius: var(--radio);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boton-confirmar-si {
+  border: 1px solid var(--rojo);
+  background: var(--rojo);
+  color: #ffffff;
+}
+
+.boton-confirmar-no {
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto);
+}
