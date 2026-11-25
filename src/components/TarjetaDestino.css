@@ -3,10 +3,10 @@
   display: block;
   height: 340px;
   overflow: hidden;
-  /* Postal de correo aereo: el borde tiene las rayas rojas y azules de los sobres */
+  /* Postal de correo aereo: rayas de sobre "air mail" con los colores de la pagina */
   border: 6px solid transparent;
   background:
-    repeating-linear-gradient(135deg, #d0342c 0 12px, #fff 12px 22px, #0057b8 22px 34px, #fff 34px 44px) border-box;
+    repeating-linear-gradient(135deg, #ff8a3d 0 12px, #fff 12px 22px, #041e42 22px 34px, #fff 34px 44px) border-box;
   border-radius: var(--radio-grande);
   box-shadow: var(--sombra);
   color: #fff;
