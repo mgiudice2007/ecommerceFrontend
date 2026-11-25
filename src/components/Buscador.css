@@ -119,6 +119,21 @@
   font-size: 16px;
 }
 
+/* El boton principal "brilla" solo cada tanto para llamar la atencion */
+.buscador-boton::after {
+  animation: brillo-cada-tanto 4.5s ease-out 1.5s infinite;
+}
+
+@keyframes brillo-cada-tanto {
+  0% {
+    left: -60%;
+  }
+  22%,
+  100% {
+    left: 130%;
+  }
+}
+
 @media (max-width: 860px) {
 .buscador-fila {
     grid-template-columns: 1fr;

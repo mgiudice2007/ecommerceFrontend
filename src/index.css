@@ -119,6 +119,8 @@ h3 {
 }
 
 .boton-accion {
+  position: relative;
+  overflow: hidden;
   background: var(--degradado-atardecer);
   color: #fff;
   box-shadow: 0 6px 18px rgba(242, 96, 12, 0.28);
@@ -357,6 +359,29 @@ h3 {
 .etiqueta-cancelada {
   background: var(--rojo-suave);
   color: var(--rojo);
+}
+
+/* Brillo que recorre los botones naranjas al pasar el mouse */
+.boton-accion::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.boton-accion:hover:not(:disabled)::after {
+  animation: brillo 0.7s ease-out;
+}
+
+@keyframes brillo {
+  to {
+    left: 130%;
+  }
 }
 
 /* ---------- Animaciones ---------- */

@@ -10,6 +10,7 @@
 }
 
 .logo-icono {
+  overflow: hidden;
   display: grid;
   place-items: center;
   width: 36px;
@@ -47,4 +48,27 @@
 .logo-claro .logo-texto strong,
 .logo-claro .logo-texto small {
   color: #fff;
+}
+
+/* Al pasar el mouse el avion del logo despega y vuelve a entrar */
+.logo:hover .logo-icono svg {
+  animation: despegar 0.8s ease-in-out;
+}
+
+@keyframes despegar {
+  0% {
+    transform: translate(0, 0);
+  }
+  45% {
+    transform: translate(22px, -18px) rotate(-20deg);
+    opacity: 0;
+  }
+  46% {
+    transform: translate(-22px, 18px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
 }

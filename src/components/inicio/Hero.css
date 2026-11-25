@@ -3,8 +3,158 @@
   padding: 96px 0 150px;
   background-size: cover;
   background-position: center 40%;
+  overflow: hidden;
   color: #fff;
   isolation: isolate;
+  animation: hero-acercar 24s ease-in-out infinite alternate;
+}
+
+/* La foto se acerca y se mueve muy despacio, como una camara */
+@keyframes hero-acercar {
+  from {
+    background-size: 100% auto;
+    background-position: center 40%;
+  }
+  to {
+    background-size: 112% auto;
+    background-position: 60% 30%;
+  }
+}
+
+.hero-cielo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Aviones con estela: cruzan de izquierda a derecha subiendo un poco */
+.hero-avion {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  opacity: 0;
+  animation: cruzar linear infinite;
+}
+
+.hero-avion svg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+/* La estela es una linea que se desvanece hacia atras */
+.hero-avion::before {
+  content: '';
+  width: 220px;
+  height: 2px;
+  margin-right: -2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55));
+}
+
+.hero-avion.a1 {
+  top: 22%;
+  animation-duration: 14s;
+}
+
+.hero-avion.a2 {
+  top: 58%;
+  animation-duration: 19s;
+  animation-delay: 6s;
+}
+
+.hero-avion.a2 svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hero-avion.a2::before {
+  width: 140px;
+}
+
+.hero-avion.a2 svg,
+.hero-avion.a3 svg {
+  color: #ffcf9a;
+}
+
+.hero-avion.a3 {
+  top: 12%;
+  animation-duration: 23s;
+  animation-delay: 11s;
+}
+
+@keyframes cruzar {
+  0% {
+    opacity: 0;
+    transform: translate(-260px, 40px) rotate(-6deg);
+  }
+  8% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(110vw, -40px) rotate(-6deg);
+  }
+}
+
+/* Nubes: manchas blancas difusas que pasan muy lento */
+.hero-nube {
+  position: absolute;
+  width: 420px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.28), transparent 70%);
+  filter: blur(8px);
+  animation: nube 60s linear infinite;
+}
+
+.hero-nube.n1 {
+  top: 8%;
+  animation-delay: -10s;
+}
+
+.hero-nube.n2 {
+  top: 45%;
+  width: 560px;
+  animation-duration: 80s;
+  animation-delay: -45s;
+}
+
+.hero-nube.n3 {
+  top: 70%;
+  width: 360px;
+  animation-duration: 70s;
+  animation-delay: -25s;
+}
+
+@keyframes nube {
+  from {
+    transform: translateX(-600px);
+  }
+  to {
+    transform: translateX(110vw);
+  }
+}
+
+/* El texto del hero entra por partes */
+.inicio-hero-chip,
+.inicio-hero h1,
+.inicio-hero p {
+  animation: aparecer 0.7s ease-out backwards;
+}
+
+.inicio-hero h1 {
+  animation-delay: 0.12s;
+}
+
+.inicio-hero p {
+  animation-delay: 0.24s;
 }
 
 .inicio-hero::before {
