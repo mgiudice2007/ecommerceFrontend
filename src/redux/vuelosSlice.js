@@ -59,6 +59,17 @@ export const fetchVuelosPanel = createAsyncThunk('vuelos/fetchVuelosPanel', asyn
   return { pagina, texto, datos: data }
 })
 
+export const crearVuelo = createAsyncThunk('vuelos/crearVuelo', async (vuelo) => {
+  const { data } = await clienteApi.post('/api/vuelos', vuelo)
+  return data
+})
+
+// El id va solo en la URL: lo que se manda en el cuerpo son los datos que el administrador puede editar
+export const editarVuelo = createAsyncThunk('vuelos/editarVuelo', async ({ id, vuelo }) => {
+  const { data } = await clienteApi.put(`/api/vuelos/${id}`, vuelo)
+  return data
+})
+
 export const cambiarEstadoVuelo = createAsyncThunk('vuelos/cambiarEstadoVuelo', async ({ id, estado }) => {
   const { data } = await clienteApi.patch(`/api/vuelos/${id}/estado`, { estado })
   return { id, ...data }
@@ -73,6 +84,7 @@ const vuelosSlice = createSlice({
     vueloActual: null,
     vuelosPanel: { pagina: 0, texto: '', datos: null },
     resumenPanel: null,
+    vueloGuardado: null,
     mensaje: null,
     loading: false,
     error: null,
@@ -80,6 +92,11 @@ const vuelosSlice = createSlice({
   reducers: {
     limpiarMensaje: (state) => {
       state.mensaje = null
+    },
+    // Al abrir un formulario o al terminar de usar el vuelo guardado: se borra el resultado y el error de la vez anterior
+    reiniciarGuardado: (state) => {
+      state.vueloGuardado = null
+      state.error = null
     },
   },
   extraReducers: (builder) => {
@@ -145,6 +162,39 @@ const vuelosSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+      .addCase(crearVuelo.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(crearVuelo.fulfilled, (state, action) => {
+        state.loading = false
+        state.vueloGuardado = action.payload
+      })
+      .addCase(crearVuelo.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+      .addCase(editarVuelo.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      // El backend devuelve el vuelo ya editado: reemplaza al que hubiera en el panel o en el detalle, sin volver a pedirlo
+      .addCase(editarVuelo.fulfilled, (state, action) => {
+        state.loading = false
+        state.vueloGuardado = action.payload
+        if (state.vueloActual?.id === action.payload.id) {
+          state.vueloActual = action.payload
+        }
+        const lista = state.vuelosPanel.datos?.content
+        const indice = lista ? lista.findIndex((vuelo) => vuelo.id === action.payload.id) : -1
+        if (indice !== -1) {
+          lista[indice] = action.payload
+        }
+      })
+      .addCase(editarVuelo.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
       .addCase(cambiarEstadoVuelo.pending, (state) => {
         state.error = null
       })
@@ -173,5 +223,5 @@ const vuelosSlice = createSlice({
   },
 })
 
-export const { limpiarMensaje } = vuelosSlice.actions
+export const { limpiarMensaje, reiniciarGuardado } = vuelosSlice.actions
 export default vuelosSlice.reducer

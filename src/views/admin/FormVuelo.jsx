@@ -1,35 +1,45 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import CamposVuelo from '../../components/admin/CamposVuelo'
 import Mensaje from '../../components/comunes/Mensaje'
-import { useSelector } from 'react-redux'
+import { crearVuelo, reiniciarGuardado } from '../../redux/vuelosSlice'
 import { cuerpoVuelo, FORM_VUELO_VACIO, problemaEnVuelo } from '../../utils/vuelos'
 import './Panel.css'
 
 function FormVuelo() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { aeropuertos, categorias } = useSelector((state) => state.catalogo)
+  const { vueloGuardado, loading: guardando, error: errorDelBackend } = useSelector((state) => state.vuelos)
 
   const [formData, setFormData] = useState(FORM_VUELO_VACIO)
-  const [guardando, setGuardando] = useState(false)
-  const [error, setError] = useState('')
+  const [problema, setProblema] = useState('')
+
+  // Al abrir el formulario no puede quedar el error de otra pantalla
+  useEffect(() => {
+    dispatch(reiniciarGuardado())
+  }, [dispatch])
+
+  // Cuando el backend confirma que el vuelo se creó, se pasa a cargarle las clases
+  useEffect(() => {
+    if (vueloGuardado) {
+      dispatch(reiniciarGuardado())
+      navigate(`/panel/vuelos/${vueloGuardado.id}`, { state: { recienCreado: true } })
+    }
+  }, [vueloGuardado, dispatch, navigate])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const problema = problemaEnVuelo(formData)
-    setError(problema)
-    if (problema) return
+    const encontrado = problemaEnVuelo(formData)
+    setProblema(encontrado)
+    if (encontrado) return
 
-    setGuardando(true)
-    api('/api/vuelos', { method: 'POST', body: cuerpoVuelo(formData) })
-      .then((vuelo) => navigate(`/panel/vuelos/${vuelo.id}`, { state: { recienCreado: true } }))
-      .catch((err) => {
-        setError(err.message)
-        setGuardando(false)
-      })
+    dispatch(crearVuelo(cuerpoVuelo(formData)))
   }
+
+  const error = problema || errorDelBackend
 
   return (
     <>

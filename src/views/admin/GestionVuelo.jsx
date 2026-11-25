@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
@@ -13,7 +14,7 @@ import TablaDescuentos from '../../components/admin/TablaDescuentos'
 import Cargando from '../../components/comunes/Cargando'
 import Mensaje from '../../components/comunes/Mensaje'
 import { useAvisos } from '../../context/AvisosContext'
-import { useSelector } from 'react-redux'
+import { editarVuelo, reiniciarGuardado } from '../../redux/vuelosSlice'
 import { useDescuentosVuelo } from '../../hooks/useDescuentosVuelo'
 import { useDisponibilidades } from '../../hooks/useDisponibilidades'
 import { useFotosVuelo } from '../../hooks/useFotosVuelo'
@@ -41,7 +42,6 @@ function GestionVuelo() {
   const [error, setError] = useState('')
   const [pestania, setPestania] = useState(location.state?.recienCreado ? 'clases' : 'datos')
   const [aviso, setAviso] = useState(null)
-  const [guardando, setGuardando] = useState(false)
   const [recargar, setRecargar] = useState(0)
 
   const { avisar: mostrarAviso } = useAvisos()
@@ -58,7 +58,9 @@ function GestionVuelo() {
   const recargarVuelo = () => setRecargar((veces) => veces + 1)
   const opciones = { avisar, onCambio: recargarVuelo }
 
+  const dispatch = useDispatch()
   const { clases, aeropuertos, categorias } = useSelector((state) => state.catalogo)
+  const { vueloGuardado, loading: guardando, error: errorAlGuardar } = useSelector((state) => state.vuelos)
 
   const disponibilidades = useDisponibilidades(vuelo, opciones)
   const descuentos = useDescuentosVuelo(vueloId, opciones)
@@ -70,23 +72,28 @@ function GestionVuelo() {
       .catch((err) => setError(err.message))
   }, [id, recargar])
 
+  // Al abrir la pantalla no puede quedar el error de otra
+  useEffect(() => {
+    dispatch(reiniciarGuardado())
+  }, [dispatch])
+
+  // Cuando el backend confirma que se guardaron los datos, se avisa y se vuelve al panel
+  useEffect(() => {
+    if (vueloGuardado) {
+      mostrarAviso(`Se guardaron los cambios del vuelo ${vueloGuardado.numeroVuelo}.`)
+      dispatch(reiniciarGuardado())
+      navigate('/panel')
+    }
+  }, [vueloGuardado, mostrarAviso, dispatch, navigate])
+
   const elegirPestania = (nueva) => {
     setPestania(nueva)
     setAviso(null)
   }
 
   const guardarDatos = (formData) => {
-    setGuardando(true)
     avisar(null)
-    api(`/api/vuelos/${vuelo.id}`, { method: 'PUT', body: cuerpoVuelo(formData) })
-      .then((actualizado) => {
-        mostrarAviso(`Se guardaron los cambios del vuelo ${actualizado.numeroVuelo}.`)
-        navigate('/panel')
-      })
-      .catch((err) => {
-        avisar('error', err.message)
-        setGuardando(false)
-      })
+    dispatch(editarVuelo({ id: vuelo.id, vuelo: cuerpoVuelo(formData) }))
   }
 
   if (error) {
@@ -133,6 +140,7 @@ function GestionVuelo() {
         <PestaniasGestion pestanias={PESTANIAS} activa={pestania} onElegir={elegirPestania} />
 
         {aviso && <Mensaje tipo={aviso.tipo}>{aviso.texto}</Mensaje>}
+        {pestania === 'datos' && errorAlGuardar && <Mensaje>{errorAlGuardar}</Mensaje>}
 
         {pestania === 'datos' && (
           <FormDatosVuelo
