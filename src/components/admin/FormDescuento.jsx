@@ -15,7 +15,7 @@ function FormDescuento({ diaDelVuelo, guardando, onCrear, onError }) {
       onError('Completá las fechas del descuento')
       return
     }
-    onCrear(nuevo).then((ok) => ok && setNuevo(formVacio()))
+    onCrear(nuevo)
   }
 
   const esPorcentaje = nuevo.tipoDescuento === 'PORCENTAJE'

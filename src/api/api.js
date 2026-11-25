@@ -53,9 +53,6 @@ export const api = (url, opciones = {}) => {
     )
 }
 
-export const pedirImagen = (fotoId) =>
-  api(`/api/fotos/${fotoId}`).then((imagen) => `data:${imagen.tipo};base64,${imagen.file}`)
-
 const pedirPorId = (ids, pedir) => {
   const unicos = ids.filter((id, i) => ids.indexOf(id) === i)
   return Promise.all(unicos.map((id) => pedir(id).catch(() => null))).then((respuestas) => {

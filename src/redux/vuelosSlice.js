@@ -5,13 +5,25 @@ import { clienteApi } from './conexion'
 
 const POR_PAGINA_PANEL = 20
 
-// Foto de portada de un vuelo (la primera de su lista) como imagen lista para un <img>; null si no tiene fotos
-const pedirPortada = async (vueloId) => {
-  const { data: fotos } = await clienteApi.get('/api/fotos', { params: { vueloId } })
-  if (fotos.length === 0) return null
-  const { data: imagen } = await clienteApi.get(`/api/fotos/${fotos[0].id}`)
+// Imagen de una foto lista para un <img>
+const pedirImagen = async (fotoId) => {
+  const { data: imagen } = await clienteApi.get(`/api/fotos/${fotoId}`)
   return `data:${imagen.tipo};base64,${imagen.file}`
 }
+
+// Foto de portada de un vuelo (la primera de su lista); null si no tiene fotos
+const pedirPortada = async (vueloId) => {
+  const { data: fotos } = await clienteApi.get('/api/fotos', { params: { vueloId } })
+  return fotos.length === 0 ? null : pedirImagen(fotos[0].id)
+}
+
+// La foto que se acaba de subir se muestra con el archivo que eligió el administrador, sin pedirla de nuevo
+const leerArchivo = (archivo) =>
+  new Promise((resolve) => {
+    const lector = new FileReader()
+    lector.onload = () => resolve(lector.result)
+    lector.readAsDataURL(archivo)
+  })
 
 // Inicio: los vuelos que se pueden comprar hoy
 export const fetchVuelosDestacados = createAsyncThunk('vuelos/fetchVuelosDestacados', async () => {
@@ -46,6 +58,24 @@ export const fetchVuelo = createAsyncThunk('vuelos/fetchVuelo', async (id) => {
   return data
 })
 
+// Fotos de un vuelo: cada una trae sus datos y su imagen. La primera es la portada
+export const fetchFotosVuelo = createAsyncThunk('vuelos/fetchFotosVuelo', async (vueloId) => {
+  const { data: fotos } = await clienteApi.get('/api/fotos', { params: { vueloId } })
+  const imagenes = await Promise.all(fotos.map((foto) => pedirImagen(foto.id)))
+  return { vueloId, lista: fotos.map((foto, i) => ({ ...foto, imagen: imagenes[i] })) }
+})
+
+export const fetchDescuentosVuelo = createAsyncThunk('vuelos/fetchDescuentosVuelo', async (vueloId) => {
+  const { data } = await clienteApi.get('/api/descuentos', { params: { vueloId } })
+  return { vueloId, lista: data }
+})
+
+// Mapa de asientos de una clase del vuelo
+export const fetchMapaAsientos = createAsyncThunk('vuelos/fetchMapaAsientos', async (disponibilidadId) => {
+  const { data } = await clienteApi.get(`/api/disponibilidades/${disponibilidadId}/asientos`)
+  return { disponibilidadId, datos: data }
+})
+
 // Panel del administrador
 export const fetchResumenPanel = createAsyncThunk('vuelos/fetchResumenPanel', async () => {
   const { data } = await clienteApi.get('/api/vuelos/resumen')
@@ -75,6 +105,70 @@ export const cambiarEstadoVuelo = createAsyncThunk('vuelos/cambiarEstadoVuelo', 
   return { id, ...data }
 })
 
+export const subirFoto = createAsyncThunk('vuelos/subirFoto', async ({ vueloId, archivo }) => {
+  const formulario = new FormData()
+  formulario.append('vueloId', vueloId)
+  formulario.append('file', archivo)
+  const { data } = await clienteApi.post('/api/fotos', formulario)
+  return { ...data, imagen: await leerArchivo(archivo) }
+})
+
+export const eliminarFoto = createAsyncThunk('vuelos/eliminarFoto', async (foto) => {
+  const { data } = await clienteApi.delete(`/api/fotos/${foto.id}`)
+  return { id: foto.id, ...data }
+})
+
+export const crearDescuento = createAsyncThunk('vuelos/crearDescuento', async ({ vueloId, descuento }) => {
+  const { data } = await clienteApi.post('/api/descuentos', { ...descuento, vueloId, valor: Number(descuento.valor) })
+  return data
+})
+
+// Pausa el descuento si estaba activo y lo activa si estaba pausado
+export const alternarDescuento = createAsyncThunk('vuelos/alternarDescuento', async ({ vueloId, descuento }) => {
+  const { data } = await clienteApi.put(`/api/descuentos/${descuento.id}`, {
+    vueloId,
+    tipoDescuento: descuento.tipoDescuento,
+    valor: descuento.valor,
+    fechaDesde: descuento.fechaDesde,
+    fechaHasta: descuento.fechaHasta,
+    activo: !descuento.activo,
+  })
+  return data
+})
+
+export const eliminarDescuento = createAsyncThunk('vuelos/eliminarDescuento', async (descuento) => {
+  const { data } = await clienteApi.delete(`/api/descuentos/${descuento.id}`)
+  return { id: descuento.id, ...data }
+})
+
+export const crearDisponibilidad = createAsyncThunk('vuelos/crearDisponibilidad', async ({ vueloId, clase }) => {
+  const { data } = await clienteApi.post('/api/disponibilidades', {
+    vueloId,
+    claseId: Number(clase.claseId),
+    asientosTotales: Number(clase.asientosTotales),
+    precio: Number(clase.precio),
+  })
+  return data
+})
+
+export const editarDisponibilidad = createAsyncThunk(
+  'vuelos/editarDisponibilidad',
+  async ({ vueloId, disponibilidad, valores }) => {
+    const { data } = await clienteApi.put(`/api/disponibilidades/${disponibilidad.id}`, {
+      vueloId,
+      claseId: disponibilidad.claseId,
+      asientosTotales: Number(valores.asientosTotales),
+      precio: Number(valores.precio),
+    })
+    return data
+  },
+)
+
+export const eliminarDisponibilidad = createAsyncThunk('vuelos/eliminarDisponibilidad', async (disponibilidad) => {
+  await clienteApi.delete(`/api/disponibilidades/${disponibilidad.id}`)
+  return disponibilidad
+})
+
 const vuelosSlice = createSlice({
   name: 'vuelos',
   initialState: {
@@ -82,11 +176,16 @@ const vuelosSlice = createSlice({
     portadas: {},
     resultadoBusqueda: null,
     vueloActual: null,
+    fotosVuelo: { vueloId: null, lista: [] },
+    descuentosVuelo: { vueloId: null, lista: [] },
+    mapaAsientos: { disponibilidadId: null, datos: null },
+    errorMapa: null,
     vuelosPanel: { pagina: 0, texto: '', datos: null },
     resumenPanel: null,
     vueloGuardado: null,
     mensaje: null,
     loading: false,
+    guardando: false,
     error: null,
   },
   reducers: {
@@ -141,6 +240,33 @@ const vuelosSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+      .addCase(fetchFotosVuelo.pending, (state) => {
+        state.error = null
+      })
+      .addCase(fetchFotosVuelo.fulfilled, (state, action) => {
+        state.fotosVuelo = action.payload
+      })
+      .addCase(fetchFotosVuelo.rejected, (state, action) => {
+        state.error = action.error.message
+      })
+      .addCase(fetchDescuentosVuelo.pending, (state) => {
+        state.error = null
+      })
+      .addCase(fetchDescuentosVuelo.fulfilled, (state, action) => {
+        state.descuentosVuelo = action.payload
+      })
+      .addCase(fetchDescuentosVuelo.rejected, (state, action) => {
+        state.error = action.error.message
+      })
+      .addCase(fetchMapaAsientos.pending, (state) => {
+        state.errorMapa = null
+      })
+      .addCase(fetchMapaAsientos.fulfilled, (state, action) => {
+        state.mapaAsientos = action.payload
+      })
+      .addCase(fetchMapaAsientos.rejected, (state, action) => {
+        state.errorMapa = action.error.message
+      })
       .addCase(fetchResumenPanel.pending, (state) => {
         state.error = null
       })
@@ -163,24 +289,24 @@ const vuelosSlice = createSlice({
         state.error = action.error.message
       })
       .addCase(crearVuelo.pending, (state) => {
-        state.loading = true
+        state.guardando = true
         state.error = null
       })
       .addCase(crearVuelo.fulfilled, (state, action) => {
-        state.loading = false
+        state.guardando = false
         state.vueloGuardado = action.payload
       })
       .addCase(crearVuelo.rejected, (state, action) => {
-        state.loading = false
+        state.guardando = false
         state.error = action.error.message
       })
       .addCase(editarVuelo.pending, (state) => {
-        state.loading = true
+        state.guardando = true
         state.error = null
       })
       // El backend devuelve el vuelo ya editado: reemplaza al que hubiera en el panel o en el detalle, sin volver a pedirlo
       .addCase(editarVuelo.fulfilled, (state, action) => {
-        state.loading = false
+        state.guardando = false
         state.vueloGuardado = action.payload
         if (state.vueloActual?.id === action.payload.id) {
           state.vueloActual = action.payload
@@ -192,7 +318,7 @@ const vuelosSlice = createSlice({
         }
       })
       .addCase(editarVuelo.rejected, (state, action) => {
-        state.loading = false
+        state.guardando = false
         state.error = action.error.message
       })
       .addCase(cambiarEstadoVuelo.pending, (state) => {
@@ -218,6 +344,120 @@ const vuelosSlice = createSlice({
         state.mensaje = mensaje
       })
       .addCase(cambiarEstadoVuelo.rejected, (state, action) => {
+        state.error = action.error.message
+      })
+      .addCase(subirFoto.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(subirFoto.fulfilled, (state, action) => {
+        state.guardando = false
+        state.fotosVuelo.lista = [...state.fotosVuelo.lista, action.payload]
+        state.mensaje = 'Foto subida.'
+      })
+      .addCase(subirFoto.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(eliminarFoto.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(eliminarFoto.fulfilled, (state, action) => {
+        state.guardando = false
+        state.fotosVuelo.lista = state.fotosVuelo.lista.filter((foto) => foto.id !== action.payload.id)
+        state.mensaje = action.payload.mensaje
+      })
+      .addCase(eliminarFoto.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(crearDescuento.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(crearDescuento.fulfilled, (state, action) => {
+        state.guardando = false
+        state.descuentosVuelo.lista = [...state.descuentosVuelo.lista, action.payload]
+        state.mensaje = 'Descuento creado.'
+      })
+      .addCase(crearDescuento.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(alternarDescuento.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(alternarDescuento.fulfilled, (state, action) => {
+        state.guardando = false
+        const lista = state.descuentosVuelo.lista
+        const indice = lista.findIndex((descuento) => descuento.id === action.payload.id)
+        if (indice !== -1) {
+          lista[indice] = action.payload
+        }
+        state.mensaje = action.payload.activo ? 'Descuento activado.' : 'Descuento pausado.'
+      })
+      .addCase(alternarDescuento.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(eliminarDescuento.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(eliminarDescuento.fulfilled, (state, action) => {
+        state.guardando = false
+        state.descuentosVuelo.lista = state.descuentosVuelo.lista.filter((descuento) => descuento.id !== action.payload.id)
+        state.mensaje = action.payload.mensaje
+      })
+      .addCase(eliminarDescuento.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(crearDisponibilidad.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(crearDisponibilidad.fulfilled, (state, action) => {
+        state.guardando = false
+        state.vueloActual.disponibilidades = [...state.vueloActual.disponibilidades, action.payload]
+        state.mensaje = 'Clase agregada. Ya se puede comprar.'
+      })
+      .addCase(crearDisponibilidad.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(editarDisponibilidad.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(editarDisponibilidad.fulfilled, (state, action) => {
+        state.guardando = false
+        const lista = state.vueloActual.disponibilidades
+        const indice = lista.findIndex((disponibilidad) => disponibilidad.id === action.payload.id)
+        if (indice !== -1) {
+          lista[indice] = action.payload
+        }
+        state.mensaje = `Se actualizó la clase ${action.payload.claseNombre}.`
+      })
+      .addCase(editarDisponibilidad.rejected, (state, action) => {
+        state.guardando = false
+        state.error = action.error.message
+      })
+      .addCase(eliminarDisponibilidad.pending, (state) => {
+        state.guardando = true
+        state.error = null
+      })
+      .addCase(eliminarDisponibilidad.fulfilled, (state, action) => {
+        state.guardando = false
+        state.vueloActual.disponibilidades = state.vueloActual.disponibilidades.filter(
+          (disponibilidad) => disponibilidad.id !== action.payload.id,
+        )
+        state.mensaje = `Se eliminó la clase ${action.payload.claseNombre} del vuelo.`
+      })
+      .addCase(eliminarDisponibilidad.rejected, (state, action) => {
+        state.guardando = false
         state.error = action.error.message
       })
   },

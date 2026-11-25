@@ -17,7 +17,8 @@ function TablaClases({ vuelo, clases, guardando, onGuardar, onEliminar }) {
       setEditando(null)
       return
     }
-    onGuardar(disponibilidad, editando).then((ok) => ok && setEditando(null))
+    onGuardar(disponibilidad, editando)
+    setEditando(null)
   }
 
   return (

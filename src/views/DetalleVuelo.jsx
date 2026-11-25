@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { api, pedirImagen } from '../api/api'
+import { api } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
@@ -14,7 +14,7 @@ import PanelCompra from '../components/detalle/PanelCompra'
 import PortadaVuelo from '../components/detalle/PortadaVuelo'
 import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
 import { useAuth } from '../context/AuthContext'
-import { fetchVuelo } from '../redux/vuelosSlice'
+import { fetchFotosVuelo, fetchMapaAsientos, fetchVuelo } from '../redux/vuelosSlice'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
 import { urlParaElegirVuelta, urlTrasLogin } from '../utils/viaje'
 import { motivoSinVenta } from '../utils/vuelos'
@@ -28,11 +28,11 @@ function DetalleVuelo() {
   const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
   const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
-  const { vueloActual, error } = useSelector((state) => state.vuelos)
+  const { vueloActual, fotosVuelo, mapaAsientos, errorMapa, error } = useSelector((state) => state.vuelos)
 
   // El store guarda el último vuelo que se pidió: solo sirve si es el de esta página
   const vuelo = vueloActual?.id === Number(id) ? vueloActual : null
-  const [imagenes, setImagenes] = useState([])
+  const imagenes = fotosVuelo.vueloId === Number(id) ? fotosVuelo.lista.map((foto) => foto.imagen) : []
 
   const [claseElegidaId, setClaseElegidaId] = useState(null)
   const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams))
@@ -43,14 +43,8 @@ function DetalleVuelo() {
 
   useEffect(() => {
     dispatch(fetchVuelo(id))
+    dispatch(fetchFotosVuelo(Number(id)))
   }, [id, dispatch])
-
-  useEffect(() => {
-    api(`/api/fotos?vueloId=${id}`)
-      .then((fotos) => Promise.all(fotos.map((foto) => pedirImagen(foto.id))))
-      .then((data) => setImagenes(data))
-      .catch(() => setImagenes([]))
-  }, [id])
 
   // La clase elegida es la que tocó el usuario; si no tocó ninguna, la de la URL o la primera con lugar
   const disponibilidades = vuelo?.disponibilidades ?? []
@@ -58,15 +52,13 @@ function DetalleVuelo() {
   const elegida =
     disponibilidades.find((d) => d.id === claseElegidaId) ?? claseDeLaUrl ?? disponibilidades.find((d) => d.hayStock) ?? null
 
-  const [mapa, setMapa] = useState({ disponibilidadId: null, datos: null, error: '' })
   const elegidaId = elegida?.id
 
   useEffect(() => {
-    if (!elegidaId) return
-    api(`/api/disponibilidades/${elegidaId}/asientos`)
-      .then((datos) => setMapa({ disponibilidadId: elegidaId, datos, error: '' }))
-      .catch((err) => setMapa({ disponibilidadId: elegidaId, datos: null, error: err.message }))
-  }, [elegidaId])
+    if (elegidaId) {
+      dispatch(fetchMapaAsientos(elegidaId))
+    }
+  }, [elegidaId, dispatch])
 
   if (error && !vuelo) {
     return (
@@ -82,7 +74,7 @@ function DetalleVuelo() {
   }
 
   const sinVenta = motivoSinVenta(vuelo)
-  const mapaDeLaClase = elegida && mapa.disponibilidadId === elegida.id
+  const mapaDeLaClase = elegida && mapaAsientos.disponibilidadId === elegida.id
   const faltanAsientos = pasajeros.adultos + pasajeros.ninos - asientos.length
   const agregado = mensaje?.tipo === 'exito'
   const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
@@ -156,8 +148,8 @@ function DetalleVuelo() {
                 clase={elegida}
                 pasajeros={pasajeros}
                 asientos={asientos}
-                mapa={mapaDeLaClase ? mapa.datos : null}
-                error={mapaDeLaClase ? mapa.error : ''}
+                mapa={mapaDeLaClase ? mapaAsientos.datos : null}
+                error={mapaDeLaClase ? '' : (errorMapa ?? '')}
                 ocupado={agregando}
                 onCambio={cambiarAsientos}
               />

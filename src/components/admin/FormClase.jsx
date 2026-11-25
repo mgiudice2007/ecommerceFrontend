@@ -14,7 +14,7 @@ function FormClase({ vuelo, clases, guardando, onAgregar }) {
 
   const agregar = (e) => {
     e.preventDefault()
-    onAgregar(nueva).then((ok) => ok && setNueva(FORM_VACIO))
+    onAgregar(nueva)
   }
 
   return (

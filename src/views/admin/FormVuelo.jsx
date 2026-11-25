@@ -12,7 +12,7 @@ function FormVuelo() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { aeropuertos, categorias } = useSelector((state) => state.catalogo)
-  const { vueloGuardado, loading: guardando, error: errorDelBackend } = useSelector((state) => state.vuelos)
+  const { vueloGuardado, guardando, error: errorDelBackend } = useSelector((state) => state.vuelos)
 
   const [formData, setFormData] = useState(FORM_VUELO_VACIO)
   const [problema, setProblema] = useState('')
