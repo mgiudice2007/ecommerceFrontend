@@ -5,6 +5,11 @@
   --celeste: #1fa2e0;
   --celeste-suave: #e7f4fc;
   --durazno: #ffc72c;
+  --naranja: #f2600c;
+  --naranja-hover: #d4500a;
+  --naranja-oscuro: #c2410c;
+  --naranja-suave: #fff1e6;
+  --degradado-atardecer: linear-gradient(135deg, #ff9a3c 0%, #f2600c 100%);
 
   --fondo: #f3f6fa;
   --superficie: #ffffff;
@@ -102,6 +107,17 @@ h3 {
 
 .boton-primario:hover:not(:disabled) {
   background: var(--azul-hover);
+  text-decoration: none;
+}
+
+.boton-accion {
+  background: var(--degradado-atardecer);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(242, 96, 12, 0.28);
+}
+
+.boton-accion:hover:not(:disabled) {
+  background: var(--naranja-hover);
   text-decoration: none;
 }
 

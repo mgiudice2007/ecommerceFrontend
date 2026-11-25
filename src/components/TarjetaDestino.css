@@ -39,8 +39,8 @@
   left: 14px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--durazno);
-  color: var(--azul-noche);
+  background: var(--degradado-atardecer);
+  color: #fff;
   font-size: 13px;
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);

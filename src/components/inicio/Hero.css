@@ -41,7 +41,10 @@
 }
 
 .inicio-hero h1 span {
-  color: #7fd0f7;
+  background: linear-gradient(90deg, #ffb066 0%, #ff7a2f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .inicio-hero p {

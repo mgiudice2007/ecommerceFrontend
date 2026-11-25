@@ -81,7 +81,7 @@ function TarjetaVuelo({ vuelo, pasajeros = '' }) {
         ) : (
           <strong className="sin-stock">{estaOperativo(vuelo) ? 'Sin asientos' : 'No disponible'}</strong>
         )}
-        <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="boton boton-primario">
+        <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="boton boton-accion">
           Ver vuelo
         </Link>
       </div>

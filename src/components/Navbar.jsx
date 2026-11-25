@@ -106,7 +106,7 @@ function Navbar() {
           ) : (
             <div className="navbar-usuario">
               <NavLink to="/login">Iniciar sesión</NavLink>
-              <NavLink to="/registro" className="boton boton-primario">
+              <NavLink to="/registro" className="boton boton-accion">
                 Registrarse
               </NavLink>
             </div>

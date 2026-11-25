@@ -47,7 +47,7 @@ function ResumenCompra({
         </Mensaje>
       )}
 
-      <button className="boton boton-primario boton-ancho" onClick={onConfirmar} disabled={procesando || bloqueado}>
+      <button className="boton boton-accion boton-ancho" onClick={onConfirmar} disabled={procesando || bloqueado}>
         {procesando ? textoProcesando : `${textoBoton} · ${precio(calculo.aPagar)}`}
       </button>
       <Link to={enlace.to} className="carrito-seguir">

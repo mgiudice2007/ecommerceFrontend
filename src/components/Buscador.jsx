@@ -159,7 +159,7 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
 
       <div className="buscador-pie">
         {error ? <span className="buscador-error">{error}</span> : <span />}
-        <button className="boton boton-primario buscador-boton">
+        <button className="boton boton-accion buscador-boton">
           <span aria-hidden="true">⌕</span> Buscar vuelos
         </button>
       </div>

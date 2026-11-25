@@ -41,8 +41,8 @@
 }
 
 .detalle-portada-etiquetas .oferta {
-  background: var(--durazno);
-  color: var(--azul-noche);
+  background: var(--degradado-atardecer);
+  color: #fff;
 }
 
 .detalle-portada h1 {

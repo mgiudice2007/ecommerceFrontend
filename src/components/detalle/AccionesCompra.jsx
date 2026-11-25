@@ -21,7 +21,7 @@ function AccionesCompra({
   if (agregado) {
     return (
       <>
-        <Link to="/carrito" className="boton boton-primario boton-ancho">
+        <Link to="/carrito" className="boton boton-accion boton-ancho">
           Ir al carrito →
         </Link>
         <button type="button" className="boton boton-secundario boton-ancho detalle-ir-carrito" onClick={onAgregarOtros}>
@@ -38,7 +38,7 @@ function AccionesCompra({
   return (
     <>
       <button
-        className="boton boton-primario boton-ancho"
+        className="boton boton-accion boton-ancho"
         onClick={() => onAgregar(eligiendoIda)}
         disabled={agregando || (estaLogueado && faltanAsientos > 0)}
       >

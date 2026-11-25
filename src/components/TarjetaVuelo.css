@@ -52,8 +52,8 @@
 }
 
 .etiqueta-descuento {
-  background: var(--verde-suave);
-  color: var(--verde);
+  background: var(--naranja-suave);
+  color: var(--naranja-oscuro);
 }
 
 .tarjeta-vuelo-fecha {
@@ -190,7 +190,7 @@
 
 .tarjeta-vuelo-precio strong {
   font-size: 26px;
-  color: var(--azul);
+  color: var(--naranja-oscuro);
 }
 
 .tarjeta-vuelo-precio .sin-stock {
