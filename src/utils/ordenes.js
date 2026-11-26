@@ -17,26 +17,28 @@ export const rotuloVuelos = (orden) => (numerosDeVuelo(orden).length === 1 ? 'Vu
 
 export const textoNumerosDeVuelo = (orden) => `${rotuloVuelos(orden)} ${numerosDeVuelo(orden).join(' · ')}`
 
-// Sellos del pasaporte: un sello por cada vuelo de las compras confirmadas (un vuelo
-// repetido en varias compras cuenta una sola vez). El codigo del aeropuerto sale del
-// catalogo; si no se encuentra, se usan las 3 primeras letras de la ciudad.
+// Sellos del pasaporte: un sello por cada destino de las compras confirmadas, con la
+// fecha del primer viaje a ese destino (si viajaste 3 veces a Buenos Aires, es un solo
+// sello). El codigo del aeropuerto sale del catalogo; si no se encuentra, se usan las 3
+// primeras letras de la ciudad.
 export const sellosDeViaje = (ordenes, aeropuertos) => {
-  const sellos = []
+  const porDestino = {}
   ;(ordenes ?? [])
     .filter((orden) => orden.estado === 'CONFIRMADA')
     .forEach((orden) =>
       orden.items.forEach((item) => {
-        if (sellos.some((s) => s.clave === item.vueloId)) return
+        const anterior = porDestino[item.destino]
+        if (anterior && anterior.fecha <= item.fechaSalida) return
         const aeropuerto = aeropuertos.find((a) => a.ciudad === item.destino)
-        sellos.push({
-          clave: item.vueloId,
+        porDestino[item.destino] = {
+          clave: item.destino,
           iata: aeropuerto?.codigoIata ?? item.destino.slice(0, 3).toUpperCase(),
           ciudad: item.destino,
           fecha: item.fechaSalida,
-        })
+        }
       }),
     )
-  return sellos.sort((a, b) => a.fecha.localeCompare(b.fecha))
+  return Object.values(porDestino).sort((a, b) => a.fecha.localeCompare(b.fecha))
 }
 
 // La proxima compra confirmada cuyo vuelo todavia no salio (para la cuenta regresiva)

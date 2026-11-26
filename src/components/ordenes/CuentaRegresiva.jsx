@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fechaLarga, hora } from '../../utils/formato'
-import LetrasGiratorias from '../comunes/LetrasGiratorias'
 import './CuentaRegresiva.css'
 
 const dosDigitos = (n) => String(n).padStart(2, '0')
@@ -17,8 +16,9 @@ const partesQueFaltan = (milisegundos) => {
   }
 }
 
-// Cartel con la cuenta regresiva para el proximo vuelo. Cada numero gira como en el
-// cartel de partidas cuando cambia (la key nueva hace que LetrasGiratorias arranque de cero).
+// Cartel con la cuenta regresiva para el proximo vuelo. Cuando un numero cambia, entra
+// deslizandose suave desde abajo (la key nueva hace que React lo monte de nuevo y la
+// animacion CSS arranque otra vez).
 function CuentaRegresiva({ proximo }) {
   const [ahora, setAhora] = useState(() => Date.now())
 
@@ -29,16 +29,16 @@ function CuentaRegresiva({ proximo }) {
 
   const falta = partesQueFaltan(proximo.salida - ahora)
   const bloques = [
-    { rotulo: 'Días', valor: String(falta.dias) },
-    { rotulo: 'Horas', valor: dosDigitos(falta.horas) },
-    { rotulo: 'Min', valor: dosDigitos(falta.minutos) },
-    { rotulo: 'Seg', valor: dosDigitos(falta.segundos) },
+    { rotulo: falta.dias === 1 ? 'día' : 'días', valor: String(falta.dias) },
+    { rotulo: 'horas', valor: dosDigitos(falta.horas) },
+    { rotulo: 'min', valor: dosDigitos(falta.minutos) },
+    { rotulo: 'seg', valor: dosDigitos(falta.segundos) },
   ]
 
   return (
     <section className="cuenta-regresiva">
       <div className="cuenta-regresiva-texto">
-        <span>Tu próximo vuelo</span>
+        <span>✈ Tu próximo vuelo</span>
         <strong>{proximo.destino}</strong>
         <small>
           Vuelo {proximo.numeroVuelo} · {fechaLarga(proximo.salida)} · {hora(proximo.salida)} hs
@@ -47,10 +47,19 @@ function CuentaRegresiva({ proximo }) {
       </div>
 
       <div className="cuenta-regresiva-reloj" aria-label="Tiempo que falta para el vuelo">
-        {bloques.map((b) => (
+        {bloques.map((b, i) => (
           <div key={b.rotulo} className="cuenta-regresiva-bloque">
-            <LetrasGiratorias key={b.valor} texto={b.valor} />
-            <small>{b.rotulo}</small>
+            {i > 0 && (
+              <span className="cuenta-regresiva-separador" aria-hidden="true">
+                :
+              </span>
+            )}
+            <div>
+              <strong key={b.valor} className="cuenta-regresiva-numero">
+                {b.valor}
+              </strong>
+              <small>{b.rotulo}</small>
+            </div>
           </div>
         ))}
       </div>

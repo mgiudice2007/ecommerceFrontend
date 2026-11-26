@@ -1,5 +1,5 @@
 /* Cartel azul noche con la cuenta regresiva: texto a la izquierda y los numeros
-   en paletas de cartel de aeropuerto a la derecha */
+   grandes y limpios a la derecha, separados por dos puntos */
 .cuenta-regresiva {
   display: flex;
   flex-wrap: wrap;
@@ -7,10 +7,10 @@
   align-items: center;
   gap: 20px 32px;
   margin-bottom: 24px;
-  padding: 24px 28px;
+  padding: 26px 30px;
   border-radius: var(--radio-grande);
   background:
-    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.3), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.28), transparent 45%),
     linear-gradient(160deg, #0c1c33 0%, #081426 100%);
   box-shadow: var(--sombra-fuerte);
   color: #fff;
@@ -32,7 +32,7 @@
 }
 
 .cuenta-regresiva-texto strong {
-  font-size: 28px;
+  font-size: 30px;
 }
 
 .cuenta-regresiva-texto small {
@@ -47,26 +47,62 @@
 
 .cuenta-regresiva-reloj {
   display: flex;
-  gap: 14px;
+  align-items: flex-start;
 }
 
 .cuenta-regresiva-bloque {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
 }
 
-.cuenta-regresiva-bloque .letras-giratorias {
-  font-size: 30px;
+.cuenta-regresiva-bloque > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 76px;
+  padding: 10px 8px 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* El numero entra deslizandose suave cada vez que cambia */
+.cuenta-regresiva-numero {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  animation: numero-entra 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes numero-entra {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
 }
 
 .cuenta-regresiva-bloque small {
-  color: rgba(255, 255, 255, 0.55);
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.cuenta-regresiva-separador {
+  padding: 8px 6px 0;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Los segundos van en naranja para que se note que esta en vivo */
+.cuenta-regresiva-bloque:last-child .cuenta-regresiva-numero {
+  color: #ffb066;
 }
 
 @media (max-width: 560px) {
@@ -74,11 +110,16 @@
     padding: 20px;
   }
 
-  .cuenta-regresiva-reloj {
-    gap: 8px;
+  .cuenta-regresiva-bloque > div {
+    min-width: 56px;
   }
 
-  .cuenta-regresiva-bloque .letras-giratorias {
-    font-size: 22px;
+  .cuenta-regresiva-numero {
+    font-size: 28px;
+  }
+
+  .cuenta-regresiva-separador {
+    font-size: 24px;
+    padding: 6px 3px 0;
   }
 }
