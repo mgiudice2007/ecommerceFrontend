@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { fechaCorta, precio } from '../utils/formato'
+import { nombreParaSello } from '../utils/destinos'
 import { precioDesde, textoDescuento } from '../utils/vuelos'
 import FotoVuelo from './FotoVuelo'
 import './TarjetaDestino.css'
@@ -20,7 +21,7 @@ function TarjetaDestino({ vuelo, pais, imagen }) {
       {/* Sello de pasaporte con el codigo del aeropuerto de destino */}
       <span className="tarjeta-destino-sello" aria-hidden="true">
         <strong>{vuelo.destinoIata}</strong>
-        <small>{vuelo.destinoCiudad}</small>
+        <small>{nombreParaSello(vuelo.destinoCiudad)}</small>
         <small>✈ BCA</small>
       </span>
 

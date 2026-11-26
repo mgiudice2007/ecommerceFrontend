@@ -29,3 +29,26 @@ export const destinosMostrados = (vuelos) => [
   ...argentinaDe(vuelos),
   ...REGIONES.flatMap((r) => mundoDe(vuelos, r.categoria)),
 ]
+
+// En el sello de las tarjetas de destino entran hasta 9 letras.
+// Las ciudades con nombre largo usan la forma corta de siempre.
+const LARGO_SELLO = 9
+const NOMBRES_CORTOS = {
+  'Buenos Aires': 'Bs As',
+  'Santiago de Chile': 'Santiago',
+  'Río de Janeiro': 'Río',
+  'Puerto Iguazú': 'Iguazú',
+  'Mar del Plata': 'Mardel',
+  'El Calafate': 'Calafate',
+  'Punta Cana': 'Pta Cana',
+  'Nueva York': 'NY',
+}
+
+// Nombre para el sello: el corto si lo tiene; si no, el nombre si entra; si no, su
+// ultima palabra si entra; y si tampoco, las primeras letras (sin puntos suspensivos)
+export const nombreParaSello = (ciudad = '') => {
+  if (NOMBRES_CORTOS[ciudad]) return NOMBRES_CORTOS[ciudad]
+  if (ciudad.length <= LARGO_SELLO) return ciudad
+  const ultima = ciudad.split(' ').pop()
+  return ultima.length <= LARGO_SELLO ? ultima : ciudad.slice(0, LARGO_SELLO)
+}
