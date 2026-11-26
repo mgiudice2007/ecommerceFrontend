@@ -10,7 +10,7 @@ import EstadoVacio from '../../components/comunes/EstadoVacio'
 import GrillaNumeros from '../../components/comunes/GrillaNumeros'
 import Mensaje from '../../components/comunes/Mensaje'
 import Paginador from '../../components/comunes/Paginador'
-import { useAvisos } from '../../context/AvisosContext'
+import { avisar } from '../../redux/avisosSlice'
 import {
   cambiarEstadoVuelo,
   fetchResumenPanel,
@@ -23,7 +23,6 @@ import './Panel.css'
 function PanelVuelos() {
   const dispatch = useDispatch()
   const { vuelosPanel, resumenPanel: resumen, mensaje, loading, error } = useSelector((state) => state.vuelos)
-  const { avisar } = useAvisos()
 
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
@@ -48,10 +47,10 @@ function PanelVuelos() {
   // El backend responde con un mensaje al cambiar el estado de un vuelo: se muestra como aviso y se limpia del store
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   const cambiarEstado = (vuelo, estado) => dispatch(cambiarEstadoVuelo({ id: vuelo.id, estado }))
 

@@ -8,13 +8,12 @@ import Mensaje from '../../components/comunes/Mensaje'
 import SinDatos from '../../components/comunes/SinDatos'
 import FiltrosUsuarios from '../../components/usuarios/FiltrosUsuarios'
 import TablaUsuarios from '../../components/usuarios/TablaUsuarios'
-import { useAvisos } from '../../context/AvisosContext'
+import { avisar } from '../../redux/avisosSlice'
 import { cambiarRol, fetchUsuarios, limpiarMensaje } from '../../redux/usuarioSlice'
 import { ROLES } from '../../utils/roles'
 import './Panel.css'
 
 function Usuarios() {
-  const { avisar } = useAvisos()
   const dispatch = useDispatch()
   const { sesion, usuarios, mensaje, guardando, error } = useSelector((state) => state.usuario)
 
@@ -31,10 +30,10 @@ function Usuarios() {
   // Cuando el backend confirma el cambio de rol, su aviso sale como mensaje flotante
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   // Una elección que ya coincide con el rol guardado deja de ser un cambio pendiente
   const pendientes = Object.fromEntries(

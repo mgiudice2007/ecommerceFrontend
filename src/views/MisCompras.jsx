@@ -7,13 +7,12 @@ import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
-import { useAvisos } from '../context/AvisosContext'
+import { avisar } from '../redux/avisosSlice'
 import { cancelarOrden, fetchOrdenes, limpiarMensaje } from '../redux/ordenesSlice'
 import { fetchPerfil } from '../redux/usuarioSlice'
 import './MisCompras.css'
 
 function MisCompras() {
-  const { avisar } = useAvisos()
   const dispatch = useDispatch()
   const { ordenes, mensaje, guardando, error } = useSelector((state) => state.ordenes)
   // Qué compra se está cancelando y cuál espera la confirmación: solo importan a esta pantalla
@@ -27,11 +26,11 @@ function MisCompras() {
   // Cuando el backend confirma la cancelación, su aviso sale flotante y se actualizan las millas del perfil
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(fetchPerfil())
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   const cancelar = (orden) => {
     setACancelar(null)

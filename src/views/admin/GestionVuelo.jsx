@@ -12,7 +12,7 @@ import TablaClases from '../../components/admin/TablaClases'
 import TablaDescuentos from '../../components/admin/TablaDescuentos'
 import Cargando from '../../components/comunes/Cargando'
 import Mensaje from '../../components/comunes/Mensaje'
-import { useAvisos } from '../../context/AvisosContext'
+import { avisar } from '../../redux/avisosSlice'
 import {
   alternarDescuento,
   crearDescuento,
@@ -49,7 +49,6 @@ function GestionVuelo() {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { avisar } = useAvisos()
 
   const { clases, aeropuertos, categorias } = useSelector((state) => state.catalogo)
   const { vueloActual, fotosVuelo, descuentosVuelo, vueloGuardado, mensaje, guardando, error } = useSelector(
@@ -75,19 +74,19 @@ function GestionVuelo() {
   // Cuando el backend confirma un cambio de clases, descuentos o fotos, su mensaje sale como aviso flotante
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   // Cuando el backend confirma que se guardaron los datos del vuelo, se avisa y se vuelve al panel
   useEffect(() => {
     if (vueloGuardado) {
-      avisar(`Se guardaron los cambios del vuelo ${vueloGuardado.numeroVuelo}.`)
+      dispatch(avisar(`Se guardaron los cambios del vuelo ${vueloGuardado.numeroVuelo}.`))
       dispatch(reiniciarGuardado())
       navigate('/panel')
     }
-  }, [vueloGuardado, avisar, dispatch, navigate])
+  }, [vueloGuardado, dispatch, navigate])
 
   const elegirPestania = (nueva) => {
     setPestania(nueva)

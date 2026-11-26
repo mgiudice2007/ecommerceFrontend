@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
+import avisosReducer from './avisosSlice'
 import carritoReducer from './carritoSlice'
 import catalogoReducer from './catalogoSlice'
 import embarqueReducer from './embarqueSlice'
@@ -9,6 +10,7 @@ import vuelosReducer from './vuelosSlice'
 
 export const store = configureStore({
   reducer: {
+    avisos: avisosReducer,
     carrito: carritoReducer,
     catalogo: catalogoReducer,
     embarque: embarqueReducer,

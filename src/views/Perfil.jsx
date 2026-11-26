@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useAvisos } from '../context/AvisosContext'
+import { avisar } from '../redux/avisosSlice'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FormPerfil from '../components/perfil/FormPerfil'
 import { fetchPerfil, limpiarMensaje } from '../redux/usuarioSlice'
@@ -16,7 +16,6 @@ const NOMBRES_DE_ROL = {
 }
 
 function Perfil() {
-  const { avisar } = useAvisos()
   const dispatch = useDispatch()
   const { perfil, mensaje, error } = useSelector((state) => state.usuario)
 
@@ -30,10 +29,10 @@ function Perfil() {
   // Cuando el backend confirma que se guardaron los datos, se avisa con un mensaje flotante
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   if (!perfil) {
     return (

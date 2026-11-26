@@ -6,14 +6,13 @@ import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
 import Boleto from '../components/ordenes/Boleto'
 import EncabezadoOrden from '../components/ordenes/EncabezadoOrden'
-import { useAvisos } from '../context/AvisosContext'
+import { avisar } from '../redux/avisosSlice'
 import { cancelarOrden, fetchOrden, limpiarMensaje } from '../redux/ordenesSlice'
 import { fetchPerfil } from '../redux/usuarioSlice'
 import { textoCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 function DetalleOrden() {
-  const { avisar } = useAvisos()
   const { id } = useParams()
   const dispatch = useDispatch()
   const { ordenActual, mensaje, guardando: cancelando, error } = useSelector((state) => state.ordenes)
@@ -29,11 +28,11 @@ function DetalleOrden() {
   // Cuando el backend confirma la cancelación, su aviso sale flotante y se actualizan las millas del perfil
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(fetchPerfil())
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   if (error && !orden) {
     return (

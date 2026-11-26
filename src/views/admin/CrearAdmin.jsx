@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FormAdministrador from '../../components/admin/FormAdministrador'
-import { useAvisos } from '../../context/AvisosContext'
+import { avisar } from '../../redux/avisosSlice'
 import { limpiarMensaje, reiniciarError } from '../../redux/usuarioSlice'
 import './Panel.css'
 
 function CrearAdmin() {
-  const { avisar } = useAvisos()
   const dispatch = useDispatch()
   const { mensaje, administradoresCreados } = useSelector((state) => state.usuario)
 
@@ -19,10 +18,10 @@ function CrearAdmin() {
   // Cuando el backend confirma que se creó el administrador, se avisa con un mensaje flotante
   useEffect(() => {
     if (mensaje) {
-      avisar(mensaje)
+      dispatch(avisar(mensaje))
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, dispatch])
+  }, [mensaje, dispatch])
 
   return (
     <>
