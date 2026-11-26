@@ -52,7 +52,7 @@ function FormVuelo() {
       </EncabezadoPagina>
 
       <div className="contenedor sobre-encabezado">
-        <section className="tarjeta panel-formulario">
+        <section className="tarjeta panel-formulario" data-plan="Torre de control · Plan de vuelo nuevo">
           {error && <Mensaje>{error}</Mensaje>}
 
           <form onSubmit={handleSubmit}>

@@ -30,7 +30,7 @@ function FormAdministrador() {
   }
 
   return (
-    <section className="tarjeta panel-formulario">
+    <section className="tarjeta panel-formulario" data-plan="Torre de control · Nuevo administrador">
       {error && <Mensaje>{error}</Mensaje>}
 
       <form onSubmit={handleSubmit}>

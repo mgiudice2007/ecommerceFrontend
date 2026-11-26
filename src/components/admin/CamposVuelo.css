@@ -1,5 +1,32 @@
 .panel-formulario {
   max-width: 760px;
+  overflow: hidden;
+  padding-top: 0;
+}
+
+/* Cabecera de torre de control: el texto sale del atributo data-plan de cada formulario */
+.panel-formulario::before {
+  content: attr(data-plan);
+  display: block;
+  margin: 0 -24px 22px;
+  padding: 14px 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(95, 224, 164, 0.18), transparent 45%),
+    linear-gradient(160deg, #0c1c33 0%, #081426 100%);
+  color: #5fe0a4;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Cada dato obligatorio marca su estado con una franja: ambar si falta, verde si esta listo */
+.panel-formulario .campo :is(input, select, textarea):required {
+  border-left: 4px solid #f2a20c;
+}
+
+.panel-formulario .campo :is(input, select, textarea):required:valid {
+  border-left-color: #2bb673;
 }
 
 .panel-formulario h2 {

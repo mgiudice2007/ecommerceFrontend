@@ -45,7 +45,7 @@ function FormDatosVuelo({ vuelo, aeropuertos, categorias, guardando, onGuardar }
   }
 
   return (
-    <section className="tarjeta panel-formulario">
+    <section className="tarjeta panel-formulario" data-plan="Torre de control · Plan de vuelo">
       <h2>Datos del vuelo</h2>
       <p className="texto-suave">
         Cambiá solo lo que necesites. Abajo ves un resumen de lo que modificaste antes de guardar. Las compras ya hechas no
