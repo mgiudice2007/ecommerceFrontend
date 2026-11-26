@@ -8,65 +8,274 @@
   font-size: 1.1rem;
 }
 
-/* Pase de embarque: franja naranja, fondo con brillo y el QR separado por
-   una linea de corte punteada */
-.pase-embarque {
+/* ---------- Tarjeta de embarque ----------
+   La sombra va en .pase-sombra porque la mascara que recorta las muescas
+   tambien cortaria la sombra. */
+.pase-sombra {
+  margin-bottom: 14px;
+  container-type: inline-size;
+  filter: drop-shadow(0 8px 22px rgba(4, 30, 66, 0.12));
+}
+
+.pase {
+  --talon: 190px;
+  --corte: calc(100% - var(--talon));
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr var(--talon);
+  overflow: hidden;
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+  color: var(--texto);
+  /* Dos muescas redondas arriba y abajo, donde se corta el talon */
+  -webkit-mask:
+    radial-gradient(circle 12px at var(--corte) 0, transparent 97%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 12px at var(--corte) 100%, transparent 97%, #000) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle 12px at var(--corte) 0, transparent 97%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 12px at var(--corte) 100%, transparent 97%, #000) bottom / 100% 51% no-repeat;
+}
+
+.pase-principal {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 26px 16px;
+}
+
+/* Encabezado: marca a la izquierda, "Tarjeta de embarque" a la derecha y una linea azul */
+.pase-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--azul);
+}
+
+.pase-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pase-marca > span:last-child {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.pase-marca strong {
+  color: var(--azul);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.pase-marca small {
+  color: var(--texto-suave);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pase-marca-icono {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 15px;
+}
+
+.pase-titulo {
+  color: var(--azul-noche);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Datos en una grilla de 4 columnas, con rotulo chiquito arriba */
+.pase-datos {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.2fr 0.8fr;
+  gap: 16px 20px;
+  padding: 18px 0 16px;
+}
+
+.pase-dato {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pase-dato small {
+  color: var(--texto-suave);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pase-dato strong {
+  overflow: hidden;
+  color: var(--azul-noche);
+  font-size: 15px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pase-dato-pasajero strong {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.pase-dato-ancho {
+  grid-column: span 2;
+}
+
+.pase-dato-grande strong {
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.pase-dato-destacado strong {
+  color: var(--azul);
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.pase-pie {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: stretch;
-  gap: 16px;
-  margin-bottom: 12px;
-  padding: 16px 18px;
-  border: 1px solid var(--borde);
-  border-left: 6px solid var(--naranja);
-  border-radius: var(--radio);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(255, 154, 60, 0.12), transparent 45%),
-    var(--superficie);
-  box-shadow: var(--sombra);
-}
-
-.pase-anulado {
-  border-left-color: var(--rojo);
-  opacity: 0.75;
-}
-
-.pase-datos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pase-datos small {
-  color: var(--naranja-oscuro);
-  font-weight: 800;
-  font-size: 12px;
+  gap: 6px 20px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--borde);
+  color: var(--texto-suave);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.pase-nombre {
-  font-size: 1.15rem;
-  color: var(--azul-noche);
-}
-
-.pase-codigo {
-  margin-top: 6px;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--azul-noche);
-}
-
-.pase-qr {
+/* Talon: clase arriba, QR, asiento grande y codigo de barras */
+.pase-talon {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: 8px;
-  padding-left: 18px;
-  border-left: 2px dashed #c9d6e6;
+  gap: 12px;
+  padding: 20px 18px 16px;
+  border-left: 2px dashed var(--borde);
+}
+
+.pase-talon-clase {
+  color: var(--azul);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pase-talon-anulado {
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pase-talon-asiento {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pase-talon-asiento strong {
+  color: var(--azul-noche);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.pase-talon-asiento small {
+  color: var(--texto-suave);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pase-barras {
+  width: 100%;
+  height: 34px;
+  margin-top: auto;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--azul-noche) 0 2px,
+    transparent 2px 4px,
+    var(--azul-noche) 4px 5px,
+    transparent 5px 8px,
+    var(--azul-noche) 8px 11px,
+    transparent 11px 13px,
+    var(--azul-noche) 13px 14px,
+    transparent 14px 17px
+  );
+}
+
+/* Sello encima del pase: "Anulado" (compra cancelada) o "Embarcado" */
+.pase-sello {
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  font-size: 22px;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  pointer-events: none;
+}
+
+.pase-anulado .pase-principal,
+.pase-anulado .pase-talon {
+  opacity: 0.55;
+}
+
+/* En pantallas angostas el talon pasa abajo */
+@container (max-width: 640px) {
+  .pase {
+    grid-template-columns: 1fr;
+    -webkit-mask: none;
+    mask: none;
+  }
+
+  .pase-datos {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pase-titulo {
+    display: none;
+  }
+
+  .pase-talon {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border-top: 2px dashed var(--borde);
+    border-left: none;
+  }
+
+  .pase-talon-asiento {
+    width: auto;
+    flex-direction: column;
+  }
 }
 
 /* ---------- Pases que se imprimen (pantalla de compra exitosa) ---------- */
@@ -119,7 +328,7 @@
 
 /* Cada pase "sale" de la ranura: se va destapando de arriba hacia abajo a los saltitos */
 .imprimiendo .pase-salida {
-  animation: imprimir-pase 1.4s steps(14) backwards;
+  animation: imprimir-pase 1.6s steps(16) backwards;
 }
 
 .imprimiendo .pase-salida:first-of-type {
