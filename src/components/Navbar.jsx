@@ -6,6 +6,14 @@ import { millas } from '../utils/formato'
 import Logo from './Logo'
 import './Navbar.css'
 
+// Valija del carrito (dibujo simple con SVG, toma el color del texto)
+const IconoValija = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <rect x="4" y="7" width="16" height="13" rx="2" />
+    <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M9 11v5M15 11v5" />
+  </svg>
+)
+
 function Navbar() {
   const dispatch = useDispatch()
   const usuario = useSelector((state) => state.usuario.sesion)
@@ -52,8 +60,15 @@ function Navbar() {
           {esComprador && <NavLink to="/mis-compras">Mis compras</NavLink>}
           {esComprador && (
             <NavLink to="/carrito" className="navbar-carrito">
+              <span className="navbar-valija">
+                <IconoValija />
+                {cantidadCarrito > 0 && (
+                  <span className="navbar-contador" aria-label={`${cantidadCarrito} pasajes`}>
+                    {cantidadCarrito}
+                  </span>
+                )}
+              </span>
               Carrito
-              {cantidadCarrito > 0 && <span className="navbar-contador">{cantidadCarrito}</span>}
             </NavLink>
           )}
           {esAdmin && (
@@ -69,7 +84,10 @@ function Navbar() {
                 <span className="navbar-inicial" aria-hidden="true">
                   {nombre[0]?.toUpperCase()}
                 </span>
-                {nombre}
+                <span className="navbar-viajero">
+                  {nombre}
+                  <small>{esComprador && perfil ? `✈ ${millas(perfil.millas)} millas` : esAdmin ? 'Administrador' : 'Pasajero BCA'}</small>
+                </span>
                 <span className={`navbar-flecha ${cuentaAbierta ? 'abierta' : ''}`} aria-hidden="true">
                   ▾
                 </span>

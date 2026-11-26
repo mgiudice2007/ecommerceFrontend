@@ -1,8 +1,9 @@
+/* El buscador es un boarding pass: cabecera azul noche, la ruta con los codigos grandes,
+   una linea de corte punteada y abajo las fechas, los pasajeros y el boton */
 .buscador {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22px 24px;
+  padding: 0;
 }
 
 .buscador-cabecera {
@@ -11,68 +12,135 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 14px 24px;
+  border-radius: var(--radio-grande) var(--radio-grande) 0 0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.3), transparent 45%),
+    var(--azul-noche);
 }
 
 .buscador-cabecera h2 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 500;
+  color: #ffcf7a;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
+/* Ruta: origen, trayecto y destino */
 .buscador-ruta {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr minmax(90px, 180px) 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px 20px;
 }
 
 .buscador-ruta .buscador-campo {
   position: relative;
-}
-
-.buscador-ruta .buscador-campo:first-child {
-  border-radius: var(--radio) 0 0 var(--radio);
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
 }
 
 .buscador-ruta .buscador-campo:last-child {
-  border-left: none;
-  border-radius: 0 var(--radio) var(--radio) 0;
+  text-align: right;
 }
 
+.buscador-ruta .buscador-campo:last-child input {
+  text-align: right;
+}
+
+.buscador-iata {
+  color: var(--azul-noche);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+
+.buscador-iata.vacio {
+  color: #c9d6e6;
+}
+
+.buscador-ruta input {
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.buscador-ruta .buscador-campo:focus-within input {
+  color: var(--texto);
+}
+
+.buscador-trayecto {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 40px;
+}
+
+.buscador-trayecto::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #b9c8da 0 6px, transparent 6px 11px);
+}
+
+.buscador-trayecto-icono {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--naranja);
+  border-radius: 50%;
+  background: var(--naranja-suave);
+  color: var(--naranja);
+  font-size: 18px;
+  font-weight: 800;
+  transition: transform 0.4s ease;
+}
+
+.buscador-trayecto-icono.ida-vuelta {
+  transform: rotate(180deg);
+}
+
+/* Linea de corte y abajo la fila crema con fechas, pasajeros y boton */
 .buscador-fila {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: stretch;
   gap: 12px;
-}
-
-.buscador-fechas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-}
-
-.buscador-fechas .buscador-campo:first-child:not(:last-child) {
-  border-radius: var(--radio) 0 0 var(--radio);
-}
-
-.buscador-fechas .buscador-campo + .buscador-campo {
-  border-left: none;
-  border-radius: 0 var(--radio) var(--radio) 0;
+  padding: 16px 24px 20px;
+  border-top: 2px dashed #dce4ee;
+  border-radius: 0 0 var(--radio-grande) var(--radio-grande);
+  background: #fffaf5;
 }
 
 .buscador-campo {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   background: var(--superficie);
 }
 
 .buscador-campo label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--texto);
+  color: var(--texto-suave);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .buscador-campo select,
@@ -82,14 +150,14 @@
   border: none;
   background: transparent;
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
   color: var(--texto);
   cursor: pointer;
 }
 
-.buscador-campo:focus-within {
-  border-color: var(--azul);
-  box-shadow: inset 0 0 0 1px var(--azul);
+.buscador-fila .buscador-campo:focus-within {
+  border-color: var(--naranja);
+  box-shadow: inset 0 0 0 1px var(--naranja);
 }
 
 .buscador-campo select:focus,
@@ -97,26 +165,61 @@
   outline: none;
 }
 
-.buscador-pie {
+/* Fecha estilo pasaje: el dia grande con el mes y el dia de la semana al lado */
+.buscador-fecha-pase {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--borde);
+  gap: 8px;
+}
+
+.buscador-fecha-pase strong {
+  color: var(--azul-noche);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.buscador-fecha-pase small {
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.buscador-fecha-pase + .campo-fecha input {
+  font-size: 12px;
+  color: var(--texto-suave);
 }
 
 .buscador-error {
+  margin: 0;
+  padding: 0 24px 16px;
+  background: #fffaf5;
+  border-radius: 0 0 var(--radio-grande) var(--radio-grande);
   color: var(--rojo);
   font-size: 14px;
   font-weight: 600;
 }
 
+.buscador-fila:has(+ .buscador-error) {
+  border-radius: 0;
+}
+
+/* Boton: el avion despega cuando se busca */
 .buscador-boton {
+  align-self: stretch;
   min-height: 52px;
-  padding: 0 32px;
+  padding: 0 24px;
   font-size: 16px;
+}
+
+.buscador-boton-avion {
+  display: inline-block;
+  transition: transform 0.45s ease-in, opacity 0.45s ease-in;
+}
+
+.buscador-boton.despegando .buscador-boton-avion {
+  opacity: 0;
+  transform: translate(40px, -24px) rotate(-25deg);
 }
 
 /* El boton principal "brilla" solo cada tanto para llamar la atencion */
@@ -134,32 +237,24 @@
   }
 }
 
-@media (max-width: 860px) {
-.buscador-fila {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 560px) {
-.buscador {
-    padding: 18px 16px;
+@media (max-width: 640px) {
+  .buscador-cabecera,
+  .buscador-ruta,
+  .buscador-fila {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
-.buscador-ruta {
-    grid-template-columns: 1fr;
+  .buscador-ruta {
+    grid-template-columns: 1fr 56px 1fr;
+    gap: 8px;
   }
 
-.buscador-ruta .buscador-campo:first-child {
-    border-radius: var(--radio) var(--radio) 0 0;
+  .buscador-iata {
+    font-size: 30px;
   }
 
-.buscador-ruta .buscador-campo:last-child {
-    border-left: 1px solid var(--borde);
-    border-top: none;
-    border-radius: 0 0 var(--radio) var(--radio);
-  }
-
-.buscador-boton {
+  .buscador-boton {
     width: 100%;
   }
 }

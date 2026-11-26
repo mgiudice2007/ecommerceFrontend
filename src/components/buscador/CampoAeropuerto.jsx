@@ -5,6 +5,7 @@ import './CampoAeropuerto.css'
 function CampoAeropuerto({
   id,
   etiqueta,
+  codigo,
   placeholder,
   valor,
   sugerencias,
@@ -19,6 +20,10 @@ function CampoAeropuerto({
   return (
     <div className="buscador-campo">
       <label htmlFor={id}>{etiqueta}</label>
+      {/* El codigo del aeropuerto elegido se ve grande, como en un pasaje */}
+      <span className={`buscador-iata ${codigo ? '' : 'vacio'}`} aria-hidden="true">
+        {codigo || '···'}
+      </span>
       <input
         id={id}
         value={valor}

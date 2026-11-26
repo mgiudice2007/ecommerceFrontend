@@ -76,3 +76,13 @@ export const urlDeBusqueda = (viaje, filtros, pasajeros) => {
   }
   return `/vuelos?${params.toString()}`
 }
+
+// Fecha del buscador partida como en un pasaje: el dia grande y abajo el mes y el dia de
+// la semana ('2026-07-10' -> { dia: '10', detalle: 'jul · vie' }). Vacio si no hay fecha.
+export const partesDeFecha = (fecha) => {
+  if (!fecha) return null
+  const dia = new Date(`${fecha}T12:00:00`)
+  const mes = dia.toLocaleDateString('es-AR', { month: 'short' }).replace('.', '')
+  const semana = dia.toLocaleDateString('es-AR', { weekday: 'short' }).replace('.', '')
+  return { dia: fecha.slice(8, 10), detalle: `${mes} · ${semana}` }
+}

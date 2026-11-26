@@ -5,9 +5,11 @@ const OPCIONES = [
   { valor: 'ida', texto: 'Solo ida' },
 ]
 
+// Interruptor de dos opciones: una pastilla blanca con un avioncito se desliza hasta la elegida
 function SelectorTipoViaje({ viaje, onCambiar }) {
   return (
-    <div className="buscador-viaje" role="radiogroup" aria-label="Tipo de viaje">
+    <div className={`buscador-viaje ${viaje === 'ida' ? 'en-segunda' : ''}`} role="radiogroup" aria-label="Tipo de viaje">
+      <span className="buscador-viaje-pastilla" aria-hidden="true" />
       {OPCIONES.map((opcion) => (
         <label key={opcion.valor} className={viaje === opcion.valor ? 'activo' : ''}>
           <input
@@ -17,7 +19,11 @@ function SelectorTipoViaje({ viaje, onCambiar }) {
             checked={viaje === opcion.valor}
             onChange={() => onCambiar(opcion.valor)}
           />
-          {viaje === opcion.valor && <span aria-hidden="true">✓ </span>}
+          {viaje === opcion.valor && (
+            <span className="buscador-viaje-avion" aria-hidden="true">
+              ✈
+            </span>
+          )}
           {opcion.texto}
         </label>
       ))}

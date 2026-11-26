@@ -5,6 +5,7 @@ import {
   destinosDe,
   etiquetaAeropuerto,
   origenesDe,
+  partesDeFecha,
   problemaEnBusqueda,
   sugerenciasDe,
   urlDeBusqueda,
@@ -17,6 +18,18 @@ import SelectorTipoViaje from './buscador/SelectorTipoViaje'
 import CampoFecha from './CampoFecha'
 import './Buscador.css'
 
+// Fecha estilo pasaje: el dia grande y al lado el mes y el dia de la semana
+function FechaPase({ fecha }) {
+  const partes = partesDeFecha(fecha)
+  if (!partes) return null
+  return (
+    <span className="buscador-fecha-pase" aria-hidden="true">
+      <strong>{partes.dia}</strong>
+      <small>{partes.detalle}</small>
+    </span>
+  )
+}
+
 function Buscador({ inicial = {}, aeropuertos = [] }) {
   const navigate = useNavigate()
 
@@ -24,6 +37,7 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
   const [pasajeros, setPasajeros] = useState(inicial.pasajeros ?? SIN_PASAJEROS_EXTRA)
   const [verPasajeros, setVerPasajeros] = useState(false)
   const [error, setError] = useState('')
+  const [despegando, setDespegando] = useState(false)
   const [filtros, setFiltros] = useState({
     origen: inicial.origen ?? '',
     destino: inicial.destino ?? '',
@@ -89,7 +103,9 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
       setError(problema)
       return
     }
-    navigate(urlDeBusqueda(viaje, filtros, pasajeros))
+    // El avion del boton despega y recien despues se va a los resultados
+    setDespegando(true)
+    setTimeout(() => navigate(urlDeBusqueda(viaje, filtros, pasajeros)), 450)
   }
 
   return (
@@ -103,6 +119,7 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
         <CampoAeropuerto
           id="origen"
           etiqueta="Desde"
+          codigo={filtros.origen}
           placeholder="Aeroparque o Ezeiza"
           valor={textoDe('origen')}
           sugerencias={sugerenciasDe(origenes, textoDe('origen'), filtros.origen)}
@@ -114,9 +131,18 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
           onEscribir={(texto) => escribir('origen', texto)}
           onElegir={(a) => elegir('origen', a)}
         />
+
+        {/* Ruta punteada entre los dos aeropuertos: un avion si es solo ida, ida y vuelta si no */}
+        <div className="buscador-trayecto" aria-hidden="true">
+          <span className={`buscador-trayecto-icono ${viaje === 'idavuelta' ? 'ida-vuelta' : ''}`}>
+            {viaje === 'idavuelta' ? '⇄' : '✈'}
+          </span>
+        </div>
+
         <CampoAeropuerto
           id="destino"
           etiqueta="Hacia"
+          codigo={filtros.destino}
           placeholder="Escribí un destino"
           valor={textoDe('destino')}
           sugerencias={sugerenciasDe(destinos, textoDe('destino'), filtros.destino)}
@@ -131,23 +157,24 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
       </div>
 
       <div className="buscador-fila">
-        <div className="buscador-fechas">
-          <div className="buscador-campo">
-            <label htmlFor="ida">Ida</label>
-            <CampoFecha id="ida" min={hoy()} value={filtros.ida} onChange={(valor) => cambiarFecha('ida', valor)} />
-          </div>
-          {viaje === 'idavuelta' && (
-            <div className="buscador-campo">
-              <label htmlFor="vuelta">Vuelta</label>
-              <CampoFecha
-                id="vuelta"
-                min={filtros.ida || hoy()}
-                value={filtros.vuelta}
-                onChange={(valor) => cambiarFecha('vuelta', valor)}
-              />
-            </div>
-          )}
+        <div className="buscador-campo">
+          <label htmlFor="ida">Ida</label>
+          <FechaPase fecha={filtros.ida} />
+          <CampoFecha id="ida" min={hoy()} value={filtros.ida} onChange={(valor) => cambiarFecha('ida', valor)} />
         </div>
+
+        {viaje === 'idavuelta' && (
+          <div className="buscador-campo">
+            <label htmlFor="vuelta">Vuelta</label>
+            <FechaPase fecha={filtros.vuelta} />
+            <CampoFecha
+              id="vuelta"
+              min={filtros.ida || hoy()}
+              value={filtros.vuelta}
+              onChange={(valor) => cambiarFecha('vuelta', valor)}
+            />
+          </div>
+        )}
 
         <CampoPasajeros
           pasajeros={pasajeros}
@@ -155,14 +182,16 @@ function Buscador({ inicial = {}, aeropuertos = [] }) {
           onAlternar={() => setVerPasajeros(!verPasajeros)}
           onCambiar={setPasajeros}
         />
-      </div>
 
-      <div className="buscador-pie">
-        {error ? <span className="buscador-error">{error}</span> : <span />}
-        <button className="boton boton-accion buscador-boton">
-          <span aria-hidden="true">⌕</span> Buscar vuelos
+        <button className={`boton boton-accion buscador-boton ${despegando ? 'despegando' : ''}`}>
+          Buscar vuelos
+          <span className="buscador-boton-avion" aria-hidden="true">
+            ✈
+          </span>
         </button>
       </div>
+
+      {error && <p className="buscador-error">{error}</p>}
     </form>
   )
 }
