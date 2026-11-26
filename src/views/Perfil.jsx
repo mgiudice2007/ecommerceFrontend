@@ -3,8 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { avisar } from '../redux/avisosSlice'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import FormPerfil from '../components/perfil/FormPerfil'
+import SellosViaje from '../components/perfil/SellosViaje'
+import { fetchOrdenes } from '../redux/ordenesSlice'
 import { fetchPerfil, limpiarMensaje } from '../redux/usuarioSlice'
 import { fechaLarga, millas } from '../utils/formato'
+import { sellosDeViaje } from '../utils/ordenes'
 import './Perfil.css'
 import Cargando from '../components/comunes/Cargando'
 import Etiqueta from '../components/comunes/Etiqueta'
@@ -26,6 +29,16 @@ const NOMBRES_DE_ROL = {
 function Perfil() {
   const dispatch = useDispatch()
   const { perfil, mensaje, error } = useSelector((state) => state.usuario)
+  const { ordenes } = useSelector((state) => state.ordenes)
+  const { aeropuertos } = useSelector((state) => state.catalogo)
+  const esComprador = perfil?.rol === 'COMPRADOR'
+
+  // Las compras se piden para armar los sellos de viaje del pasaporte (solo compradores)
+  useEffect(() => {
+    if (esComprador && !ordenes) {
+      dispatch(fetchOrdenes())
+    }
+  }, [esComprador, ordenes, dispatch])
 
   // El perfil se pide al iniciar sesión; solo se vuelve a pedir si no llegó
   useEffect(() => {
@@ -91,6 +104,8 @@ function Perfil() {
           </aside>
 
           <FormPerfil perfil={perfil} />
+
+          {esComprador && <SellosViaje sellos={sellosDeViaje(ordenes, aeropuertos)} />}
         </div>
       </div>
     </>

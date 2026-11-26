@@ -16,3 +16,41 @@ export const numerosDeVuelo = (orden) => {
 export const rotuloVuelos = (orden) => (numerosDeVuelo(orden).length === 1 ? 'Vuelo N°' : 'Vuelos N°')
 
 export const textoNumerosDeVuelo = (orden) => `${rotuloVuelos(orden)} ${numerosDeVuelo(orden).join(' · ')}`
+
+// Sellos del pasaporte: un sello por cada vuelo de las compras confirmadas (un vuelo
+// repetido en varias compras cuenta una sola vez). El codigo del aeropuerto sale del
+// catalogo; si no se encuentra, se usan las 3 primeras letras de la ciudad.
+export const sellosDeViaje = (ordenes, aeropuertos) => {
+  const sellos = []
+  ;(ordenes ?? [])
+    .filter((orden) => orden.estado === 'CONFIRMADA')
+    .forEach((orden) =>
+      orden.items.forEach((item) => {
+        if (sellos.some((s) => s.clave === item.vueloId)) return
+        const aeropuerto = aeropuertos.find((a) => a.ciudad === item.destino)
+        sellos.push({
+          clave: item.vueloId,
+          iata: aeropuerto?.codigoIata ?? item.destino.slice(0, 3).toUpperCase(),
+          ciudad: item.destino,
+          fecha: item.fechaSalida,
+        })
+      }),
+    )
+  return sellos.sort((a, b) => a.fecha.localeCompare(b.fecha))
+}
+
+// La proxima compra confirmada cuyo vuelo todavia no salio (para la cuenta regresiva)
+export const proximoVuelo = (ordenes, ahora = Date.now()) => {
+  let proximo = null
+  ;(ordenes ?? [])
+    .filter((orden) => orden.estado === 'CONFIRMADA')
+    .forEach((orden) =>
+      orden.items.forEach((item) => {
+        const salida = new Date(item.fechaSalida).getTime()
+        if (salida > ahora && (!proximo || salida < proximo.salida)) {
+          proximo = { salida, destino: item.destino, numeroVuelo: item.numeroVuelo, ordenId: orden.id }
+        }
+      }),
+    )
+  return proximo
+}
