@@ -152,7 +152,7 @@ function DetalleVuelo() {
               onElegir={elegirClase}
             />
 
-            {!sinVenta && elegida && !agregado && (
+            {!sinVenta && elegida && (
               <ElegirAsientos
                 clase={elegida}
                 pasajeros={pasajeros}

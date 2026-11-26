@@ -3,10 +3,6 @@
   display: block;
   height: 340px;
   overflow: hidden;
-  /* Postal de correo aereo: rayas de sobre "air mail" con los colores de la pagina */
-  border: 6px solid transparent;
-  background:
-    repeating-linear-gradient(135deg, #ff8a3d 0 12px, #fff 12px 22px, #041e42 22px 34px, #fff 34px 44px) border-box;
   border-radius: var(--radio-grande);
   box-shadow: var(--sombra);
   color: #fff;
@@ -22,7 +18,6 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  border-radius: 13px;
   z-index: -2;
   transition: transform 0.5s ease;
 }
@@ -36,7 +31,6 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: 13px;
   background: linear-gradient(180deg, rgba(4, 30, 66, 0) 35%, rgba(4, 30, 66, 0.55) 60%, rgba(4, 30, 66, 0.92) 100%);
 }
 
