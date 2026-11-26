@@ -1,0 +1,85 @@
+/* Cartel oscuro de aeropuerto con el 404 en paletas y un avion dando vueltas */
+.vuelo-perdido {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 24px;
+  border-radius: var(--radio-grande);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.22), transparent 45%),
+    linear-gradient(180deg, #0c1c33 0%, #081426 100%);
+  box-shadow: var(--sombra-fuerte);
+  color: #fff;
+  text-align: center;
+}
+
+.vuelo-perdido-codigo .letras-giratorias {
+  font-size: 44px;
+}
+
+.vuelo-perdido-fila {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 140px;
+  gap: 12px;
+  width: min(520px, 100%);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+  text-align: left;
+}
+
+.vuelo-perdido-fila .hora {
+  color: #ffcf7a;
+  font-weight: 800;
+}
+
+.vuelo-perdido-fila .estado {
+  color: #ff8a80;
+  font-weight: 800;
+}
+
+.vuelo-perdido h1 {
+  margin: 10px 0 0;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.vuelo-perdido p {
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* El avion perdido da vueltas en una orbita punteada, arriba a la derecha */
+.vuelo-perdido-orbita {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  width: 90px;
+  height: 90px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: orbitar 6s linear infinite;
+}
+
+.vuelo-perdido-orbita span {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  margin-left: -10px;
+  color: var(--naranja);
+  font-size: 22px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .vuelo-perdido-fila {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .vuelo-perdido-orbita {
+    display: none;
+  }
+}
