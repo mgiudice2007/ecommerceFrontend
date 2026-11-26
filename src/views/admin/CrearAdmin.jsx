@@ -1,44 +1,28 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
+import FormAdministrador from '../../components/admin/FormAdministrador'
 import { useAvisos } from '../../context/AvisosContext'
-import { REGLA_NOMBRE, REGLA_USUARIO } from '../../utils/validaciones'
+import { limpiarMensaje, reiniciarError } from '../../redux/usuarioSlice'
 import './Panel.css'
-import Mensaje from '../../components/comunes/Mensaje'
-
-const FORM_VACIO = { nombre: '', apellido: '', username: '', mail: '', password: '' }
 
 function CrearAdmin() {
-  const [formData, setFormData] = useState(FORM_VACIO)
-  const [error, setError] = useState('')
   const { avisar } = useAvisos()
-  const [guardando, setGuardando] = useState(false)
+  const dispatch = useDispatch()
+  const { mensaje, administradoresCreados } = useSelector((state) => state.usuario)
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+  useEffect(() => {
+    dispatch(reiniciarError())
+  }, [dispatch])
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setError('')
-    setGuardando(true)
-
-    const datosAEnviar = {
-      ...formData,
-      nombre: formData.nombre.trim(),
-      apellido: formData.apellido.trim(),
-      username: formData.username.trim(),
-      rol: 'ADMIN',
+  // Cuando el backend confirma que se creó el administrador, se avisa con un mensaje flotante
+  useEffect(() => {
+    if (mensaje) {
+      avisar(mensaje)
+      dispatch(limpiarMensaje())
     }
-    api('/api/auth/registro/administrador', { method: 'POST', body: datosAEnviar })
-      .then((creado) => {
-        avisar(`Se creó el administrador "${creado.username}". Ya puede iniciar sesión.`)
-        setFormData(FORM_VACIO)
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setGuardando(false))
-  }
+  }, [mensaje, avisar, dispatch])
 
   return (
     <>
@@ -51,67 +35,7 @@ function CrearAdmin() {
       </EncabezadoPagina>
 
       <div className="contenedor sobre-encabezado">
-        <section className="tarjeta panel-formulario">
-          {error && <Mensaje>{error}</Mensaje>}
-
-          <form onSubmit={handleSubmit}>
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="nombre">Nombre</label>
-                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} {...REGLA_NOMBRE} required />
-              </div>
-              <div className="campo">
-                <label htmlFor="apellido">Apellido</label>
-                <input
-                  id="apellido"
-                  name="apellido"
-                  value={formData.apellido}
-                  onChange={handleChange}
-                  {...REGLA_NOMBRE}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="fila-campos">
-              <div className="campo">
-                <label htmlFor="username">Usuario</label>
-                <input
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  {...REGLA_USUARIO}
-                  required
-                />
-                <small className="texto-suave">4 a 20 caracteres, empieza con letra, sin espacios ni tildes.</small>
-              </div>
-              <div className="campo">
-                <label htmlFor="mail">Correo electrónico</label>
-                <input id="mail" name="mail" type="email" value={formData.mail} onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className="campo">
-              <label htmlFor="password">Contraseña inicial</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                minLength={6}
-                value={formData.password}
-                onChange={handleChange}
-                autoComplete="new-password"
-                placeholder="Mínimo 6 caracteres"
-                required
-              />
-            </div>
-
-            <button className="boton boton-primario" disabled={guardando}>
-              {guardando ? 'Creando…' : 'Crear administrador'}
-            </button>
-          </form>
-        </section>
+        <FormAdministrador key={administradoresCreados} />
       </div>
     </>
   )

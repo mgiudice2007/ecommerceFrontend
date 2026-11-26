@@ -12,7 +12,6 @@ import ListaClases from '../components/detalle/ListaClases'
 import PanelCompra from '../components/detalle/PanelCompra'
 import PortadaVuelo from '../components/detalle/PortadaVuelo'
 import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
-import { useAuth } from '../context/AuthContext'
 import { agregarPasajes, reiniciarAgregado } from '../redux/carritoSlice'
 import { fetchFotosVuelo, fetchMapaAsientos, fetchVuelo } from '../redux/vuelosSlice'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
@@ -25,7 +24,10 @@ function DetalleVuelo() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-  const { estaLogueado, esComprador, esAdmin } = useAuth()
+  const sesion = useSelector((state) => state.usuario.sesion)
+  const estaLogueado = sesion !== null
+  const esComprador = sesion?.rol === 'COMPRADOR'
+  const esAdmin = sesion?.rol === 'ADMIN'
   const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
   const { vueloActual, fotosVuelo, mapaAsientos, errorMapa, error } = useSelector((state) => state.vuelos)

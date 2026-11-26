@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { clienteApi } from './conexion'
+import { logout, vencerSesion } from './usuarioSlice'
 
 export const fetchOrdenes = createAsyncThunk('ordenes/fetchOrdenes', async () => {
   const { data } = await clienteApi.get('/api/ordenes')
@@ -45,11 +46,13 @@ const ordenesSlice = createSlice({
       state.ordenConfirmada = null
       state.error = null
     },
-    // Al cerrar sesión no queda nada de las compras del usuario anterior
-    vaciarOrdenes: () => initialState,
   },
   extraReducers: (builder) => {
     builder
+      // Al salir de la sesión no queda nada de las compras del usuario anterior
+      .addCase(logout.fulfilled, () => initialState)
+      .addCase(logout.rejected, () => initialState)
+      .addCase(vencerSesion, () => initialState)
       .addCase(fetchOrdenes.pending, (state) => {
         state.loading = true
         state.error = null
@@ -113,5 +116,5 @@ const ordenesSlice = createSlice({
   },
 })
 
-export const { limpiarMensaje, reiniciarConfirmada, vaciarOrdenes } = ordenesSlice.actions
+export const { limpiarMensaje, reiniciarConfirmada } = ordenesSlice.actions
 export default ordenesSlice.reducer

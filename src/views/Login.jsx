@@ -1,18 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { login, reiniciarError } from '../redux/usuarioSlice'
 import './Auth.css'
 import Etiqueta from '../components/comunes/Etiqueta'
 import Mensaje from '../components/comunes/Mensaje'
 
 function Login() {
-  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch()
+  const { sesion, guardando: cargando, error } = useSelector((state) => state.usuario)
 
   const [formData, setFormData] = useState({ username: '', password: '' })
-  const [error, setError] = useState('')
-  const [cargando, setCargando] = useState(false)
+
+  useEffect(() => {
+    dispatch(reiniciarError())
+  }, [dispatch])
+
+  // Cuando el backend confirma el login, se va a la página que se quería ver o al inicio de su rol
+  useEffect(() => {
+    if (sesion) {
+      navigate(location.state?.desde ?? (sesion.rol === 'COMPRADOR' ? '/' : '/panel'), { replace: true })
+    }
+  }, [sesion, location.state, navigate])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -20,18 +31,7 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setError('')
-    setCargando(true)
-
-    login(formData.username, formData.password)
-      .then((usuario) => {
-        const destino = location.state?.desde ?? (usuario.rol === 'COMPRADOR' ? '/' : '/panel')
-        navigate(destino, { replace: true })
-      })
-      .catch((err) => {
-        setError(err.message)
-        setCargando(false)
-      })
+    dispatch(login(formData))
   }
 
   return (

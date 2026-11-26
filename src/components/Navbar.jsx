@@ -1,17 +1,21 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { NavLink } from 'react-router-dom'
+import { logout } from '../redux/usuarioSlice'
 import { millas } from '../utils/formato'
 import Logo from './Logo'
 import './Navbar.css'
 
 function Navbar() {
-  const { usuario, perfil, estaLogueado, esComprador, esAdmin, logout } = useAuth()
+  const dispatch = useDispatch()
+  const usuario = useSelector((state) => state.usuario.sesion)
+  const perfil = useSelector((state) => state.usuario.perfil)
   const carrito = useSelector((state) => state.carrito.carrito)
+  const estaLogueado = usuario !== null
+  const esComprador = usuario?.rol === 'COMPRADOR'
+  const esAdmin = usuario?.rol === 'ADMIN'
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [cuentaAbierta, setCuentaAbierta] = useState(false)
-  const navigate = useNavigate()
 
   const cerrarMenu = () => {
     setMenuAbierto(false)
@@ -19,10 +23,8 @@ function Navbar() {
   }
 
   const cerrarSesion = () => {
-    logout().then(() => {
-      cerrarMenu()
-      navigate('/')
-    })
+    cerrarMenu()
+    dispatch(logout())
   }
 
   const cantidadCarrito = carrito ? carrito.items.reduce((total, item) => total + item.cantidad, 0) : 0

@@ -11,9 +11,9 @@ import DetallePago from '../components/pago/DetallePago'
 import PasosCompra from '../components/pago/PasosCompra'
 import SelectorMedioPago from '../components/pago/SelectorMedioPago'
 import PasoPasajeros from '../components/pasajeros/PasoPasajeros'
-import { useAuth } from '../context/AuthContext'
 import { fetchCarrito } from '../redux/carritoSlice'
 import { confirmarCompra, reiniciarConfirmada } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
 import { calcularMillas, vuelosSinAdulto } from '../utils/carrito'
 import { armarPersonas, pedidoDePasajeros, validarPersonas } from '../utils/datosPasajeros'
 import {
@@ -28,7 +28,6 @@ import './Carrito.css'
 import './Checkout.css'
 
 function Checkout() {
-  const { recargarPerfil } = useAuth()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { carrito, error: errorCarrito } = useSelector((state) => state.carrito)
@@ -52,11 +51,11 @@ function Checkout() {
   // Cuando el backend confirma el pago, se actualizan las millas del perfil y se sigue a la compra exitosa
   useEffect(() => {
     if (ordenConfirmada) {
-      recargarPerfil()
+      dispatch(fetchPerfil())
       dispatch(reiniciarConfirmada())
       navigate(`/compra-exitosa/${ordenConfirmada}`, { replace: true })
     }
-  }, [ordenConfirmada, recargarPerfil, dispatch, navigate])
+  }, [ordenConfirmada, dispatch, navigate])
 
   if (!carrito) {
     return (

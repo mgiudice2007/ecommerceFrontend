@@ -9,14 +9,13 @@ import Hero from '../components/inicio/Hero'
 import LlamadoRegistro from '../components/inicio/LlamadoRegistro'
 import SeccionDestinos from '../components/inicio/SeccionDestinos'
 import SeccionMundo from '../components/inicio/SeccionMundo'
-import { useAuth } from '../context/AuthContext'
 import { fetchPortadas, fetchVuelosDestacados } from '../redux/vuelosSlice'
 import { argentinaDe, ATAJOS, destinosMostrados, mundoDe, ofertasDe, REGIONES } from '../utils/destinos'
 import './Inicio.css'
 
 function Inicio() {
-  const { estaLogueado } = useAuth()
   const dispatch = useDispatch()
+  const estaLogueado = useSelector((state) => state.usuario.sesion) !== null
   const { aeropuertos } = useSelector((state) => state.catalogo)
   const { vuelosDestacados: vuelos, portadas, loading, error } = useSelector((state) => state.vuelos)
 

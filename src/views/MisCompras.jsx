@@ -7,13 +7,12 @@ import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
-import { useAuth } from '../context/AuthContext'
 import { useAvisos } from '../context/AvisosContext'
 import { cancelarOrden, fetchOrdenes, limpiarMensaje } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
 import './MisCompras.css'
 
 function MisCompras() {
-  const { recargarPerfil } = useAuth()
   const { avisar } = useAvisos()
   const dispatch = useDispatch()
   const { ordenes, mensaje, guardando, error } = useSelector((state) => state.ordenes)
@@ -29,10 +28,10 @@ function MisCompras() {
   useEffect(() => {
     if (mensaje) {
       avisar(mensaje)
-      recargarPerfil()
+      dispatch(fetchPerfil())
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, recargarPerfil, dispatch])
+  }, [mensaje, avisar, dispatch])
 
   const cancelar = (orden) => {
     setACancelar(null)

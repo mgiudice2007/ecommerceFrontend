@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { clienteApi } from './conexion'
 import { confirmarCompra } from './ordenesSlice'
+import { logout, vencerSesion } from './usuarioSlice'
 
 export const fetchCarrito = createAsyncThunk('carrito/fetchCarrito', async () => {
   const { data } = await clienteApi.get('/api/carrito')
@@ -52,8 +53,6 @@ const carritoSlice = createSlice({
       state.pasajesAgregados = false
       state.error = null
     },
-    // Se usa al cerrar sesión: el carrito queda sin cargar y se pide de nuevo la próxima vez
-    vaciarCarrito: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -71,6 +70,10 @@ const carritoSlice = createSlice({
       })
       // Al pagar, el backend vacía el carrito: queda sin cargar y se pide de nuevo la próxima vez
       .addCase(confirmarCompra.fulfilled, () => initialState)
+      // Al salir de la sesión no queda nada del carrito del usuario anterior
+      .addCase(logout.fulfilled, () => initialState)
+      .addCase(logout.rejected, () => initialState)
+      .addCase(vencerSesion, () => initialState)
       .addCase(fetchVuelosDelCarrito.fulfilled, (state, action) => {
         state.vuelosDelCarrito = { ...state.vuelosDelCarrito, ...action.payload }
       })
@@ -117,5 +120,5 @@ const carritoSlice = createSlice({
   },
 })
 
-export const { reiniciarAgregado, vaciarCarrito } = carritoSlice.actions
+export const { reiniciarAgregado } = carritoSlice.actions
 export default carritoSlice.reducer

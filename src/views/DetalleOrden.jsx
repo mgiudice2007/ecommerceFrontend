@@ -6,14 +6,13 @@ import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
 import Boleto from '../components/ordenes/Boleto'
 import EncabezadoOrden from '../components/ordenes/EncabezadoOrden'
-import { useAuth } from '../context/AuthContext'
 import { useAvisos } from '../context/AvisosContext'
 import { cancelarOrden, fetchOrden, limpiarMensaje } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
 import { textoCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 function DetalleOrden() {
-  const { recargarPerfil } = useAuth()
   const { avisar } = useAvisos()
   const { id } = useParams()
   const dispatch = useDispatch()
@@ -31,10 +30,10 @@ function DetalleOrden() {
   useEffect(() => {
     if (mensaje) {
       avisar(mensaje)
-      recargarPerfil()
+      dispatch(fetchPerfil())
       dispatch(limpiarMensaje())
     }
-  }, [mensaje, avisar, recargarPerfil, dispatch])
+  }, [mensaje, avisar, dispatch])
 
   if (error && !orden) {
     return (

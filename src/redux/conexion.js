@@ -1,12 +1,31 @@
 import axios from 'axios'
-import { BASE_URL, mensajeDeError, obtenerToken } from '../api/api'
+
+export const BASE_URL = 'http://localhost:8080'
+
+const mensajeDeError = (data, status) => {
+  if (data?.fields) {
+    return Object.values(data.fields).join('. ')
+  }
+  if (data?.error && !['Unauthorized', 'Forbidden'].includes(data.error)) {
+    return data.error
+  }
+  if (status === 401) return 'Tenés que iniciar sesión'
+  if (status === 403) return 'No tenés permiso para hacer esto'
+  return 'Ocurrió un error inesperado'
+}
 
 // Un solo cliente para todos los slices: la URL base, el token y los errores se resuelven acá y no en cada llamada
 export const clienteApi = axios.create({ baseURL: BASE_URL })
 
-// Antes de cada pedido agrega el JWT si hay sesión (hoy sigue en localStorage hasta que auth pase a Redux)
+// El token de la sesión vive en el store (slice `usuario`); store.js se lo pasa a este módulo cada vez que cambia
+let token = null
+
+export const fijarToken = (nuevoToken) => {
+  token = nuevoToken
+}
+
+// Antes de cada pedido agrega el JWT si hay sesión
 clienteApi.interceptors.request.use((config) => {
-  const token = obtenerToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
