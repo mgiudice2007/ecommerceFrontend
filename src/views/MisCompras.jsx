@@ -6,8 +6,10 @@ import EncabezadoPagina from '../components/EncabezadoPagina'
 import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
+import CuentaRegresiva from '../components/ordenes/CuentaRegresiva'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
 import { usePortadas } from '../hooks/usePortadas'
+import { proximoVuelo } from '../utils/ordenes'
 import { avisar } from '../redux/avisosSlice'
 import { cancelarOrden, fetchOrdenes, limpiarMensaje } from '../redux/ordenesSlice'
 import { fetchPerfil } from '../redux/usuarioSlice'
@@ -40,6 +42,8 @@ function MisCompras() {
     dispatch(cancelarOrden(orden.id))
   }
 
+  const proximo = proximoVuelo(ordenes)
+
   return (
     <>
       <EncabezadoPagina titulo="Mis compras" subtitulo="Revisá tus pasajes y cancelá una compra si cambian tus planes." />
@@ -48,6 +52,8 @@ function MisCompras() {
         {error && <Mensaje>{error}</Mensaje>}
 
         {!ordenes && !error && <Cargando texto="Cargando compras…" />}
+
+        {proximo && <CuentaRegresiva proximo={proximo} />}
 
         {ordenes?.length === 0 && (
           <EstadoVacio

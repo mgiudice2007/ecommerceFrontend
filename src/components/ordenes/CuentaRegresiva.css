@@ -1,0 +1,84 @@
+/* Cartel azul noche con la cuenta regresiva: texto a la izquierda y los numeros
+   en paletas de cartel de aeropuerto a la derecha */
+.cuenta-regresiva {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px 32px;
+  margin-bottom: 24px;
+  padding: 24px 28px;
+  border-radius: var(--radio-grande);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.3), transparent 45%),
+    linear-gradient(160deg, #0c1c33 0%, #081426 100%);
+  box-shadow: var(--sombra-fuerte);
+  color: #fff;
+  animation: aparecer 0.5s ease-out backwards;
+}
+
+.cuenta-regresiva-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cuenta-regresiva-texto span {
+  color: #ffb066;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cuenta-regresiva-texto strong {
+  font-size: 28px;
+}
+
+.cuenta-regresiva-texto small {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cuenta-regresiva-texto a {
+  margin-top: 8px;
+  color: #ffcf7a;
+  font-size: 14px;
+}
+
+.cuenta-regresiva-reloj {
+  display: flex;
+  gap: 14px;
+}
+
+.cuenta-regresiva-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.cuenta-regresiva-bloque .letras-giratorias {
+  font-size: 30px;
+}
+
+.cuenta-regresiva-bloque small {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 560px) {
+  .cuenta-regresiva {
+    padding: 20px;
+  }
+
+  .cuenta-regresiva-reloj {
+    gap: 8px;
+  }
+
+  .cuenta-regresiva-bloque .letras-giratorias {
+    font-size: 22px;
+  }
+}
