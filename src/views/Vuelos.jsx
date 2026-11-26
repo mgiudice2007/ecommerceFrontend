@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 import Buscador from '../components/Buscador'
 import EncabezadoPagina from '../components/EncabezadoPagina'
@@ -9,8 +10,8 @@ import AyudaVuelos from '../components/vuelos/AyudaVuelos'
 import FiltroPrecio from '../components/vuelos/FiltroPrecio'
 import ResultadosIdaYVuelta from '../components/vuelos/ResultadosIdaYVuelta'
 import ResultadosSoloIda from '../components/vuelos/ResultadosSoloIda'
+import { fetchBusqueda } from '../redux/vuelosSlice'
 import {
-  buscarVuelos,
   consultaDePasajeros,
   consultaDeTramoIda,
   consultasDeBusqueda,
@@ -18,8 +19,6 @@ import {
   esIdaYVuelta,
 } from '../utils/busqueda'
 import { leerPasajeros } from '../utils/pasajeros'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAeropuertos } from '../redux/catalogoSlice'
 import './Vuelos.css'
 
 function Vuelos() {
@@ -28,17 +27,15 @@ function Vuelos() {
 
   const busqueda = searchParams.toString()
 
-  const [respuesta, setRespuesta] = useState({ busqueda: null, datos: null, error: '' })
-  const cargando = respuesta.busqueda !== busqueda
-  const resultado = cargando ? null : respuesta.datos
-  const error = cargando ? '' : respuesta.error
-
   const dispatch = useDispatch()
   const { aeropuertos } = useSelector((state) => state.catalogo)
+  const { resultadoBusqueda, loading, error: errorBusqueda } = useSelector((state) => state.vuelos)
 
-  useEffect(() => {
-    dispatch(fetchAeropuertos())
-  }, [dispatch])
+  // El resultado guardado en el store es de la búsqueda que se hizo antes; hasta que llegue el de esta, se espera
+  const esDeEstaBusqueda = resultadoBusqueda?.consulta === busqueda
+  const cargando = loading || (!esDeEstaBusqueda && !errorBusqueda)
+  const resultado = !cargando && esDeEstaBusqueda ? resultadoBusqueda : null
+  const error = cargando ? '' : errorBusqueda
 
   const [precios, setPrecios] = useState({
     precioMin: searchParams.get('precioMin') ?? '',
@@ -46,24 +43,10 @@ function Vuelos() {
   })
 
   useEffect(() => {
-    const consultas = consultasDeBusqueda(busqueda)
-    if (!consultas) return
-
-    if (!consultas.vuelta) {
-      buscarVuelos(consultas.ida)
-        .then((ida) => setRespuesta({ busqueda, datos: { ida, vuelta: null }, error: '' }))
-        .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
-      return
+    if (consultasDeBusqueda(busqueda)) {
+      dispatch(fetchBusqueda(busqueda))
     }
-
-    buscarVuelos(consultas.ida)
-      .then((ida) =>
-        buscarVuelos(consultas.vuelta).then((regreso) =>
-          setRespuesta({ busqueda, datos: { ida, vuelta: regreso }, error: '' }),
-        ),
-      )
-      .catch((err) => setRespuesta({ busqueda, datos: null, error: err.message }))
-  }, [busqueda])
+  }, [busqueda, dispatch])
 
   const cambiarFiltro = (cambios) => {
     const params = new URLSearchParams(searchParams)

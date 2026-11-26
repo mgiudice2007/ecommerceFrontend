@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import FormClase from '../../components/admin/FormClase'
 import FormDatosVuelo from '../../components/admin/FormDatosVuelo'
@@ -12,12 +12,23 @@ import TablaClases from '../../components/admin/TablaClases'
 import TablaDescuentos from '../../components/admin/TablaDescuentos'
 import Cargando from '../../components/comunes/Cargando'
 import Mensaje from '../../components/comunes/Mensaje'
-import { useAvisos } from '../../context/AvisosContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAeropuertos, fetchCategorias, fetchClases } from '../../redux/catalogoSlice'
-import { useDescuentosVuelo } from '../../hooks/useDescuentosVuelo'
-import { useDisponibilidades } from '../../hooks/useDisponibilidades'
-import { useFotosVuelo } from '../../hooks/useFotosVuelo'
+import { avisar } from '../../redux/avisosSlice'
+import {
+  alternarDescuento,
+  crearDescuento,
+  crearDisponibilidad,
+  editarDisponibilidad,
+  editarVuelo,
+  eliminarDescuento,
+  eliminarDisponibilidad,
+  eliminarFoto,
+  fetchDescuentosVuelo,
+  fetchFotosVuelo,
+  fetchVuelo,
+  limpiarMensaje,
+  reiniciarGuardado,
+  subirFoto,
+} from '../../redux/vuelosSlice'
 import { fechaLarga, hora } from '../../utils/formato'
 import { cuerpoVuelo } from '../../utils/vuelos'
 import './Panel.css'
@@ -37,66 +48,59 @@ function GestionVuelo() {
   const vueloId = Number(id)
   const location = useLocation()
   const navigate = useNavigate()
-
-  const [vuelo, setVuelo] = useState(null)
-  const [error, setError] = useState('')
-  const [pestania, setPestania] = useState(location.state?.recienCreado ? 'clases' : 'datos')
-  const [aviso, setAviso] = useState(null)
-  const [guardando, setGuardando] = useState(false)
-  const [recargar, setRecargar] = useState(0)
-
-  const { avisar: mostrarAviso } = useAvisos()
-
-  // El exito sale como aviso flotante; los errores quedan arriba de la pestania, junto al formulario
-  const avisar = (tipo, texto) => {
-    if (tipo === 'exito') {
-      setAviso(null)
-      mostrarAviso(texto)
-      return
-    }
-    setAviso(tipo ? { tipo, texto } : null)
-  }
-  const recargarVuelo = () => setRecargar((veces) => veces + 1)
-  const opciones = { avisar, onCambio: recargarVuelo }
-
   const dispatch = useDispatch()
+
   const { clases, aeropuertos, categorias } = useSelector((state) => state.catalogo)
+  const { vueloActual, fotosVuelo, descuentosVuelo, vueloGuardado, mensaje, guardando, error } = useSelector(
+    (state) => state.vuelos,
+  )
+
+  // El store guarda el último vuelo, fotos y descuentos que se pidieron: solo sirven si son de este vuelo
+  const vuelo = vueloActual?.id === vueloId ? vueloActual : null
+  const fotos = fotosVuelo.vueloId === vueloId ? fotosVuelo.lista : []
+  const descuentos = descuentosVuelo.vueloId === vueloId ? descuentosVuelo.lista : []
+
+  const [pestania, setPestania] = useState(location.state?.recienCreado ? 'clases' : 'datos')
+  // Avisos de los formularios (por ejemplo, fechas sin completar): lo que responde el backend sale de `error` y `mensaje`
+  const [aviso, setAviso] = useState(null)
 
   useEffect(() => {
-    dispatch(fetchClases())
-    dispatch(fetchAeropuertos())
-    dispatch(fetchCategorias())
-  }, [dispatch])
-  const disponibilidades = useDisponibilidades(vuelo, opciones)
-  const descuentos = useDescuentosVuelo(vueloId, opciones)
-  const fotos = useFotosVuelo(vueloId, opciones)
+    dispatch(reiniciarGuardado())
+    dispatch(fetchVuelo(vueloId))
+    dispatch(fetchFotosVuelo(vueloId))
+    dispatch(fetchDescuentosVuelo(vueloId))
+  }, [vueloId, dispatch])
 
+  // Cuando el backend confirma un cambio de clases, descuentos o fotos, su mensaje sale como aviso flotante
   useEffect(() => {
-    api(`/api/vuelos/${id}`)
-      .then((data) => setVuelo(data))
-      .catch((err) => setError(err.message))
-  }, [id, recargar])
+    if (mensaje) {
+      dispatch(avisar(mensaje))
+      dispatch(limpiarMensaje())
+    }
+  }, [mensaje, dispatch])
+
+  // Cuando el backend confirma que se guardaron los datos del vuelo, se avisa y se vuelve al panel
+  useEffect(() => {
+    if (vueloGuardado) {
+      dispatch(avisar(`Se guardaron los cambios del vuelo ${vueloGuardado.numeroVuelo}.`))
+      dispatch(reiniciarGuardado())
+      navigate('/panel')
+    }
+  }, [vueloGuardado, dispatch, navigate])
 
   const elegirPestania = (nueva) => {
     setPestania(nueva)
     setAviso(null)
   }
 
-  const guardarDatos = (formData) => {
-    setGuardando(true)
-    avisar(null)
-    api(`/api/vuelos/${vuelo.id}`, { method: 'PUT', body: cuerpoVuelo(formData) })
-      .then((actualizado) => {
-        mostrarAviso(`Se guardaron los cambios del vuelo ${actualizado.numeroVuelo}.`)
-        navigate('/panel')
-      })
-      .catch((err) => {
-        avisar('error', err.message)
-        setGuardando(false)
-      })
+  const mostrarError = (texto) => setAviso(texto ? { tipo: 'error', texto } : null)
+
+  const despachar = (accion) => {
+    setAviso(null)
+    dispatch(accion)
   }
 
-  if (error) {
+  if (error && !vuelo) {
     return (
       <div className="contenedor pagina">
         <Mensaje>{error}</Mensaje>
@@ -112,7 +116,7 @@ function GestionVuelo() {
   return (
     <>
       <EncabezadoPagina
-        imagen={fotos.imagenes[0]}
+        imagen={fotos[0]?.imagen}
         etiqueta={`Vuelo ${vuelo.numeroVuelo} · ${vuelo.categoriaNombre}`}
         titulo={`${vuelo.origenCiudad} → ${vuelo.destinoCiudad}`}
         subtitulo={`${vuelo.origenIata} → ${vuelo.destinoIata} · Sale el ${fechaLarga(vuelo.fechaSalida)} a las ${hora(vuelo.fechaSalida)} hs`}
@@ -140,6 +144,7 @@ function GestionVuelo() {
         <PestaniasGestion pestanias={PESTANIAS} activa={pestania} onElegir={elegirPestania} />
 
         {aviso && <Mensaje tipo={aviso.tipo}>{aviso.texto}</Mensaje>}
+        {error && <Mensaje>{error}</Mensaje>}
 
         {pestania === 'datos' && (
           <FormDatosVuelo
@@ -147,7 +152,7 @@ function GestionVuelo() {
             aeropuertos={aeropuertos}
             categorias={categorias}
             guardando={guardando}
-            onGuardar={guardarDatos}
+            onGuardar={(formData) => despachar(editarVuelo({ id: vuelo.id, vuelo: cuerpoVuelo(formData) }))}
           />
         )}
 
@@ -156,15 +161,18 @@ function GestionVuelo() {
             <TablaClases
               vuelo={vuelo}
               clases={clases}
-              guardando={disponibilidades.guardando}
-              onGuardar={disponibilidades.guardar}
-              onEliminar={disponibilidades.eliminar}
+              guardando={guardando}
+              onGuardar={(disponibilidad, valores) =>
+                despachar(editarDisponibilidad({ vueloId: vuelo.id, disponibilidad, valores }))
+              }
+              onEliminar={(disponibilidad) => despachar(eliminarDisponibilidad(disponibilidad))}
             />
             <FormClase
+              key={vuelo.disponibilidades.length}
               vuelo={vuelo}
               clases={clases}
-              guardando={disponibilidades.guardando}
-              onAgregar={disponibilidades.agregar}
+              guardando={guardando}
+              onAgregar={(clase) => despachar(crearDisponibilidad({ vueloId: vuelo.id, clase }))}
             />
           </div>
         )}
@@ -172,16 +180,17 @@ function GestionVuelo() {
         {pestania === 'descuentos' && (
           <div className="gestion-seccion">
             <TablaDescuentos
-              descuentos={descuentos.descuentos}
-              guardando={descuentos.guardando}
-              onAlternar={descuentos.alternarActivo}
-              onEliminar={descuentos.eliminar}
+              descuentos={descuentos}
+              guardando={guardando}
+              onAlternar={(descuento) => despachar(alternarDescuento({ vueloId: vuelo.id, descuento }))}
+              onEliminar={(descuento) => despachar(eliminarDescuento(descuento))}
             />
             <FormDescuento
+              key={descuentos.length}
               diaDelVuelo={vuelo.fechaSalida.slice(0, 10)}
-              guardando={descuentos.guardando}
-              onCrear={descuentos.crear}
-              onError={(texto) => avisar('error', texto)}
+              guardando={guardando}
+              onCrear={(descuento) => despachar(crearDescuento({ vueloId: vuelo.id, descuento }))}
+              onError={mostrarError}
             />
           </div>
         )}
@@ -189,17 +198,18 @@ function GestionVuelo() {
         {pestania === 'fotos' && (
           <div className="gestion-seccion">
             <GrillaFotos
-              fotos={fotos.fotos}
-              imagenes={fotos.imagenes}
+              fotos={fotos}
+              imagenes={fotos.map((foto) => foto.imagen)}
               maximo={MAXIMO_FOTOS}
-              onEliminar={fotos.eliminar}
+              onEliminar={(foto) => despachar(eliminarFoto(foto))}
             />
             <SubirFoto
-              lleno={fotos.fotos.length >= MAXIMO_FOTOS}
+              key={fotos.length}
+              lleno={fotos.length >= MAXIMO_FOTOS}
               maximo={MAXIMO_FOTOS}
-              subiendo={fotos.subiendo}
-              onSubir={fotos.subir}
-              onError={(texto) => avisar(texto ? 'error' : null, texto)}
+              subiendo={guardando}
+              onSubir={(archivo) => despachar(subirFoto({ vueloId: vuelo.id, archivo }))}
+              onError={mostrarError}
             />
           </div>
         )}

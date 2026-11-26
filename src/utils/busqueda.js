@@ -1,4 +1,3 @@
-import { api } from '../api/api'
 import { sumarDias } from './formato'
 
 export const POR_PAGINA = 10
@@ -11,8 +10,6 @@ const filtrarPorFecha = (params, fecha) => {
 
 export const esIdaYVuelta = (searchParams) =>
   searchParams.get('viaje') === 'idavuelta' && Boolean(searchParams.get('origen') && searchParams.get('destino'))
-
-export const buscarVuelos = (params) => api(`/api/vuelos?${params.toString()}`)
 
 // Convierte la URL de la busqueda en los pedidos al backend:
 // { ida, vuelta } (vuelta es null si el viaje es solo de ida). Devuelve null si falta la ruta.

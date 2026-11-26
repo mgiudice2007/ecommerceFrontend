@@ -1,23 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { conToken, textoDeError, URL } from './conexion'
+import { clienteApi } from './conexion'
 
-export const fetchPase = createAsyncThunk('embarque/fetchPase', async (codigo, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get(`${URL}/api/embarque/${encodeURIComponent(codigo)}`, conToken())
-    return data
-  } catch (error) {
-    return rejectWithValue(textoDeError(error))
-  }
+export const fetchPase = createAsyncThunk('embarque/fetchPase', async (codigo) => {
+  const { data } = await clienteApi.get(`/api/embarque/${encodeURIComponent(codigo)}`)
+  return data
 })
 
-export const embarcarPasajero = createAsyncThunk('embarque/embarcarPasajero', async (codigo, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post(`${URL}/api/embarque/${encodeURIComponent(codigo)}/embarcar`, null, conToken())
-    return data
-  } catch (error) {
-    return rejectWithValue(textoDeError(error))
-  }
+export const embarcarPasajero = createAsyncThunk('embarque/embarcarPasajero', async (codigo) => {
+  const { data } = await clienteApi.post(`/api/embarque/${encodeURIComponent(codigo)}/embarcar`)
+  return data
 })
 
 const embarqueSlice = createSlice({
@@ -42,7 +33,7 @@ const embarqueSlice = createSlice({
       })
       .addCase(fetchPase.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload
+        state.error = action.error.message
       })
       .addCase(embarcarPasajero.pending, (state) => {
         state.loading = true
@@ -55,7 +46,7 @@ const embarqueSlice = createSlice({
       })
       .addCase(embarcarPasajero.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload
+        state.error = action.error.message
       })
   },
 })

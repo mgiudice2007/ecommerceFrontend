@@ -4,7 +4,7 @@ import { usePortadas } from '../../hooks/usePortadas'
 import './ListaVuelos.css'
 
 function ListaVuelos({ pagina, consulta }) {
-  const portadas = usePortadas(pagina.content)
+  const portadas = usePortadas(pagina.content.map((vuelo) => vuelo.id))
 
   return (
     <>

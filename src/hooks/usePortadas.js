@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react'
-import { pedirPortadas } from '../api/api'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchPortadas } from '../redux/vuelosSlice'
 
-// Portada (primera foto) de cada vuelo de la lista: { [vueloId]: imagen }.
-// Se piden de nuevo solo cuando cambian los vuelos que se muestran.
-export function usePortadas(vuelos) {
-  const ids = vuelos.map((v) => v.id).join(',')
-  const [portadas, setPortadas] = useState({})
+// Portada (primera foto) de cada vuelo, guardada en el store: { [vueloId]: imagen }.
+// Solo despacha el pedido de los vuelos cuya portada todavia no esta en el store.
+export function usePortadas(vueloIds) {
+  const dispatch = useDispatch()
+  const portadas = useSelector((state) => state.vuelos.portadas)
+
+  const faltantes = [...new Set(vueloIds)].filter((id) => !(id in portadas)).join(',')
 
   useEffect(() => {
-    if (!ids) return
-    pedirPortadas(ids.split(',').map(Number)).then((datos) => setPortadas((antes) => ({ ...antes, ...datos })))
-  }, [ids])
+    if (faltantes) {
+      dispatch(fetchPortadas(faltantes.split(',').map(Number)))
+    }
+  }, [faltantes, dispatch])
 
   return portadas
 }

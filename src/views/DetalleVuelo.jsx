@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { api, pedirImagen } from '../api/api'
 import GaleriaFotos from '../components/GaleriaFotos'
 import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
@@ -12,12 +12,11 @@ import ListaClases from '../components/detalle/ListaClases'
 import PanelCompra from '../components/detalle/PanelCompra'
 import PortadaVuelo from '../components/detalle/PortadaVuelo'
 import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
-import { useAuth } from '../context/AuthContext'
+import { agregarPasajes, reiniciarAgregado } from '../redux/carritoSlice'
+import { fetchFotosVuelo, fetchMapaAsientos, fetchVuelo } from '../redux/vuelosSlice'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
 import { urlParaElegirVuelta, urlTrasLogin } from '../utils/viaje'
 import { motivoSinVenta } from '../utils/vuelos'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchClases } from '../redux/catalogoSlice'
 import './DetalleVuelo.css'
 
 function DetalleVuelo() {
@@ -25,51 +24,56 @@ function DetalleVuelo() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-  const { estaLogueado, esComprador, esAdmin, actualizarCarrito } = useAuth()
+  const sesion = useSelector((state) => state.usuario.sesion)
+  const estaLogueado = sesion !== null
+  const esComprador = sesion?.rol === 'COMPRADOR'
+  const esAdmin = sesion?.rol === 'ADMIN'
   const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
+  const { vueloActual, fotosVuelo, mapaAsientos, errorMapa, error } = useSelector((state) => state.vuelos)
+  const { pasajesAgregados, guardando: agregando, error: errorAlAgregar } = useSelector((state) => state.carrito)
 
-  useEffect(() => {
-    dispatch(fetchClases())
-  }, [dispatch])
+  // El store guarda el último vuelo que se pidió: solo sirve si es el de esta página
+  const vuelo = vueloActual?.id === Number(id) ? vueloActual : null
+  const imagenes = fotosVuelo.vueloId === Number(id) ? fotosVuelo.lista.map((foto) => foto.imagen) : []
 
-  const [vuelo, setVuelo] = useState(null)
-  const [imagenes, setImagenes] = useState([])
-  const [error, setError] = useState('')
-
-  const [elegida, setElegida] = useState(null)
+  const [claseElegidaId, setClaseElegidaId] = useState(null)
   const [pasajeros, setPasajeros] = useState(leerPasajeros(searchParams))
   const [claseInicial] = useState(searchParams.get('clase'))
   const [asientos, setAsientos] = useState(searchParams.get('asientos') ? searchParams.get('asientos').split(',') : [])
-  const [agregando, setAgregando] = useState(false)
-  const [mensaje, setMensaje] = useState(null)
+  // Lo que se pidió agregar, para el aviso, y si después hay que seguir con el vuelo de vuelta
+  const [textoAgregado, setTextoAgregado] = useState('')
+  const [seguirConVuelta, setSeguirConVuelta] = useState(false)
 
   useEffect(() => {
-    api(`/api/vuelos/${id}`)
-      .then((data) => {
-        setVuelo(data)
-        const deLaUrl = data.disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
-        setElegida(deLaUrl ?? data.disponibilidades.find((d) => d.hayStock) ?? null)
-      })
-      .catch((err) => setError(err.message))
+    dispatch(reiniciarAgregado())
+    dispatch(fetchVuelo(id))
+    dispatch(fetchFotosVuelo(Number(id)))
+  }, [id, dispatch])
 
-    api(`/api/fotos?vueloId=${id}`)
-      .then((fotos) => Promise.all(fotos.map((foto) => pedirImagen(foto.id))))
-      .then((data) => setImagenes(data))
-      .catch(() => setImagenes([]))
-  }, [id, claseInicial])
+  // Cuando el backend confirma los pasajes y hay que elegir la vuelta, se sigue a la búsqueda de la vuelta
+  useEffect(() => {
+    if (pasajesAgregados && seguirConVuelta) {
+      dispatch(reiniciarAgregado())
+      navigate(urlParaElegirVuelta(searchParams, pasajeros))
+    }
+  }, [pasajesAgregados, seguirConVuelta, dispatch, navigate, searchParams, pasajeros])
 
-  const [mapa, setMapa] = useState({ disponibilidadId: null, datos: null, error: '' })
+  // La clase elegida es la que tocó el usuario; si no tocó ninguna, la de la URL o la primera con lugar
+  const disponibilidades = vuelo?.disponibilidades ?? []
+  const claseDeLaUrl = disponibilidades.find((d) => String(d.id) === claseInicial && d.hayStock)
+  const elegida =
+    disponibilidades.find((d) => d.id === claseElegidaId) ?? claseDeLaUrl ?? disponibilidades.find((d) => d.hayStock) ?? null
+
   const elegidaId = elegida?.id
 
   useEffect(() => {
-    if (!elegidaId) return
-    api(`/api/disponibilidades/${elegidaId}/asientos`)
-      .then((datos) => setMapa({ disponibilidadId: elegidaId, datos, error: '' }))
-      .catch((err) => setMapa({ disponibilidadId: elegidaId, datos: null, error: err.message }))
-  }, [elegidaId])
+    if (elegidaId) {
+      dispatch(fetchMapaAsientos(elegidaId))
+    }
+  }, [elegidaId, dispatch])
 
-  if (error) {
+  if (error && !vuelo) {
     return (
       <div className="contenedor pagina">
         <Mensaje>{error}</Mensaje>
@@ -83,55 +87,45 @@ function DetalleVuelo() {
   }
 
   const sinVenta = motivoSinVenta(vuelo)
-  const mapaDeLaClase = elegida && mapa.disponibilidadId === elegida.id
+  const mapaDeLaClase = elegida && mapaAsientos.disponibilidadId === elegida.id
   const faltanAsientos = pasajeros.adultos + pasajeros.ninos - asientos.length
-  const agregado = mensaje?.tipo === 'exito'
+  const agregado = pasajesAgregados && !seguirConVuelta
   const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
 
   const elegirClase = (disponibilidad) => {
-    setElegida(disponibilidad)
+    setClaseElegidaId(disponibilidad.id)
     setAsientos([])
-    setMensaje(null)
+    dispatch(reiniciarAgregado())
   }
 
   const cambiarPasajeros = (nuevos) => {
     setPasajeros(nuevos)
     setAsientos(asientos.slice(0, nuevos.adultos + nuevos.ninos))
-    setMensaje(null)
+    dispatch(reiniciarAgregado())
   }
 
   const cambiarAsientos = (nuevos) => {
     setAsientos(nuevos)
-    setMensaje(null)
+    dispatch(reiniciarAgregado())
   }
 
-  const agregarAlCarrito = (seguirConVuelta = false) => {
+  const agregarAlCarrito = (irAVuelta = false) => {
     if (!estaLogueado) {
       const desde = urlTrasLogin(location.pathname, searchParams, pasajeros, elegida?.id, asientos)
       navigate('/login', { state: { desde } })
       return
     }
 
-    setAgregando(true)
-    setMensaje(null)
-    api('/api/carrito/pasajes', {
-      method: 'POST',
-      body: { disponibilidadId: elegida.id, ...pasajeros, asientos },
-    })
-      .then((carrito) => {
-        actualizarCarrito(carrito)
-        if (seguirConVuelta) {
-          navigate(urlParaElegirVuelta(searchParams, pasajeros))
-          return
-        }
-        setMensaje({
-          tipo: 'exito',
-          texto: `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito (asientos ${asientos.join(', ')}).`,
-        })
-        setAsientos([])
-      })
-      .catch((err) => setMensaje({ tipo: 'error', texto: err.message }))
-      .finally(() => setAgregando(false))
+    setSeguirConVuelta(irAVuelta)
+    setTextoAgregado(
+      `Agregaste ${textoPasajeros(pasajeros)} en ${elegida.claseNombre} al carrito (asientos ${asientos.join(', ')}).`,
+    )
+    dispatch(agregarPasajes({ disponibilidadId: elegida.id, ...pasajeros, asientos }))
+  }
+
+  const agregarOtros = () => {
+    setAsientos([])
+    dispatch(reiniciarAgregado())
   }
 
   return (
@@ -157,8 +151,8 @@ function DetalleVuelo() {
                 clase={elegida}
                 pasajeros={pasajeros}
                 asientos={asientos}
-                mapa={mapaDeLaClase ? mapa.datos : null}
-                error={mapaDeLaClase ? mapa.error : ''}
+                mapa={mapaDeLaClase ? mapaAsientos.datos : null}
+                error={mapaDeLaClase ? '' : (errorMapa ?? '')}
                 ocupado={agregando}
                 onCambio={cambiarAsientos}
               />
@@ -175,7 +169,8 @@ function DetalleVuelo() {
           <PanelCompra motivoSinVenta={sinVenta} hayClase={elegida !== null}>
             <ResumenSeleccion clase={elegida} pasajeros={pasajeros} onCambiarPasajeros={cambiarPasajeros} />
 
-            {mensaje && <Mensaje tipo={mensaje.tipo}>{mensaje.texto}</Mensaje>}
+            {agregado && <Mensaje tipo="exito">{textoAgregado}</Mensaje>}
+            {errorAlAgregar && <Mensaje>{errorAlAgregar}</Mensaje>}
 
             <AccionesCompra
               agregado={agregado}
@@ -185,7 +180,7 @@ function DetalleVuelo() {
               faltanAsientos={faltanAsientos}
               eligiendoIda={eligiendoIda}
               onAgregar={agregarAlCarrito}
-              onAgregarOtros={() => setMensaje(null)}
+              onAgregarOtros={agregarOtros}
             />
           </PanelCompra>
         </div>

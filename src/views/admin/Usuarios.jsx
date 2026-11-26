@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { api } from '../../api/api'
 import EncabezadoPagina from '../../components/EncabezadoPagina'
 import Cargando from '../../components/comunes/Cargando'
 import GrillaNumeros from '../../components/comunes/GrillaNumeros'
@@ -8,27 +8,37 @@ import Mensaje from '../../components/comunes/Mensaje'
 import SinDatos from '../../components/comunes/SinDatos'
 import FiltrosUsuarios from '../../components/usuarios/FiltrosUsuarios'
 import TablaUsuarios from '../../components/usuarios/TablaUsuarios'
-import { useAuth } from '../../context/AuthContext'
-import { useAvisos } from '../../context/AvisosContext'
-import { nombreDeRol, ROLES } from '../../utils/roles'
+import { avisar } from '../../redux/avisosSlice'
+import { cambiarRol, fetchUsuarios, limpiarMensaje } from '../../redux/usuarioSlice'
+import { ROLES } from '../../utils/roles'
 import './Panel.css'
 
 function Usuarios() {
-  const { usuario: yo } = useAuth()
+  const dispatch = useDispatch()
+  const { sesion, usuarios, mensaje, guardando, error } = useSelector((state) => state.usuario)
 
-  const [usuarios, setUsuarios] = useState(null)
+  // Roles elegidos que todavía no se guardaron, qué cuenta se está guardando y los filtros: solo importan a esta pantalla
   const [cambios, setCambios] = useState({})
+  const [guardandoId, setGuardandoId] = useState(null)
   const [busqueda, setBusqueda] = useState('')
   const [filtroRol, setFiltroRol] = useState('')
-  const [error, setError] = useState('')
-  const { avisar } = useAvisos()
-  const [guardando, setGuardando] = useState(null)
 
   useEffect(() => {
-    api('/api/usuarios')
-      .then(setUsuarios)
-      .catch((err) => setError(err.message))
-  }, [])
+    dispatch(fetchUsuarios())
+  }, [dispatch])
+
+  // Cuando el backend confirma el cambio de rol, su aviso sale como mensaje flotante
+  useEffect(() => {
+    if (mensaje) {
+      dispatch(avisar(mensaje))
+      dispatch(limpiarMensaje())
+    }
+  }, [mensaje, dispatch])
+
+  // Una elección que ya coincide con el rol guardado deja de ser un cambio pendiente
+  const pendientes = Object.fromEntries(
+    Object.entries(cambios).filter(([id, rol]) => (usuarios ?? []).find((u) => u.id === Number(id))?.rol !== rol),
+  )
 
   const elegirRol = (usuario, rol) => {
     const nuevos = { ...cambios }
@@ -38,20 +48,8 @@ function Usuarios() {
   }
 
   const guardar = (usuario) => {
-    const rol = cambios[usuario.id]
-    const nombreRol = nombreDeRol(rol)
-    setError('')
-    setGuardando(usuario.id)
-    api(`/api/usuarios/${usuario.id}/rol`, { method: 'PUT', body: { rol } })
-      .then((actualizado) => {
-        setUsuarios(usuarios.map((u) => (u.id === actualizado.id ? actualizado : u)))
-        const pendientes = { ...cambios }
-        delete pendientes[usuario.id]
-        setCambios(pendientes)
-        avisar(`${actualizado.username} ahora es ${nombreRol}. El cambio rige desde su próximo pedido.`)
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setGuardando(null))
+    setGuardandoId(usuario.id)
+    dispatch(cambiarRol({ id: usuario.id, rol: cambios[usuario.id] }))
   }
 
   const texto = busqueda.trim().toLowerCase()
@@ -103,10 +101,10 @@ function Usuarios() {
           {visibles.length > 0 && (
             <TablaUsuarios
               usuarios={visibles}
-              miUsername={yo.username}
+              miUsername={sesion.username}
               roles={ROLES}
-              cambios={cambios}
-              guardando={guardando}
+              cambios={pendientes}
+              guardando={guardando ? guardandoId : null}
               onElegirRol={elegirRol}
               onGuardar={guardar}
             />

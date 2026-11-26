@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../api/api'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ResumenCompra from '../components/carrito/ResumenCompra'
 import SelectorMillas from '../components/carrito/SelectorMillas'
@@ -11,7 +11,9 @@ import DetallePago from '../components/pago/DetallePago'
 import PasosCompra from '../components/pago/PasosCompra'
 import SelectorMedioPago from '../components/pago/SelectorMedioPago'
 import PasoPasajeros from '../components/pasajeros/PasoPasajeros'
-import { useAuth } from '../context/AuthContext'
+import { fetchCarrito } from '../redux/carritoSlice'
+import { confirmarCompra, reiniciarConfirmada } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
 import { calcularMillas, vuelosSinAdulto } from '../utils/carrito'
 import { armarPersonas, pedidoDePasajeros, validarPersonas } from '../utils/datosPasajeros'
 import {
@@ -26,33 +28,39 @@ import './Carrito.css'
 import './Checkout.css'
 
 function Checkout() {
-  const { actualizarCarrito, recargarPerfil } = useAuth()
   const navigate = useNavigate()
-  const [carrito, setCarrito] = useState(null)
+  const dispatch = useDispatch()
+  const { carrito, error: errorCarrito } = useSelector((state) => state.carrito)
+  const { ordenConfirmada, guardando: pagando, error: errorDelPago } = useSelector((state) => state.ordenes)
   const [error, setError] = useState('')
   const [medio, setMedio] = useState('TARJETA_CREDITO')
   const [tarjeta, setTarjeta] = useState(TARJETA_INICIAL)
   const [intento, setIntento] = useState(false)
   const [usarMillas, setUsarMillas] = useState(false)
   const [millasElegidas, setMillasElegidas] = useState('')
-  const [pagando, setPagando] = useState(false)
   const [paso, setPaso] = useState('pasajeros')
-  const [personas, setPersonas] = useState([])
+  // Lo que se fue escribiendo de cada persona, por clave: el resto de sus datos sale del carrito
+  const [cambios, setCambios] = useState({})
   const [intentoPasajeros, setIntentoPasajeros] = useState(false)
 
   useEffect(() => {
-    api('/api/carrito')
-      .then((datos) => {
-        setCarrito(datos)
-        setPersonas(armarPersonas(datos.items))
-      })
-      .catch((err) => setError(err.message))
-  }, [])
+    dispatch(reiniciarConfirmada())
+    dispatch(fetchCarrito())
+  }, [dispatch])
+
+  // Cuando el backend confirma el pago, se actualizan las millas del perfil y se sigue a la compra exitosa
+  useEffect(() => {
+    if (ordenConfirmada) {
+      dispatch(fetchPerfil())
+      dispatch(reiniciarConfirmada())
+      navigate(`/compra-exitosa/${ordenConfirmada}`, { replace: true })
+    }
+  }, [ordenConfirmada, dispatch, navigate])
 
   if (!carrito) {
     return (
       <div className="contenedor pagina">
-        {error ? <Mensaje>{error}</Mensaje> : <Cargando texto="Preparando el pago…" />}
+        {errorCarrito ? <Mensaje>{errorCarrito}</Mensaje> : <Cargando texto="Preparando el pago…" />}
       </div>
     )
   }
@@ -75,10 +83,10 @@ function Checkout() {
   const errores = !millasCubrenTodo && esTarjeta(medio) ? validarTarjeta(tarjeta) : {}
   const hayErrores = Object.keys(errores).length > 0
 
+  const personas = armarPersonas(carrito.items).map((persona) => ({ ...persona, ...cambios[persona.clave] }))
   const erroresPasajeros = validarPersonas(personas, carrito.items)
 
-  const cambiarPersona = (clave, campo, valor) =>
-    setPersonas(personas.map((persona) => (persona.clave === clave ? { ...persona, [campo]: valor } : persona)))
+  const cambiarPersona = (clave, campo, valor) => setCambios({ ...cambios, [clave]: { ...cambios[clave], [campo]: valor } })
 
   const continuar = () => {
     setIntentoPasajeros(true)
@@ -109,18 +117,8 @@ function Checkout() {
     if (usarMillas) pedido.millas = calculo.aUsar
     if (esTarjeta(pedido.medioPago)) pedido.ultimosDigitos = ultimosCuatro(tarjeta.numero)
 
-    setPagando(true)
     setError('')
-    api('/api/carrito/checkout', { method: 'POST', body: pedido })
-      .then((orden) => {
-        actualizarCarrito({ items: [] })
-        recargarPerfil()
-        navigate(`/compra-exitosa/${orden.id}`, { replace: true, state: { orden } })
-      })
-      .catch((err) => {
-        setError(err.message)
-        setPagando(false)
-      })
+    dispatch(confirmarCompra(pedido))
   }
 
   return (
@@ -137,6 +135,7 @@ function Checkout() {
       <div className="contenedor sobre-encabezado">
         <PasosCompra actual={paso === 'pasajeros' ? 1 : 2} />
         {error && <Mensaje>{error}</Mensaje>}
+        {errorDelPago && <Mensaje>{errorDelPago}</Mensaje>}
 
         <div className="carrito-layout">
           {paso === 'pasajeros' ? (

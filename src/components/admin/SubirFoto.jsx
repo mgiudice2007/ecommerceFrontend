@@ -20,12 +20,7 @@ function SubirFoto({ lleno, maximo, subiendo, onSubir, onError }) {
   const subir = (e) => {
     e.preventDefault()
     if (!archivo) return
-    const formulario = e.target
-    onSubir(archivo).then((ok) => {
-      if (!ok) return
-      setArchivo(null)
-      formulario.reset()
-    })
+    onSubir(archivo)
   }
 
   return (

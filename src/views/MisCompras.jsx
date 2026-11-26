@@ -1,45 +1,43 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { api } from '../api/api'
 import Confirmacion from '../components/Confirmacion'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
-import { useAuth } from '../context/AuthContext'
-import { useAvisos } from '../context/AvisosContext'
 import { usePortadas } from '../hooks/usePortadas'
-import { cancelarOrden } from '../utils/ordenes'
+import { avisar } from '../redux/avisosSlice'
+import { cancelarOrden, fetchOrdenes, limpiarMensaje } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
 import './MisCompras.css'
 
 function MisCompras() {
-  const { recargarPerfil } = useAuth()
-  const [ordenes, setOrdenes] = useState(null)
-  const [error, setError] = useState('')
-  const { avisar } = useAvisos()
-  const [cancelando, setCancelando] = useState(null)
+  const dispatch = useDispatch()
+  const { ordenes, mensaje, guardando, error } = useSelector((state) => state.ordenes)
+  // Qué compra se está cancelando y cuál espera la confirmación: solo importan a esta pantalla
+  const [cancelandoId, setCancelandoId] = useState(null)
   const [aCancelar, setACancelar] = useState(null)
-  const portadas = usePortadas((ordenes ?? []).map((o) => ({ id: o.items[0].vueloId })))
+  const portadas = usePortadas((ordenes ?? []).map((orden) => orden.items[0].vueloId))
 
   useEffect(() => {
-    api('/api/ordenes')
-      .then(setOrdenes)
-      .catch((err) => setError(err.message))
-  }, [])
+    dispatch(fetchOrdenes())
+  }, [dispatch])
+
+  // Cuando el backend confirma la cancelación, su aviso sale flotante y se actualizan las millas del perfil
+  useEffect(() => {
+    if (mensaje) {
+      dispatch(avisar(mensaje))
+      dispatch(fetchPerfil())
+      dispatch(limpiarMensaje())
+    }
+  }, [mensaje, dispatch])
 
   const cancelar = (orden) => {
     setACancelar(null)
-    setError('')
-    setCancelando(orden.id)
-    cancelarOrden(orden)
-      .then((actualizada) => {
-        setOrdenes(ordenes.map((o) => (o.id === actualizada.id ? actualizada : o)))
-        recargarPerfil()
-        avisar(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setCancelando(null))
+    setCancelandoId(orden.id)
+    dispatch(cancelarOrden(orden.id))
   }
 
   return (
@@ -69,7 +67,7 @@ function MisCompras() {
               key={orden.id}
               orden={orden}
               imagen={portadas[orden.items[0].vueloId]}
-              cancelando={cancelando === orden.id}
+              cancelando={guardando && cancelandoId === orden.id}
               onCancelar={setACancelar}
             />
           ))}

@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../api/api'
-import { useAuth } from '../context/AuthContext'
+import { login, registrarUsuario, reiniciarError, reiniciarRegistrado } from '../redux/usuarioSlice'
 import { REGLA_NOMBRE, REGLA_USUARIO } from '../utils/validaciones'
 import './Auth.css'
 import Etiqueta from '../components/comunes/Etiqueta'
@@ -17,12 +17,33 @@ const FORM_VACIO = {
 }
 
 function Registro() {
-  const { login } = useAuth()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { registrado, sesion, guardando: cargando, error: errorDelBackend } = useSelector((state) => state.usuario)
 
   const [formData, setFormData] = useState(FORM_VACIO)
-  const [error, setError] = useState('')
-  const [cargando, setCargando] = useState(false)
+  // Avisos del formulario (contraseñas distintas): lo que responde el backend sale de `errorDelBackend`
+  const [problema, setProblema] = useState('')
+  const error = problema || errorDelBackend
+
+  useEffect(() => {
+    dispatch(reiniciarError())
+  }, [dispatch])
+
+  // Cuando el backend confirma el registro, se inicia sesión con los mismos datos
+  useEffect(() => {
+    if (registrado) {
+      dispatch(reiniciarRegistrado())
+      dispatch(login({ username: formData.username.trim(), password: formData.password }))
+    }
+  }, [registrado, formData, dispatch])
+
+  // Cuando el backend confirma el login, se va al inicio
+  useEffect(() => {
+    if (sesion) {
+      navigate('/', { replace: true })
+    }
+  }, [sesion, navigate])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -30,30 +51,22 @@ function Registro() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setError('')
 
     if (formData.password !== formData.confirmarPassword) {
-      setError('Las contraseñas no coinciden')
+      setProblema('Las contraseñas no coinciden')
       return
     }
 
-    setCargando(true)
-
-    const datosAEnviar = {
-      nombre: formData.nombre.trim(),
-      apellido: formData.apellido.trim(),
-      username: formData.username.trim(),
-      mail: formData.mail,
-      password: formData.password,
-    }
-
-    api('/api/auth/registro', { method: 'POST', body: datosAEnviar })
-      .then(() => login(datosAEnviar.username, datosAEnviar.password))
-      .then(() => navigate('/', { replace: true }))
-      .catch((err) => {
-        setError(err.message)
-        setCargando(false)
-      })
+    setProblema('')
+    dispatch(
+      registrarUsuario({
+        nombre: formData.nombre.trim(),
+        apellido: formData.apellido.trim(),
+        username: formData.username.trim(),
+        mail: formData.mail,
+        password: formData.password,
+      }),
+    )
   }
 
   return (

@@ -1,33 +1,40 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
-import { api } from '../api/api'
 import Confirmacion from '../components/Confirmacion'
 import Cargando from '../components/comunes/Cargando'
 import Mensaje from '../components/comunes/Mensaje'
 import Boleto from '../components/ordenes/Boleto'
 import EncabezadoOrden from '../components/ordenes/EncabezadoOrden'
-import { useAuth } from '../context/AuthContext'
-import { useAvisos } from '../context/AvisosContext'
-import { cancelarOrden, textoCancelacion } from '../utils/ordenes'
+import { avisar } from '../redux/avisosSlice'
+import { cancelarOrden, fetchOrden, limpiarMensaje } from '../redux/ordenesSlice'
+import { fetchPerfil } from '../redux/usuarioSlice'
+import { textoCancelacion } from '../utils/ordenes'
 import './DetalleOrden.css'
 
 function DetalleOrden() {
-  const { recargarPerfil } = useAuth()
-  const { avisar } = useAvisos()
   const { id } = useParams()
+  const dispatch = useDispatch()
+  const { ordenActual, mensaje, guardando: cancelando, error } = useSelector((state) => state.ordenes)
 
-  const [orden, setOrden] = useState(null)
-  const [error, setError] = useState('')
-  const [cancelando, setCancelando] = useState(false)
+  // El store guarda la última orden que se pidió: solo sirve si es la de esta página
+  const orden = ordenActual?.id === Number(id) ? ordenActual : null
   const [preguntando, setPreguntando] = useState(false)
 
   useEffect(() => {
-    api(`/api/ordenes/${id}`)
-      .then(setOrden)
-      .catch((err) => setError(err.message))
-  }, [id])
+    dispatch(fetchOrden(id))
+  }, [id, dispatch])
 
-  if (error) {
+  // Cuando el backend confirma la cancelación, su aviso sale flotante y se actualizan las millas del perfil
+  useEffect(() => {
+    if (mensaje) {
+      dispatch(avisar(mensaje))
+      dispatch(fetchPerfil())
+      dispatch(limpiarMensaje())
+    }
+  }, [mensaje, dispatch])
+
+  if (error && !orden) {
     return (
       <div className="contenedor pagina">
         <Mensaje>{error}</Mensaje>
@@ -44,21 +51,14 @@ function DetalleOrden() {
 
   const cancelar = () => {
     setPreguntando(false)
-    setCancelando(true)
-    cancelarOrden(orden)
-      .then((actualizada) => {
-        setOrden(actualizada)
-        recargarPerfil()
-        avisar(`Cancelaste la compra #${actualizada.id}. Los asientos volvieron a estar disponibles.`)
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setCancelando(false))
+    dispatch(cancelarOrden(orden.id))
   }
 
   return (
     <div className="contenedor pagina orden">
       <EncabezadoOrden orden={orden} />
 
+      {error && <Mensaje>{error}</Mensaje>}
       {cancelada && <Mensaje>Esta compra está cancelada: los asientos se devolvieron al vuelo.</Mensaje>}
 
       <Boleto orden={orden} />
