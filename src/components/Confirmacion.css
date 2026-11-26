@@ -9,27 +9,52 @@
   background: rgba(4, 30, 66, 0.55);
 }
 
+/* El cuadro es un aviso de la tripulacion: cabecera azul noche, linea de
+   corte punteada y los botones abajo sobre fondo crema */
 .confirmacion {
+  overflow: hidden;
   width: 100%;
   max-width: 440px;
-  padding: 28px;
+  padding: 0;
   box-shadow: var(--sombra-fuerte);
+  animation: aparecer 0.25s ease-out;
+}
+
+.confirmacion-cabecera {
+  padding: 16px 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.3), transparent 50%),
+    var(--azul-noche);
+  color: #fff;
+}
+
+.confirmacion-cabecera small {
+  color: #ffcf7a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .confirmacion h2 {
-  margin: 0 0 10px;
+  margin: 2px 0 0;
   font-size: 1.25rem;
-  color: var(--azul-noche);
+  color: #fff;
+}
+
+.confirmacion-cuerpo {
+  padding: 18px 22px;
+  border-bottom: 2px dashed var(--borde);
 }
 
 .confirmacion p {
-  margin: 0 0 24px;
+  margin: 0;
   color: var(--texto-suave);
   line-height: 1.5;
 }
 
 .confirmacion-detalle {
-  margin: 0 0 24px;
+  margin: 12px 0 0;
   padding: 12px 16px 12px 32px;
   border-radius: 10px;
   background: var(--superficie-2);
@@ -41,4 +66,6 @@
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 14px 22px;
+  background: #fffaf5;
 }

@@ -13,15 +13,20 @@ function Confirmacion({ titulo, mensaje, detalle, textoConfirmar = 'Confirmar', 
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.key === 'Escape' && onCancelar()}
       >
-        <h2 id="confirmacion-titulo">{titulo}</h2>
-        {mensaje && <p>{mensaje}</p>}
-        {detalle && (
-          <ul className="confirmacion-detalle">
-            {detalle.map((linea) => (
-              <li key={linea}>{linea}</li>
-            ))}
-          </ul>
-        )}
+        <div className="confirmacion-cabecera">
+          <small>Aviso de la tripulación</small>
+          <h2 id="confirmacion-titulo">{titulo}</h2>
+        </div>
+        <div className="confirmacion-cuerpo">
+          {mensaje && <p>{mensaje}</p>}
+          {detalle && (
+            <ul className="confirmacion-detalle">
+              {detalle.map((linea) => (
+                <li key={linea}>{linea}</li>
+              ))}
+            </ul>
+          )}
+        </div>
         <div className="confirmacion-botones">
           <button className="boton boton-secundario" onClick={onCancelar} autoFocus>
             No, volver
