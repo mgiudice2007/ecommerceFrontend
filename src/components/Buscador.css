@@ -94,16 +94,13 @@
 
 .buscador-trayecto-icono {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--naranja);
-  border-radius: 50%;
-  background: var(--naranja-suave);
+  padding: 0 8px;
+  background: var(--superficie);
   color: var(--naranja);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
   transition: transform 0.4s ease;
 }
 
