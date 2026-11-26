@@ -34,6 +34,30 @@
   animation: paleta 0.11s linear infinite;
 }
 
+/* Version limpia: sin cajitas, cada letra con un ancho fijo para que el texto
+   no "baile" mientras giran; mientras gira se ve tenue y despues queda nitida */
+.letras-giratorias.limpias {
+  gap: 0;
+}
+
+.letras-giratorias.limpias .letra {
+  width: 0.72em;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  line-height: 1.2;
+}
+
+.letras-giratorias.limpias .letra::after {
+  display: none;
+}
+
+.letras-giratorias.limpias .letra.girando {
+  color: rgba(255, 255, 255, 0.35);
+}
+
 @keyframes paleta {
   0% {
     transform: perspective(200px) rotateX(0deg);

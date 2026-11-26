@@ -7,7 +7,9 @@ const VUELTAS_POR_LETRA = 5
 // Texto de cartel de aeropuerto: cada letra gira mostrando otras letras hasta que se
 // "asienta" en la suya, de izquierda a derecha. Para que vuelva a girar, el padre le
 // cambia la key (React la monta de nuevo y arranca de cero).
-function LetrasGiratorias({ texto, largo = String(texto).length, demora = 0 }) {
+// Con paletas={false} las letras no llevan la cajita oscura: queda el efecto de giro
+// pero con texto limpio (lo usa el cartel de partidas del inicio).
+function LetrasGiratorias({ texto, largo = String(texto).length, demora = 0, paletas = true }) {
   const final = String(texto).toUpperCase().padEnd(largo).slice(0, largo)
   const total = demora + largo + VUELTAS_POR_LETRA
   const [vuelta, setVuelta] = useState(0)
@@ -23,7 +25,7 @@ function LetrasGiratorias({ texto, largo = String(texto).length, demora = 0 }) {
   }, [total])
 
   return (
-    <span className="letras-giratorias" aria-label={final.trim()}>
+    <span className={`letras-giratorias ${paletas ? '' : 'limpias'}`.trim()} aria-label={final.trim()}>
       {[...final].map((letra, i) => {
         const asentada = vuelta >= demora + i + VUELTAS_POR_LETRA
         const mostrada = asentada || letra === ' ' ? letra : ALFABETO[(i * 7 + vuelta * 11) % ALFABETO.length]

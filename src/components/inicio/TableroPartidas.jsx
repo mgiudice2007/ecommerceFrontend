@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { hora, precio } from '../../utils/formato'
+import { fechaCorta, hora, precio } from '../../utils/formato'
 import { precioDesde } from '../../utils/vuelos'
 import LetrasGiratorias from '../comunes/LetrasGiratorias'
 import TituloSeccion from './TituloSeccion'
@@ -14,8 +14,8 @@ const puertaDe = (vuelo) => `${'ABC'[vuelo.id % 3]}${(vuelo.id % 12) + 1}`
 
 const relojAhora = () => hora(new Date())
 
-// Cartel de partidas como el de Ezeiza: muestra los proximos vuelos de a 5 y cada
-// 8 segundos pasa a los siguientes, con las letras girando.
+// Cartel de partidas como el de los aeropuertos: muestra los proximos vuelos de a 5 y
+// cada 8 segundos pasa a los siguientes. La hora y el destino giran letra por letra.
 function TableroPartidas({ vuelos }) {
   const partidas = [...vuelos].sort((a, b) => a.fechaSalida.localeCompare(b.fechaSalida)).slice(0, FILAS * 3)
   const paginas = Math.max(1, Math.ceil(partidas.length / FILAS))
@@ -39,34 +39,59 @@ function TableroPartidas({ vuelos }) {
 
       <div className="tablero">
         <div className="tablero-cabecera">
-          <span className="tablero-titulo">
-            <span aria-hidden="true">🛫</span> Partidas · Departures
-          </span>
-          <span className="tablero-reloj">{reloj}</span>
+          <div className="tablero-titulo">
+            <span className="tablero-icono" aria-hidden="true">
+              ✈
+            </span>
+            <div>
+              <strong>Partidas</strong>
+              <small>Departures</small>
+            </div>
+          </div>
+          <div className="tablero-vivo">
+            <span className="tablero-punto" aria-hidden="true" />
+            En vivo
+            <span className="tablero-reloj">{reloj}</span>
+          </div>
         </div>
 
         <div className="tablero-fila tablero-columnas" aria-hidden="true">
           <span>Hora</span>
-          <span>Vuelo</span>
           <span>Destino</span>
           <span className="tablero-opcional">Puerta</span>
-          <span>Desde</span>
           <span className="tablero-opcional">Estado</span>
+          <span className="derecha">Desde</span>
         </div>
 
         {visibles.map((vuelo, i) => {
           const oferta = Boolean(vuelo.descuentoVigente)
           return (
             <Link key={`${pagina}-${vuelo.id}`} to={`/vuelos/${vuelo.id}`} className="tablero-fila">
-              <LetrasGiratorias texto={hora(vuelo.fechaSalida)} demora={i * 2} />
-              <LetrasGiratorias texto={vuelo.numeroVuelo} largo={6} demora={i * 2 + 2} />
-              <LetrasGiratorias texto={vuelo.destinoCiudad} largo={14} demora={i * 2 + 4} />
-              <span className="tablero-opcional">
-                <LetrasGiratorias texto={puertaDe(vuelo)} largo={3} demora={i * 2 + 6} />
+              <span className="tablero-hora">
+                <LetrasGiratorias texto={hora(vuelo.fechaSalida)} demora={i * 2} paletas={false} />
+                <small>{fechaCorta(vuelo.fechaSalida)}</small>
               </span>
-              <span className="tablero-precio">{precio(precioDesde(vuelo).precioConDescuento)}</span>
-              <span className={`tablero-estado tablero-opcional ${oferta ? 'oferta' : ''}`}>
-                {oferta ? 'Oferta' : 'A horario'}
+
+              <span className="tablero-destino">
+                <LetrasGiratorias texto={vuelo.destinoCiudad} demora={i * 2 + 3} paletas={false} />
+                <small>
+                  {vuelo.numeroVuelo} · desde {vuelo.origenCiudad}
+                </small>
+              </span>
+
+              <span className="tablero-opcional">
+                <span className="tablero-puerta">{puertaDe(vuelo)}</span>
+              </span>
+
+              <span className="tablero-opcional">
+                <span className={`tablero-estado ${oferta ? 'oferta' : ''}`}>{oferta ? 'Oferta' : 'A horario'}</span>
+              </span>
+
+              <span className="tablero-precio">
+                {precio(precioDesde(vuelo).precioConDescuento)}
+                <span className="tablero-flecha" aria-hidden="true">
+                  →
+                </span>
               </span>
             </Link>
           )

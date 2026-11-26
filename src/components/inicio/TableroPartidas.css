@@ -1,51 +1,101 @@
+/* Cartel de partidas: panel azul noche limpio, filas con mucho aire y
+   la informacion importante (hora y destino) bien grande */
 .tablero {
   overflow: hidden;
-  padding: 18px 22px 14px;
+  padding: 22px 26px 16px;
   border-radius: var(--radio-grande);
   background:
-    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.18), transparent 40%),
-    linear-gradient(180deg, #0a1628 0%, #06101f 100%);
-  box-shadow: var(--sombra-fuerte), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  color: #e8eef7;
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.16), transparent 38%),
+    linear-gradient(180deg, #0c1c33 0%, #081426 100%);
+  box-shadow: var(--sombra-fuerte);
+  color: #fff;
 }
 
 .tablero-cabecera {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 18px;
 }
 
 .tablero-titulo {
-  color: #ffcf7a;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tablero-icono {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--degradado-atardecer);
+  font-size: 18px;
+  transform: rotate(-20deg);
+}
+
+.tablero-titulo div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.tablero-titulo strong {
+  font-size: 18px;
+}
+
+.tablero-titulo small {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.tablero-reloj {
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffcf7a;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
+.tablero-vivo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 700;
 }
 
+.tablero-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5a4e;
+  box-shadow: 0 0 0 0 rgba(255, 90, 78, 0.6);
+  animation: en-vivo 1.6s ease-out infinite;
+}
+
+@keyframes en-vivo {
+  to {
+    box-shadow: 0 0 0 8px rgba(255, 90, 78, 0);
+  }
+}
+
+.tablero-reloj {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Filas */
 .tablero-fila {
   display: grid;
-  grid-template-columns: 110px 150px 1fr 90px 150px 120px;
+  grid-template-columns: 120px 1fr 90px 130px 160px;
   align-items: center;
-  gap: 14px;
-  padding: 10px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  gap: 16px;
+  padding: 14px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
   color: inherit;
-  font-size: 15px;
-  font-weight: 600;
+  font-weight: 400;
   transition: background 0.2s;
 }
 
@@ -55,55 +105,111 @@ a.tablero-fila:hover {
 }
 
 .tablero-columnas {
-  color: rgba(232, 238, 247, 0.5);
+  padding-top: 0;
+  padding-bottom: 10px;
+  border-top: none;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.tablero-precio {
-  color: #fff;
+.tablero-columnas .derecha {
+  text-align: right;
+}
+
+.tablero-hora,
+.tablero-destino {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tablero-hora .letras-giratorias {
+  color: #ffcf7a;
+  font-size: 22px;
   font-weight: 800;
-  font-variant-numeric: tabular-nums;
+}
+
+.tablero-destino .letras-giratorias {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.tablero-hora small,
+.tablero-destino small {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+}
+
+.tablero-puerta {
+  display: inline-block;
+  min-width: 44px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  font-weight: 800;
+  text-align: center;
 }
 
 .tablero-estado {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(95, 224, 164, 0.12);
   color: #5fe0a4;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 .tablero-estado::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 10px currentColor;
-  animation: titilar 1.6s ease-in-out infinite;
 }
 
 .tablero-estado.oferta {
-  color: #ff9a3c;
+  background: rgba(255, 154, 60, 0.15);
+  color: #ffb066;
 }
 
-@keyframes titilar {
-  50% {
-    opacity: 0.3;
-  }
+.tablero-precio {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La flechita aparece al pasar el mouse por la fila */
+.tablero-flecha {
+  color: var(--naranja);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+a.tablero-fila:hover .tablero-flecha {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .tablero-puntos {
   display: flex;
   justify-content: center;
   gap: 6px;
-  padding-top: 12px;
+  padding-top: 14px;
 }
 
 .tablero-puntos span {
@@ -117,13 +223,12 @@ a.tablero-fila:hover {
 .tablero-puntos span.activo {
   width: 22px;
   border-radius: 3px;
-  background: #ffcf7a;
+  background: var(--naranja);
 }
 
-@media (max-width: 1060px) {
+@media (max-width: 960px) {
   .tablero-fila {
-    grid-template-columns: 90px 130px 1fr 130px;
-    font-size: 13px;
+    grid-template-columns: 100px 1fr 140px;
   }
 
   .tablero-opcional {
@@ -131,17 +236,25 @@ a.tablero-fila:hover {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 560px) {
   .tablero {
-    padding: 14px 10px;
+    padding: 16px 12px;
   }
 
   .tablero-fila {
-    grid-template-columns: auto 1fr;
-    gap: 8px 10px;
+    grid-template-columns: 80px 1fr;
+    gap: 10px;
   }
 
-  .tablero-fila > :nth-child(2) {
+  .tablero-precio {
     display: none;
+  }
+
+  .tablero-hora .letras-giratorias {
+    font-size: 18px;
+  }
+
+  .tablero-destino .letras-giratorias {
+    font-size: 16px;
   }
 }
