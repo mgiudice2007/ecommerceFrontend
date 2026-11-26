@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { hora, precio } from '../../utils/formato'
 import { precioDesde } from '../../utils/vuelos'
-import LetrasGiratorias from './LetrasGiratorias'
+import LetrasGiratorias from '../comunes/LetrasGiratorias'
 import TituloSeccion from './TituloSeccion'
 import './TableroPartidas.css'
 

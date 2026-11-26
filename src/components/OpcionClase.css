@@ -1,8 +1,11 @@
 .opcion-clase {
+  --zona: var(--azul);
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 18px;
+  padding: 0 18px 18px;
   border: 2px solid var(--borde);
   border-radius: var(--radio-grande);
   background: var(--superficie);
@@ -10,16 +13,50 @@
   color: var(--texto);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.opcion-clase.zona-ejecutiva {
+  --zona: var(--naranja);
+}
+
+.opcion-clase.zona-primera {
+  --zona: #b8862b;
+}
+
+/* Cinta de arriba con la zona de embarque, del color de cada clase */
+.opcion-clase-zona {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 -18px 6px;
+  padding: 10px 18px;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0 8px, transparent 8px 16px),
+    var(--zona);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.opcion-clase-zona span {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .opcion-clase:hover:not(:disabled) {
-  border-color: var(--celeste);
+  border-color: var(--zona);
+  transform: translateY(-4px);
+  box-shadow: var(--sombra-fuerte);
 }
 
 .opcion-clase.seleccionada {
-  border-color: var(--azul);
-  background: var(--celeste-suave);
+  border-color: var(--zona);
+  background: var(--naranja-suave);
+  box-shadow: 0 0 0 4px rgba(242, 96, 12, 0.15), var(--sombra);
 }
 
 .opcion-clase:disabled {

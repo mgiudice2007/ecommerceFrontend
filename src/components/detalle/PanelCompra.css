@@ -1,12 +1,64 @@
-.detalle-compra {
+/* El panel de compra es un pasaje: la sombra va en el contenedor porque la
+   mascara que recorta las muescas tambien cortaria la sombra */
+.detalle-compra-pase {
   position: sticky;
   top: 96px;
-  box-shadow: var(--sombra-fuerte);
+  filter: drop-shadow(0 18px 34px rgba(4, 30, 66, 0.18));
+}
+
+.detalle-compra {
+  --alto-cabecera: 92px;
+  padding-top: 0;
+  box-shadow: none;
+  -webkit-mask:
+    radial-gradient(circle at 0 var(--alto-cabecera), #0000 12px, #000 12.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% var(--alto-cabecera), #0000 12px, #000 12.5px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 var(--alto-cabecera), #0000 12px, #000 12.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% var(--alto-cabecera), #0000 12px, #000 12.5px) right / 51% 100% no-repeat;
+}
+
+/* Cabecera azul noche del pasaje, separada por una linea de corte */
+.detalle-compra-cabecera {
+  height: var(--alto-cabecera);
+  margin: 0 -24px 18px;
+  padding: 18px 24px 0;
+  border-bottom: 2px dashed #c9d6e6;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.35), transparent 55%),
+    var(--azul-noche);
+  color: #fff;
+}
+
+.detalle-compra-cabecera span {
+  color: #ffcf7a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .detalle-compra h2 {
-  margin-bottom: 16px;
-  font-size: 20px;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.detalle-compra-barras {
+  display: block;
+  height: 34px;
+  margin-top: 18px;
+  opacity: 0.7;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--azul-noche) 0 2px,
+    transparent 2px 4px,
+    var(--azul-noche) 4px 5px,
+    transparent 5px 8px,
+    var(--azul-noche) 8px 11px,
+    transparent 11px 13px,
+    var(--azul-noche) 13px 14px,
+    transparent 14px 17px
+  );
 }
 
 .detalle-resumen {
@@ -30,7 +82,7 @@
 }
 
 @media (max-width: 960px) {
-.detalle-compra {
+  .detalle-compra-pase {
     position: static;
   }
 }

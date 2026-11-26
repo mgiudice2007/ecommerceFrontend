@@ -64,17 +64,26 @@
   cursor: default;
 }
 
+/* El mapa es el fuselaje del avion: nariz redondeada arriba y ventanillas a los costados */
 .selector-asientos-avion {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  max-height: 380px;
+  width: fit-content;
+  max-width: 100%;
+  max-height: 420px;
+  margin: 0 auto;
   overflow-y: auto;
-  padding: 14px 8px;
-  border: 1px solid var(--borde);
-  border-radius: 40px 40px var(--radio) var(--radio);
-  background: var(--superficie-2);
+  padding: 70px 40px 24px;
+  border: 3px solid #c9d6e6;
+  border-radius: 220px 220px 28px 28px;
+  background:
+    radial-gradient(ellipse 5px 8px at 14px 50%, #8fb3dc 70%, transparent 75%) 0 0 / 100% 38px repeat-y,
+    radial-gradient(ellipse 5px 8px at calc(100% - 14px) 50%, #8fb3dc 70%, transparent 75%) 0 0 / 100% 38px repeat-y,
+    linear-gradient(180deg, #f7faff 0%, #ffffff 100%);
+  box-shadow: inset 0 0 0 6px #eef3fa, var(--sombra);
+  background-attachment: local;
 }
 
 .fila-asientos {
@@ -96,34 +105,47 @@
   margin-left: 22px;
 }
 
+/* Cada asiento tiene respaldo (borde de arriba grueso) y apoyabrazos */
 .asiento {
   display: inline-block;
   width: 30px;
   height: 30px;
   padding: 0;
-  border: 1px solid var(--azul);
-  border-radius: 8px 8px 4px 4px;
+  border: 2px solid #9fb8d6;
+  border-top-width: 6px;
+  border-radius: 10px 10px 5px 5px;
   background: var(--superficie);
   cursor: pointer;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
 }
 
 .asiento:hover:not(:disabled) {
-  background: var(--celeste-suave);
+  border-color: var(--naranja);
+  background: var(--naranja-suave);
+  transform: translateY(-2px);
 }
 
 .asiento:focus-visible {
-  outline: 2px solid var(--celeste);
+  outline: 2px solid var(--naranja);
   outline-offset: 2px;
 }
 
 .asiento.elegido {
-  border-color: var(--azul);
-  background: var(--azul);
+  border-color: var(--naranja-hover);
+  background: var(--degradado-atardecer);
+  box-shadow: 0 4px 10px rgba(242, 96, 12, 0.4);
+  animation: asiento-elegido 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes asiento-elegido {
+  from {
+    transform: scale(0.6);
+  }
 }
 
 .asiento.ocupado {
-  border-color: var(--borde);
-  background: var(--borde);
+  border-color: #d5dde8;
+  background: repeating-linear-gradient(135deg, #e3e9f1 0 4px, #d5dde8 4px 8px);
   cursor: not-allowed;
 }
 

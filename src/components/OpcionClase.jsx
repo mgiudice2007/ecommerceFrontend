@@ -1,22 +1,35 @@
 import { precio } from '../utils/formato'
 import './OpcionClase.css'
-import Etiqueta from './comunes/Etiqueta'
+
+// Cada clase embarca en una zona, como en el aeropuerto: Primera sube primero
+const zonaDe = (nombre = '') => {
+  const clase = nombre.toLowerCase()
+  if (clase.includes('primera')) return { numero: 1, tono: 'primera' }
+  if (clase.includes('ejecutiva')) return { numero: 2, tono: 'ejecutiva' }
+  return { numero: 3, tono: 'economica' }
+}
 
 function OpcionClase({ disponibilidad, clase, seleccionada, onElegir }) {
   const conDescuento = disponibilidad.precioConDescuento < disponibilidad.precio
   const pocosAsientos = disponibilidad.hayStock && disponibilidad.asientosDisponibles <= 5
+  const zona = zonaDe(disponibilidad.claseNombre)
 
   return (
     <button
       type="button"
-      className={`opcion-clase ${seleccionada ? 'seleccionada' : ''}`}
+      className={`opcion-clase zona-${zona.tono} ${seleccionada ? 'seleccionada' : ''}`}
       onClick={() => onElegir(disponibilidad)}
       disabled={!disponibilidad.hayStock}
       aria-pressed={seleccionada}
     >
+      <span className="opcion-clase-zona">
+        Zona {zona.numero}
+        <span>Embarque</span>
+      </span>
+
       <div className="opcion-clase-encabezado">
         <strong>{disponibilidad.claseNombre}</strong>
-        {seleccionada && <Etiqueta>Elegida</Etiqueta>}
+        {seleccionada && <span className="sello">Elegida</span>}
       </div>
 
       {clase && <p>{clase.descripcion}</p>}
