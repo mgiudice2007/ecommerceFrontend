@@ -1,26 +1,33 @@
 import { fechaLarga, hora } from '../../utils/formato'
-import Etiqueta from '../comunes/Etiqueta'
 import './ResultadoEmbarque.css'
 
+// Lo que muestra el semaforo segun el estado del pase
 const ESTADOS = {
-  VALIDO: { tipo: 'exito', texto: 'Pase válido' },
-  EMBARCADO: { tipo: 'aviso', texto: 'Ya embarcó' },
-  ANULADO: { tipo: 'cancelada', texto: 'Pase anulado' },
+  VALIDO: { clase: 'valido', icono: '✓', texto: 'Puede embarcar' },
+  OK: { clase: 'ok', icono: '✓', texto: 'Embarque OK' },
+  EMBARCADO: { clase: 'embarcado', icono: '!', texto: 'Ya embarcó' },
+  ANULADO: { clase: 'anulado', icono: '✕', texto: 'Pase anulado' },
 }
 
 // El pase que se encontró: sus datos, si es válido y el botón para marcarlo como embarcado
-function ResultadoEmbarque({ pase, embarcando, onEmbarcar }) {
-  const estado = ESTADOS[pase.estado]
+function ResultadoEmbarque({ pase, embarcando, recienEmbarcado, onEmbarcar }) {
+  // Si se acaba de embarcar en esta pantalla, se muestra en verde "Embarque OK"
+  const estado = ESTADOS[recienEmbarcado && pase.estado === 'EMBARCADO' ? 'OK' : pase.estado]
 
   return (
-    <section className={`tarjeta resultado-embarque resultado-${pase.estado.toLowerCase()}`}>
-      <header>
-        <h2>
-          {pase.nombre} {pase.apellido}
-        </h2>
-        <Etiqueta tipo={estado.tipo}>{estado.texto}</Etiqueta>
+    <section className={`tarjeta resultado-embarque semaforo-${estado.clase}`} key={estado.clase}>
+      <header className="resultado-semaforo">
+        <span className="resultado-luz" aria-hidden="true">
+          {estado.icono}
+        </span>
+        <div>
+          <strong>{estado.texto}</strong>
+          <span>
+            {pase.nombre} {pase.apellido} · {pase.asiento ?? 'sin asiento'} · {pase.numeroVuelo}
+          </span>
+          {pase.motivo && estado.clase !== 'ok' && <small>Motivo: {pase.motivo}</small>}
+        </div>
       </header>
-      {pase.motivo && <p className="resultado-motivo">{pase.motivo}</p>}
 
       <dl>
         <div>

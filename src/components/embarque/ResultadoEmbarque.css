@@ -1,34 +1,73 @@
+/* Resultado como semaforo: una cabecera grande de color segun el estado del pase */
 .resultado-embarque {
+  --luz: var(--verde);
+  --luz-fondo: var(--verde-suave);
   margin-top: 20px;
-  border-left: 6px solid var(--borde);
+  padding-top: 0;
+  overflow: hidden;
+  border: 2px solid var(--luz);
+  animation: semaforo-entra 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
-.resultado-valido {
-  border-left-color: var(--verde);
+@keyframes semaforo-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 
-.resultado-embarcado {
-  border-left-color: var(--durazno);
+.semaforo-embarcado {
+  --luz: #e8a10c;
+  --luz-fondo: #fff4e0;
 }
 
-.resultado-anulado {
-  border-left-color: var(--rojo);
+.semaforo-anulado {
+  --luz: var(--rojo);
+  --luz-fondo: var(--rojo-suave);
 }
 
-.resultado-embarque header {
+.resultado-semaforo {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 16px;
+  margin: 0 -24px 16px;
+  padding: 18px 24px;
+  background: var(--luz-fondo);
 }
 
-.resultado-embarque h2 {
-  margin: 0;
+.resultado-luz {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--luz);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--luz) 25%, transparent);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
 }
 
-.resultado-motivo {
-  margin: 8px 0 0;
+.resultado-semaforo div {
+  display: flex;
+  flex-direction: column;
+}
+
+.resultado-semaforo strong {
+  color: var(--luz);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.resultado-semaforo span {
+  font-weight: 700;
+}
+
+.resultado-semaforo small {
+  margin-top: 2px;
+  color: var(--texto-suave);
   font-weight: 600;
 }
 
@@ -36,7 +75,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px 24px;
-  margin: 16px 0;
+  margin: 0 0 16px;
 }
 
 .resultado-embarque dt {

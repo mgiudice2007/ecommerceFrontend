@@ -12,10 +12,23 @@ function ValidarEmbarque() {
   const dispatch = useDispatch()
   const { pase, loading, error } = useSelector((state) => state.embarque)
   const [codigo, setCodigo] = useState('')
+  // Para distinguir "lo acabo de embarcar" (verde) de "ya habia embarcado antes" (ambar)
+  const [recienEmbarcado, setRecienEmbarcado] = useState(false)
 
   const cambiarCodigo = (valor) => {
     setCodigo(valor)
+    setRecienEmbarcado(false)
     if (pase || error) dispatch(limpiarPase())
+  }
+
+  const buscar = () => {
+    setRecienEmbarcado(false)
+    dispatch(fetchPase(codigo.trim()))
+  }
+
+  const embarcar = () => {
+    setRecienEmbarcado(true)
+    dispatch(embarcarPasajero(pase.codigoEmbarque))
   }
 
   return (
@@ -29,22 +42,11 @@ function ValidarEmbarque() {
       </EncabezadoPagina>
 
       <div className="contenedor sobre-encabezado">
-        <section className="tarjeta">
-          <FormCodigo
-            codigo={codigo}
-            buscando={loading && !pase}
-            onCambiar={cambiarCodigo}
-            onBuscar={() => dispatch(fetchPase(codigo.trim()))}
-          />
-        </section>
+        <FormCodigo codigo={codigo} buscando={loading && !pase} onCambiar={cambiarCodigo} onBuscar={buscar} />
 
         {error && <Mensaje>{error}</Mensaje>}
         {pase && (
-          <ResultadoEmbarque
-            pase={pase}
-            embarcando={loading}
-            onEmbarcar={() => dispatch(embarcarPasajero(pase.codigoEmbarque))}
-          />
+          <ResultadoEmbarque pase={pase} embarcando={loading} recienEmbarcado={recienEmbarcado} onEmbarcar={embarcar} />
         )}
       </div>
     </>

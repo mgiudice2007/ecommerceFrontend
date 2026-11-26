@@ -1,15 +1,115 @@
-.form-codigo {
+/* Lector de la puerta: panel oscuro con el recuadro del QR y el campo del codigo */
+.lector-pase {
+  padding: 18px 22px 22px;
+  border-radius: var(--radio-grande);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(95, 224, 164, 0.15), transparent 45%),
+    linear-gradient(160deg, #0c1c33 0%, #081426 100%);
+  box-shadow: var(--sombra-fuerte);
+  color: #fff;
+}
+
+.lector-pase-titulo {
+  display: block;
+  margin-bottom: 16px;
+  color: #5fe0a4;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lector-pase-cuerpo {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 22px;
 }
 
-.form-codigo .campo {
-  flex: 1 1 260px;
-  margin: 0;
+/* Recuadro del QR con la linea roja del escaner */
+.lector-pase-ventana {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 130px;
+  height: 130px;
+  overflow: hidden;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.form-codigo .boton {
-  margin-top: 26px;
+.lector-pase-linea {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 2px;
+  background: #ff5a4e;
+  box-shadow: 0 0 10px #ff5a4e;
+  opacity: 0.5;
+}
+
+/* Mientras busca, la linea sube y baja como un escaner */
+.lector-pase.escaneando .lector-pase-linea {
+  opacity: 1;
+  animation: escanear 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes escanear {
+  from {
+    top: 10%;
+  }
+  to {
+    top: 88%;
+  }
+}
+
+.lector-pase-campo {
+  display: flex;
+  flex: 1 1 280px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lector-pase-campo label {
+  color: #ffcf7a;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lector-pase-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lector-pase-fila input {
+  flex: 1 1 200px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lector-pase-fila input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.lector-pase-fila input:focus {
+  outline: 2px solid var(--naranja);
+  outline-offset: 1px;
+}
+
+.lector-pase-campo small {
+  color: rgba(255, 255, 255, 0.55);
 }
