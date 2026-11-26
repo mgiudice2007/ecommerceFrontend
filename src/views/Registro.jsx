@@ -144,7 +144,7 @@ function Registro() {
             </div>
           </div>
 
-          <button className="boton boton-primario boton-ancho" disabled={cargando}>
+          <button className="boton boton-accion boton-ancho" disabled={cargando}>
             {cargando ? 'Creando cuenta…' : 'Crear mi cuenta gratis →'}
           </button>
         </form>
@@ -155,6 +155,9 @@ function Registro() {
       </section>
 
       <aside className="auth-panel">
+        <span className="auth-panel-ruta" aria-hidden="true">
+          <span>✈</span>
+        </span>
         <span className="auth-panel-etiqueta">Beneficios de tu cuenta</span>
         <h2>Tu próximo viaje empieza acá</h2>
         <ul>

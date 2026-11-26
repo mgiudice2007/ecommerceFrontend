@@ -5,8 +5,21 @@
   align-items: stretch;
 }
 
+/* El formulario es el mostrador de check-in: franja de rayas arriba */
 .auth-formulario {
-  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  padding: 48px 40px 40px;
+}
+
+.auth-formulario::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: repeating-linear-gradient(135deg, var(--naranja) 0 14px, var(--azul-noche) 14px 28px);
 }
 
 .auth-formulario h1 {
@@ -27,6 +40,8 @@
 }
 
 .auth-panel {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -35,8 +50,45 @@
   border-radius: var(--radio-grande);
   color: rgba(255, 255, 255, 0.85);
   background:
+    radial-gradient(ellipse at 90% 110%, rgba(255, 122, 47, 0.55), transparent 50%),
     linear-gradient(160deg, rgba(0, 87, 184, 0.82) 0%, rgba(4, 30, 66, 0.94) 100%),
     url('../assets/portada.jpg') center / cover;
+}
+
+/* Ruta punteada arriba del panel con un avion que la recorre sin parar */
+.auth-panel-ruta {
+  position: absolute;
+  top: 34px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 6px, transparent 6px 12px);
+}
+
+.auth-panel-ruta span {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  color: #ffb066;
+  font-size: 20px;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(255, 154, 60, 0.8);
+  animation: ruta-panel 5s ease-in-out infinite;
+}
+
+@keyframes ruta-panel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 20px);
+    opacity: 0;
+  }
 }
 
 .auth-panel h2 {
@@ -58,9 +110,9 @@
 }
 
 .auth-panel li::before {
-  content: '✓';
+  content: '✈';
   margin-right: 10px;
-  color: var(--durazno);
+  color: #ffb066;
   font-weight: 800;
 }
 
@@ -68,8 +120,8 @@
   align-self: flex-start;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--durazno);
+  background: rgba(255, 154, 60, 0.2);
+  color: #ffcf7a;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;

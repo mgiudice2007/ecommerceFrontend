@@ -74,7 +74,7 @@ function Login() {
             />
           </div>
 
-          <button className="boton boton-primario boton-ancho" disabled={cargando}>
+          <button className="boton boton-accion boton-ancho" disabled={cargando}>
             {cargando ? 'Ingresando…' : 'Iniciar sesión →'}
           </button>
         </form>
@@ -85,6 +85,9 @@ function Login() {
       </section>
 
       <aside className="auth-panel">
+        <span className="auth-panel-ruta" aria-hidden="true">
+          <span>✈</span>
+        </span>
         <span className="auth-panel-etiqueta">BCA Airlines</span>
         <h2>Volá alto por toda la Argentina y el mundo</h2>
         <p>Buscá vuelos por origen y destino, elegí tu clase y comprá en pocos pasos.</p>

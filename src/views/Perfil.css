@@ -6,21 +6,73 @@
   max-width: 1000px;
 }
 
+/* La tarjeta de la cuenta es un pasaporte: tapa azul noche con dorado,
+   foto con marco y el renglon de letras y "<" abajo */
 .perfil-cuenta {
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 0;
+  border: none;
+  background:
+    repeating-radial-gradient(circle at 50% 0%, rgba(4, 30, 66, 0.035) 0 2px, transparent 2px 9px),
+    #fdfbf6;
   text-align: center;
+}
+
+.pasaporte-tapa {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: calc(100% + 48px);
+  margin: 0 -24px 22px;
+  padding: 18px 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.3), transparent 55%),
+    var(--azul-noche);
+  color: #e9c46a;
+}
+
+.pasaporte-tapa span {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.pasaporte-tapa small {
+  color: rgba(233, 196, 106, 0.75);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.pasaporte-mrz {
+  display: block;
+  width: calc(100% + 48px);
+  margin: 8px -24px -24px;
+  padding: 12px 16px;
+  overflow: hidden;
+  border-top: 1px dashed #d8cfb8;
+  background: #f4efe2;
+  color: var(--azul-noche);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  text-overflow: clip;
 }
 
 .perfil-avatar {
   display: grid;
   place-items: center;
-  width: 72px;
-  height: 72px;
+  width: 84px;
+  height: 100px;
   margin-bottom: 12px;
-  border-radius: 50%;
-  background: var(--azul);
+  border: 3px solid #e9c46a;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(4, 30, 66, 0.2);
+  background: var(--degradado-atardecer);
   color: #fff;
   font-size: 30px;
   font-weight: 800;
@@ -36,7 +88,7 @@
   width: 100%;
   margin: 20px 0 0;
   padding-top: 16px;
-  border-top: 1px solid var(--borde);
+  border-top: 1px dashed #d8cfb8;
   text-align: left;
 }
 
@@ -73,8 +125,7 @@
   }
 }
 
-.perfil-millas {
-  color: var(--azul);
-  font-size: 20px;
-  font-weight: 800;
+.perfil-millas .sello {
+  margin-top: 6px;
+  font-size: 15px;
 }

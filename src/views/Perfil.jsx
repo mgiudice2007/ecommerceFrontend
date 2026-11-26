@@ -11,6 +11,14 @@ import Cargando from '../components/comunes/Cargando'
 import Etiqueta from '../components/comunes/Etiqueta'
 import Mensaje from '../components/comunes/Mensaje'
 
+// Renglon de abajo del pasaporte (la "zona legible por maquina"), armado con los datos del usuario
+const lineaPasaporte = (usuario) =>
+  `P<ARG${usuario.apellido ?? ''}<<${usuario.nombre ?? usuario.username}`
+    .toUpperCase()
+    .replace(/\s+/g, '<')
+    .padEnd(40, '<')
+    .slice(0, 40)
+
 const NOMBRES_DE_ROL = {
   COMPRADOR: 'Comprador',
   ADMIN: 'Administrador',
@@ -84,6 +92,10 @@ function Perfil() {
       <div className="contenedor sobre-encabezado perfil">
         <div className="perfil-layout">
           <aside className="tarjeta perfil-cuenta">
+            <div className="pasaporte-tapa">
+              <span>Pasaporte · Passport</span>
+              <small>República Argentina · BCA Airlines</small>
+            </div>
             <span className="perfil-avatar" aria-hidden="true">
               {usuario.nombre?.[0] ?? usuario.username[0]}
             </span>
@@ -102,10 +114,15 @@ function Perfil() {
               {usuario.rol === 'COMPRADOR' && (
                 <>
                   <dt>Millas</dt>
-                  <dd className="perfil-millas">✈ {millas(usuario.millas)}</dd>
+                  <dd className="perfil-millas">
+                    <span className="sello">✈ {millas(usuario.millas)}</span>
+                  </dd>
                 </>
               )}
             </dl>
+            <code className="pasaporte-mrz" aria-hidden="true">
+              {lineaPasaporte(usuario)}
+            </code>
           </aside>
 
           <section className="tarjeta">
