@@ -27,6 +27,12 @@ function PortadaVuelo({ vuelo, imagen }) {
         <p>
           Vuelo {vuelo.numeroVuelo} · Directo · {duracion(vuelo.duracionMinutos)} · {fechaLarga(vuelo.fechaSalida)}
         </p>
+
+        {/* Ventanilla del avion: se ve el destino y la persiana sube sola al entrar */}
+        <div className="ventanilla" aria-hidden="true">
+          <div className="ventanilla-vista" style={fondo} />
+          <span className="ventanilla-persiana" />
+        </div>
       </div>
     </section>
   )
