@@ -22,8 +22,11 @@ Guía para explicar el estado global del frontend. Todo lo que viene del backend
 
 ## Archivos base
 
-- **`src/main.jsx`:** el `<Provider store={store}>` envuelve a toda la app, una sola vez.
+- **`src/main.jsx`:** el `<Provider store={store}>` envuelve a toda la app, una sola vez. Adentro, `<PersistGate>` espera a recuperar la sesión guardada antes de dibujar la app.
 - **`src/redux/store.js`:** junta los 7 slices. Se suscribe al store para pasarle el token a `conexion.js` cada vez que cambia.
+  - Con **redux-persist**, el slice `usuario` se guarda en `sessionStorage`, pero solo `token`, `sesion` y `perfil`.
+  - Así un F5 no te saca de la sesión. Cerrar la pestaña sí la borra.
+  - El resto del store no se guarda: se vuelve a pedir al backend.
 - **`src/redux/conexion.js`:** un único cliente de axios con la URL del backend y dos interceptores:
   - **Pedido:** agrega `Authorization: Bearer <token>` si hay sesión.
   - **Respuesta:** si el backend responde con error, lo convierte en `new Error(mensajeDelBackend)`. Así `action.error.message` trae el texto real ("Usuario o contraseña incorrectos") y los thunks no necesitan `try/catch`.
@@ -37,7 +40,7 @@ Guía para explicar el estado global del frontend. Todo lo que viene del backend
 - **Datos con su dueño:** el store guarda a qué pedido pertenece cada dato. Por ejemplo `fotosVuelo = { vueloId, lista }` y `resultadoBusqueda.consulta`. La vista solo los usa si son de la pantalla actual, así nunca muestra los de otra.
 - **Formularios que se vacían solos:** el padre les cambia la `key` cuando el backend confirma el alta. Si el backend rechaza, el formulario conserva lo escrito.
 - **Lo que solo le importa a una pantalla queda en `useState`:** filtros, pestaña elegida, qué fila se está editando, el formulario que se está escribiendo.
-- **Sin `localStorage`:** al recargar la página (F5) el store arranca vacío y hay que volver a iniciar sesión.
+- **Ningún componente toca `localStorage` ni `sessionStorage`:** la sesión la guarda y la recupera redux-persist.
 
 ## Los slices
 
@@ -95,12 +98,13 @@ Las compras del comprador y el pago.
 Sesión y cuentas juntas.
 
 - **Thunks:** `login`, `logout`, `registrarUsuario`, `registrarAdministrador`, `fetchPerfil`, `editarPerfil`, `fetchUsuarios`, `cambiarRol`.
-- **Estado:** `token`, `sesion`, `perfil`, `usuarios`, `registrado`, `administradoresCreados`, `mensaje`, `loading`, `guardando`, `error`.
+- **Estado:** `token`, `sesion`, `perfil`, `usuarios`, `registrado`, `administradoresCreados`, `sesionVencida`, `mensaje`, `loading`, `guardando`, `error`.
   - `sesion` es el id, usuario, rol y vencimiento, leídos del JWT.
 - **Acciones:** `limpiarMensaje`, `reiniciarError`, `reiniciarRegistrado`, `vencerSesion`.
 - **Cómo funciona:**
   - Al aparecer la `sesion`, `App` pide el perfil y, si es comprador, el carrito.
-  - Un `setTimeout` en `App` despacha `vencerSesion` cuando vence el token.
+  - Un `setTimeout` en `App` despacha `vencerSesion` cuando vence el token, aunque haya vencido mientras la pestaña estaba cerrada. `vencerSesion` deja `sesionVencida` en verdadero y el login muestra el aviso.
+  - Se guarda en `sessionStorage` (redux-persist): `token`, `sesion` y `perfil`.
   - `RutaProtegida` lee la `sesion` para dejar pasar o mandar al login.
 
 ### `embarque`

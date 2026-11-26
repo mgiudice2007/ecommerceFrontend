@@ -24,7 +24,7 @@ Consume la API REST del backend en Spring Boot
 El frontend le habla directo al backend en `http://localhost:8080` (ver `BASE_URL`
 en `src/redux/conexion.js`). Como corren en puertos distintos, el backend lo permite con CORS.
 
-La sesión vive solo en el store de Redux: **al recargar la página (F5) hay que volver a iniciar sesión**.
+La sesión vive en el store de Redux y redux-persist la guarda en `sessionStorage`: **sobrevive a F5 y se cierra al cerrar la pestaña**.
 Cómo está armado Redux, slice por slice: [REDUX.md](REDUX.md).
 
 ## Usuarios de prueba

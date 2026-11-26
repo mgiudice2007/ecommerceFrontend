@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
-  const { sesion, guardando: cargando, error } = useSelector((state) => state.usuario)
+  const { sesion, sesionVencida, guardando: cargando, error } = useSelector((state) => state.usuario)
 
   const [formData, setFormData] = useState({ username: '', password: '' })
 
@@ -41,7 +41,7 @@ function Login() {
         <h1>¡Hola de nuevo! Ingresá a tu cuenta</h1>
         <p className="texto-suave">Gestioná tus pasajes, tu carrito y tus próximos viajes.</p>
 
-        {location.state?.sesionVencida && !error && (
+        {sesionVencida && !error && (
           <Mensaje>Tu sesión venció. Iniciá sesión de nuevo para seguir.</Mensaje>
         )}
         {error && <Mensaje>{error}</Mensaje>}

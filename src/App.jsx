@@ -59,7 +59,7 @@ function App() {
     if (!sesion) return
     const timer = setTimeout(() => {
       dispatch(vencerSesion())
-      navigate('/login', { state: { sesionVencida: true } })
+      navigate('/login')
     }, sesion.vence - Date.now())
     return () => clearTimeout(timer)
   }, [sesion, dispatch, navigate])

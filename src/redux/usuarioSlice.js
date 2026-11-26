@@ -45,7 +45,7 @@ export const cambiarRol = createAsyncThunk('usuario/cambiarRol', async ({ id, ro
 })
 
 const initialState = {
-  // El token solo vive acá: al recargar la página (F5) se pierde la sesión y hay que volver a iniciarla
+  // token, sesion y perfil los guarda redux-persist en sessionStorage (ver store.js): sobreviven a F5
   token: null,
   sesion: null,
   perfil: null,
@@ -54,6 +54,8 @@ const initialState = {
   registrado: false,
   // Cantidad de administradores creados: sirve para vaciar el formulario cuando se crea uno
   administradoresCreados: 0,
+  // Verdadero cuando la sesión se cerró porque venció el token: el login muestra el aviso
+  sesionVencida: false,
   mensaje: null,
   loading: false,
   guardando: false,
@@ -74,13 +76,14 @@ const usuarioSlice = createSlice({
       state.registrado = false
     },
     // El token venció: se cierra la sesión sin avisarle al backend
-    vencerSesion: () => initialState,
+    vencerSesion: () => ({ ...initialState, sesionVencida: true }),
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
         state.guardando = true
         state.error = null
+        state.sesionVencida = false
       })
       .addCase(login.fulfilled, (state, action) => {
         state.guardando = false

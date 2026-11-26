@@ -4,14 +4,18 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { store } from './redux/store'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistor, store } from './redux/store'
 
+// PersistGate espera a recuperar la sesión guardada antes de dibujar la app: así un F5 no manda al login
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <BrowserRouter>
-      <StrictMode>
-        <App />
-      </StrictMode>
-    </BrowserRouter>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <StrictMode>
+          <App />
+        </StrictMode>
+      </BrowserRouter>
+    </PersistGate>
   </Provider>,
 )
