@@ -6,7 +6,7 @@ import EncabezadoPagina from '../components/EncabezadoPagina'
 import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
-import AyudaVuelos from '../components/vuelos/AyudaVuelos'
+import InfoBusqueda from '../components/vuelos/InfoBusqueda'
 import FiltroPrecio from '../components/vuelos/FiltroPrecio'
 import ResultadosIdaYVuelta from '../components/vuelos/ResultadosIdaYVuelta'
 import ResultadosSoloIda from '../components/vuelos/ResultadosSoloIda'
@@ -110,12 +110,10 @@ function Vuelos() {
 
               {cargando && <Cargando texto="Buscando vuelos…" />}
 
-              {hayFecha && (
-                <AyudaVuelos>
-                  📅 Fechas flexibles: te mostramos los vuelos que salen hasta {DIAS_FLEXIBLES} días antes o después
-                  de la fecha que elegiste.
-                </AyudaVuelos>
-              )}
+              <InfoBusqueda
+                diasFlexibles={hayFecha ? DIAS_FLEXIBLES : null}
+                idaYVuelta={idaYVuelta && searchParams.get('tramo') !== 'vuelta'}
+              />
 
               {!cargando && resultado && idaYVuelta && (
                 <ResultadosIdaYVuelta

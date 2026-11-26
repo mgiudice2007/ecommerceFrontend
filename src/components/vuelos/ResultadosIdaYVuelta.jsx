@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import Mensaje from '../comunes/Mensaje'
-import AyudaVuelos from './AyudaVuelos'
 import ListaVuelos from './ListaVuelos'
 import TramoVuelos from './TramoVuelos'
 
@@ -13,7 +12,6 @@ function ResultadosIdaYVuelta({ resultado, soloVuelta, consultaIda, consultaPasa
         </Mensaje>
       ) : (
         <>
-          <AyudaVuelos>Elegí un vuelo de ida, agregalo al carrito y seguí con el de vuelta.</AyudaVuelos>
           <TramoVuelos
             numero={1}
             titulo="Vuelos de ida"

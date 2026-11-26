@@ -1,0 +1,59 @@
+/* Barra oscura con los datos de la busqueda, separados por una linea punteada */
+.info-busqueda {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin: 0 0 16px;
+  border-radius: var(--radio);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.2), transparent 45%),
+    linear-gradient(160deg, #0c1c33 0%, #081426 100%);
+  box-shadow: var(--sombra);
+  color: #fff;
+  animation: aparecer 0.4s ease-out;
+}
+
+.info-busqueda-dato {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.info-busqueda-dato + .info-busqueda-dato {
+  border-left: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.info-busqueda-icono {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  color: #ffcf7a;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.info-busqueda small {
+  color: #ffcf7a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.info-busqueda p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.info-busqueda strong {
+  color: #ffb066;
+}
+
+@media (max-width: 560px) {
+  .info-busqueda-dato + .info-busqueda-dato {
+    border-left: none;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  }
+}
