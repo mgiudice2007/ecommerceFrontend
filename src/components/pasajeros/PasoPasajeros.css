@@ -1,14 +1,29 @@
+/* Cada pasajero es una tarjeta de check-in: borde naranja a la izquierda y
+   el nombre del pasajero como etiqueta de equipaje */
 .form-pasajero {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   padding: 16px 18px 6px;
   border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  border-left: 5px solid var(--naranja);
+  border-radius: 6px var(--radio) var(--radio) 6px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 154, 60, 0.08), transparent 40%),
+    var(--superficie);
 }
 
 .form-pasajero legend {
-  padding: 0 8px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: var(--azul-noche);
+  color: #ffcf7a;
+  font-size: 13px;
   font-weight: 800;
-  color: var(--azul-noche);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form-pasajero legend::before {
+  content: '🧳 ';
 }
 
 .form-pasajero-vuelos {

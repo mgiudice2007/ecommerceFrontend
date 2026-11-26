@@ -21,7 +21,10 @@ function ResumenCompra({
 }) {
   return (
     <aside className="tarjeta carrito-resumen">
-      <h2>Resumen de compra</h2>
+      <div className="carrito-resumen-cabecera">
+        <span>BCA Airlines · Tu pasaje</span>
+        <h2>Resumen de compra</h2>
+      </div>
       {items.map((item) => (
         <FilaResumen
           key={item.id}
@@ -53,6 +56,7 @@ function ResumenCompra({
       <Link to={enlace.to} className="carrito-seguir">
         {enlace.texto}
       </Link>
+      <span className="carrito-resumen-barras" aria-hidden="true" />
     </aside>
   )
 }

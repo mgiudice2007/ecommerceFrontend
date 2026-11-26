@@ -1,11 +1,51 @@
 .carrito-resumen {
   position: sticky;
   top: 96px;
+  overflow: hidden;
+  padding-top: 0;
+  box-shadow: var(--sombra-fuerte);
+}
+
+/* Cabecera azul noche de pasaje con linea de corte */
+.carrito-resumen-cabecera {
+  margin: 0 -24px 16px;
+  padding: 18px 24px 16px;
+  border-bottom: 2px dashed #c9d6e6;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.35), transparent 55%),
+    var(--azul-noche);
+  color: #fff;
+}
+
+.carrito-resumen-cabecera span {
+  color: #ffcf7a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .carrito-resumen h2 {
-  margin-bottom: 16px;
-  font-size: 20px;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.carrito-resumen-barras {
+  display: block;
+  height: 30px;
+  margin-top: 16px;
+  opacity: 0.7;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--azul-noche) 0 2px,
+    transparent 2px 4px,
+    var(--azul-noche) 4px 5px,
+    transparent 5px 8px,
+    var(--azul-noche) 8px 11px,
+    transparent 11px 13px,
+    var(--azul-noche) 13px 14px,
+    transparent 14px 17px
+  );
 }
 
 .carrito-resumen-total {
@@ -34,7 +74,7 @@
 
 .carrito-millas-gana {
   margin: 6px 0 0;
-  color: var(--azul);
+  color: var(--naranja-oscuro);
   font-size: 14px;
   font-weight: 700;
 }

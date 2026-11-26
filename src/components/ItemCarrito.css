@@ -1,12 +1,36 @@
+/* Cada pasaje del carrito es un pase de abordar con talon a la derecha.
+   La sombra va en .pase-item porque la mascara de las muescas la cortaria. */
+.pase-item {
+  --talon: 190px;
+  filter: drop-shadow(0 10px 22px rgba(4, 30, 66, 0.12));
+  animation: aparecer 0.5s ease-out backwards;
+}
+
 .item-carrito {
   display: grid;
-  grid-template-columns: 130px 1fr auto;
+  grid-template-columns: 130px 1fr var(--talon);
   gap: 20px;
-  align-items: center;
-  padding: 16px 20px 16px 16px;
+  align-items: stretch;
+  padding: 16px 0 16px 16px;
+  box-shadow: none;
+  -webkit-mask:
+    radial-gradient(circle at calc(100% - var(--talon)) 0, #0000 12px, #000 12.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - var(--talon)) 100%, #0000 12px, #000 12.5px) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle at calc(100% - var(--talon)) 0, #0000 12px, #000 12.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - var(--talon)) 100%, #0000 12px, #000 12.5px) bottom / 100% 51% no-repeat;
+}
+
+.item-carrito-talon {
+  color: var(--naranja-oscuro);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .item-carrito-foto {
+  align-self: center;
   height: 110px;
   overflow: hidden;
   border-radius: var(--radio);
@@ -17,11 +41,12 @@
 }
 
 .item-carrito-info {
+  align-self: center;
   min-width: 0;
 }
 
 .item-carrito-info h3 {
-  margin: 10px 0 4px;
+  margin: 6px 0 4px;
   font-size: 20px;
 }
 
@@ -41,13 +66,37 @@
 .item-carrito-acciones {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-end;
   gap: 10px;
+  margin: -16px 0;
+  padding: 16px 20px;
+  border-left: 2px dashed #c9d6e6;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 154, 60, 0.16), transparent 55%),
+    #fffaf5;
 }
 
 .item-carrito-subtotal {
-  color: var(--azul);
+  color: var(--naranja-oscuro);
   font-size: 22px;
+}
+
+.item-carrito-barras {
+  align-self: stretch;
+  height: 22px;
+  opacity: 0.7;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--azul-noche) 0 2px,
+    transparent 2px 4px,
+    var(--azul-noche) 4px 5px,
+    transparent 5px 8px,
+    var(--azul-noche) 8px 11px,
+    transparent 11px 13px,
+    var(--azul-noche) 13px 14px,
+    transparent 14px 17px
+  );
 }
 
 .item-carrito-eliminar {
@@ -68,6 +117,13 @@
 @media (max-width: 560px) {
   .item-carrito {
     grid-template-columns: 1fr;
+    padding-right: 16px;
+    -webkit-mask: none;
+    mask: none;
+  }
+
+  .item-carrito-barras {
+    display: none;
   }
 
   .item-carrito-foto {
@@ -78,5 +134,8 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin: 0 -16px -16px;
+    border-left: none;
+    border-top: 2px dashed #c9d6e6;
   }
 }

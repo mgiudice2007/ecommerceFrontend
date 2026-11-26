@@ -9,6 +9,7 @@ import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import PasosCompra from '../components/pago/PasosCompra'
 import { useAuth } from '../context/AuthContext'
+import { usePortadas } from '../hooks/usePortadas'
 import { calcularMillas, textoCantidadPasajes, vuelosSinAdulto } from '../utils/carrito'
 import './Carrito.css'
 
@@ -19,6 +20,7 @@ function Carrito() {
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [vuelos, setVuelos] = useState({})
+  const portadas = usePortadas((carrito?.items ?? []).map((item) => ({ id: item.vueloId })))
 
   useEffect(() => {
     api('/api/carrito')
@@ -88,6 +90,7 @@ function Carrito() {
                     key={item.id}
                     item={item}
                     vuelo={vuelos[item.vueloId]}
+                    imagen={portadas[item.vueloId]}
                     onCambiarCantidad={cambiarCantidad}
                     onEliminar={eliminar}
                     ocupado={ocupado}

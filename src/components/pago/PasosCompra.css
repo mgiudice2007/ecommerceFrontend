@@ -57,20 +57,48 @@
   color: var(--texto);
 }
 
+/* El paso actual es el avion: naranja, con un anillo que late */
 .pasos-compra .paso-actual span {
-  background: var(--azul);
+  position: relative;
+  background: var(--degradado-atardecer);
   color: #fff;
+  font-size: 15px;
+}
+
+.pasos-compra .paso-actual span::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--naranja);
+  border-radius: 50%;
+  animation: latir 1.6s ease-out infinite;
+}
+
+@keyframes latir {
+  from {
+    transform: scale(0.85);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 .pasos-compra .paso-hecho {
-  color: var(--verde);
+  color: var(--naranja-oscuro);
 }
 
 .pasos-compra .paso-hecho span {
-  background: var(--verde-suave);
+  background: var(--naranja-suave);
+}
+
+/* La ruta: punteada lo que falta, naranja lo ya recorrido */
+.pasos-compra li + li::before {
+  background: repeating-linear-gradient(90deg, #b9c8da 0 5px, transparent 5px 9px);
 }
 
 .pasos-compra .paso-hecho + li::before,
 .pasos-compra .paso-actual::before {
-  background: var(--verde);
+  background: var(--naranja);
 }

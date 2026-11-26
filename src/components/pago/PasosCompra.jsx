@@ -11,7 +11,7 @@ function PasosCompra({ actual }) {
           className={i < actual ? 'paso-hecho' : i === actual ? 'paso-actual' : ''}
           aria-current={i === actual ? 'step' : undefined}
         >
-          <span>{i < actual ? '✓' : i + 1}</span>
+          <span>{i < actual ? '✓' : i === actual ? '✈' : i + 1}</span>
           {paso}
         </li>
       ))}
