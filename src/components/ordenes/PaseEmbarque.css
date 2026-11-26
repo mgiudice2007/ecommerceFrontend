@@ -68,3 +68,71 @@
   padding-left: 18px;
   border-left: 2px dashed #c9d6e6;
 }
+
+/* ---------- Pases que se imprimen (pantalla de compra exitosa) ---------- */
+
+/* Maquina de check-in: barra oscura con una luz verde que titila y la ranura */
+.impresora {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -6px;
+  padding: 12px 16px 18px;
+  border-radius: 14px 14px 6px 6px;
+  background: linear-gradient(180deg, #1b2a40 0%, #0c1626 100%);
+  box-shadow: 0 8px 18px rgba(4, 30, 66, 0.3);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.impresora-luz {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5fe0a4;
+  box-shadow: 0 0 8px #5fe0a4;
+  animation: luz-impresora 0.8s steps(2) infinite;
+}
+
+@keyframes luz-impresora {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* La ranura por donde sale el papel */
+.impresora-ranura {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 6px;
+  height: 4px;
+  border-radius: 2px;
+  background: #02060d;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Cada pase "sale" de la ranura: se va destapando de arriba hacia abajo a los saltitos */
+.imprimiendo .pase-salida {
+  animation: imprimir-pase 1.4s steps(14) backwards;
+}
+
+.imprimiendo .pase-salida:first-of-type {
+  margin-top: -4px;
+}
+
+@keyframes imprimir-pase {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-40px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}

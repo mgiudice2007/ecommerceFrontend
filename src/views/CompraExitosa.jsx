@@ -44,7 +44,7 @@ function CompraExitosa() {
     <div className="contenedor pagina orden">
       <PasosCompra actual={4} />
       <PagoAprobado orden={orden} />
-      <Boleto orden={orden} />
+      <Boleto orden={orden} imprimir />
 
       <div className="orden-acciones">
         <Link to="/mis-compras" className="boton boton-primario">

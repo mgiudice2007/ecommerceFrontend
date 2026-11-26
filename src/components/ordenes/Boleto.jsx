@@ -7,7 +7,7 @@ import EtiquetaOrden from './EtiquetaOrden'
 import TotalesOrden from './TotalesOrden'
 import './Boleto.css'
 
-function Boleto({ orden }) {
+function Boleto({ orden, imprimir = false }) {
   const cancelada = orden.estado === 'CANCELADA'
 
   return (
@@ -58,7 +58,7 @@ function Boleto({ orden }) {
         ))}
       </ul>
 
-      <PasesEmbarque items={orden.items} anulados={cancelada} />
+      <PasesEmbarque items={orden.items} anulados={cancelada} imprimir={imprimir} />
 
       <TotalesOrden orden={orden} cancelada={cancelada} />
     </section>
