@@ -79,3 +79,6 @@ export const comprasPorMomento = (ordenes, ahora = Date.now()) => {
   grupos.realizada.sort((a, b) => primeraSalida(b) - primeraSalida(a))
   return grupos
 }
+
+// Si el vuelo de un tramo ya salio (en Mis compras se muestra apagado, con "Ya volo")
+export const tramoYaSalio = (item, ahora = Date.now()) => new Date(item.fechaSalida).getTime() <= ahora

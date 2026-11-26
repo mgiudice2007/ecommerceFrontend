@@ -55,6 +55,20 @@
   font-weight: 600;
 }
 
+/* Un tramo que ya salio queda apagado y dice "Ya volo" en vez de la hora */
+.compra-vuelos li.tramo-volado {
+  opacity: 0.5;
+}
+
+.compra-vuelos li.tramo-volado .compra-avion {
+  color: var(--azul);
+}
+
+.compra-vuelos li.tramo-volado .compra-salida small {
+  color: var(--azul);
+  font-weight: 800;
+}
+
 /* Los viajes que ya se hicieron quedan mas apagados y con borde azul */
 .compra-realizada {
   border-left-color: var(--azul);

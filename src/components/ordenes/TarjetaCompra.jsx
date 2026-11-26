@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { fechaCorta, fechaLarga, hora, precio } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
-import { momentoDeCompra, textoNumerosDeVuelo } from '../../utils/ordenes'
+import { momentoDeCompra, textoNumerosDeVuelo, tramoYaSalio as yaSalio } from '../../utils/ordenes'
 import { textoMedioPago } from '../../utils/pagos'
 import FotoVuelo from '../FotoVuelo'
 import EtiquetaOrden from './EtiquetaOrden'
@@ -11,6 +11,8 @@ function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
   const momento = momentoDeCompra(orden)
   const cancelada = momento === 'cancelada'
   const pasajes = orden.items.reduce((total, item) => total + item.cantidad, 0)
+  // Los tramos van ordenados por fecha de salida, y se marca cuales ya salieron
+  const tramos = [...orden.items].sort((a, b) => a.fechaSalida.localeCompare(b.fechaSalida))
 
   return (
     <article className={`tarjeta compra compra-${momento}`}>
@@ -33,8 +35,8 @@ function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
 
         {/* Un renglon por tramo y tipo de pasajero, con la fecha y hora en que sale ese vuelo */}
         <ul className="compra-vuelos">
-          {orden.items.map((item) => (
-            <li key={item.id}>
+          {tramos.map((item) => (
+            <li key={item.id} className={!cancelada && yaSalio(item) ? 'tramo-volado' : ''}>
               <span className="compra-avion" aria-hidden="true">
                 ✈
               </span>
@@ -46,7 +48,7 @@ function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
               </span>
               <span className="compra-salida">
                 {fechaCorta(item.fechaSalida)}
-                <small>{hora(item.fechaSalida)} hs</small>
+                <small>{!cancelada && yaSalio(item) ? 'Ya voló' : `${hora(item.fechaSalida)} hs`}</small>
               </span>
             </li>
           ))}
