@@ -1,9 +1,29 @@
+/* Ficha de vuelo de la torre de control: franja de color a la izquierda
+   segun el estado (verde activo, ambar pausado, rojo cancelado) */
 .panel-vuelo {
+  --estado: #2bb673;
   display: grid;
   grid-template-columns: 96px 1fr auto auto;
   gap: 20px;
   align-items: center;
   padding: 14px 22px 14px 14px;
+  border-left: 6px solid var(--estado);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.panel-vuelo:hover {
+  transform: translateX(4px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.panel-vuelo.estado-pausado,
+.panel-vuelo.estado-demorado {
+  --estado: #f2a20c;
+}
+
+.panel-vuelo.estado-cancelado,
+.panel-vuelo.estado-eliminado {
+  --estado: var(--rojo);
 }
 
 .panel-vuelo-foto {
@@ -12,8 +32,15 @@
   border-radius: 10px;
 }
 
+/* El cuadrado del destino es una pantallita con el codigo en ambar */
+.panel-vuelo-foto .foto-vuelo-vacia {
+  background: linear-gradient(160deg, #0a1f3d 0%, #041226 100%);
+}
+
 .panel-vuelo-foto .foto-vuelo-vacia span {
+  color: #ffcf7a;
   font-size: 18px;
+  text-shadow: 0 0 10px rgba(255, 207, 122, 0.5);
 }
 
 .panel-vuelo-titulo {

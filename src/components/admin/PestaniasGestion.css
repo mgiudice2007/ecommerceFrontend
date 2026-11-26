@@ -23,8 +23,8 @@
 
 .gestion-pestanias button.activa {
   background: var(--superficie);
-  color: var(--azul);
-  box-shadow: 0 2px 8px rgba(10, 37, 64, 0.08);
+  color: var(--naranja-oscuro);
+  box-shadow: 0 2px 8px rgba(10, 37, 64, 0.08), inset 0 -3px 0 var(--naranja);
 }
 
 @media (max-width: 480px) {

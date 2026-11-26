@@ -84,7 +84,7 @@ function PanelVuelos() {
   return (
     <>
       <EncabezadoPagina
-        etiqueta="Administrador"
+        etiqueta="Torre de control · Administrador"
         titulo="Vuelos de la aerolínea"
         subtitulo="Publicá vuelos y manejá su estado, asientos, promociones y fotos."
         acciones={

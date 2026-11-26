@@ -5,23 +5,55 @@
   margin-bottom: 24px;
 }
 
+/* Cada numero es una pantalla de radar de la torre de control: fondo oscuro,
+   anillos, un haz que gira y el numero en ambar */
 .tarjeta-numero {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 18px 20px;
   border: none;
-  border-left: 5px solid var(--celeste);
+  background:
+    repeating-radial-gradient(circle at 92% 50%, transparent 0 18px, rgba(95, 224, 164, 0.12) 18px 19px),
+    linear-gradient(160deg, #0a1f3d 0%, #041226 100%);
   box-shadow: var(--sombra-fuerte);
+  isolation: isolate;
+}
+
+.tarjeta-numero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 92%;
+  z-index: -1;
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(95, 224, 164, 0.35), transparent 60deg);
+  animation: radar 4s linear infinite;
+}
+
+@keyframes radar {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .tarjeta-numero small {
-  color: var(--texto-suave);
-  font-weight: 600;
+  color: #5fe0a4;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .tarjeta-numero strong {
-  color: var(--azul);
-  font-size: 30px;
+  color: #ffcf7a;
+  font-size: 32px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 14px rgba(255, 207, 122, 0.45);
 }
 
 @media (max-width: 560px) {

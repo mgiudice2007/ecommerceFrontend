@@ -12,7 +12,7 @@ function FilaVueloPanel({ vuelo, onCambiarEstado, onEliminar }) {
   const sinClases = vuelo.disponibilidades.length === 0
 
   return (
-    <article className="tarjeta panel-vuelo">
+    <article className={`tarjeta panel-vuelo estado-${vuelo.estado.toLowerCase()}`}>
       <div className="panel-vuelo-foto" aria-hidden="true">
         <FotoVuelo destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
       </div>
