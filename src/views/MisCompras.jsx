@@ -7,7 +7,7 @@ import Cargando from '../components/comunes/Cargando'
 import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import CuentaRegresiva from '../components/ordenes/CuentaRegresiva'
-import TarjetaCompra from '../components/ordenes/TarjetaCompra'
+import SeccionCompras from '../components/ordenes/SeccionCompras'
 import { usePortadas } from '../hooks/usePortadas'
 import { comprasPorMomento, proximoVuelo } from '../utils/ordenes'
 import { avisar } from '../redux/avisosSlice'
@@ -74,22 +74,14 @@ function MisCompras() {
         )}
 
         {secciones.map((seccion) => (
-          <section key={seccion.clave} className="compras-seccion">
-            <h2>
-              {seccion.titulo} <span>{seccion.compras.length}</span>
-            </h2>
-            <div className="compras-lista">
-              {seccion.compras.map((orden) => (
-                <TarjetaCompra
-                  key={orden.id}
-                  orden={orden}
-                  imagen={portadas[orden.items[0].vueloId]}
-                  cancelando={guardando && cancelandoId === orden.id}
-                  onCancelar={setACancelar}
-                />
-              ))}
-            </div>
-          </section>
+          <SeccionCompras
+            key={seccion.clave}
+            titulo={seccion.titulo}
+            compras={seccion.compras}
+            portadas={portadas}
+            cancelandoId={guardando ? cancelandoId : null}
+            onCancelar={setACancelar}
+          />
         ))}
       </div>
 
