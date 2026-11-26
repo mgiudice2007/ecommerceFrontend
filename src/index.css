@@ -360,6 +360,10 @@ h3 {
   color: var(--verde);
 }
 
+.sello-volado {
+  color: var(--azul);
+}
+
 .sello-cancelada {
   color: var(--rojo);
 }

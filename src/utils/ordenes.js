@@ -56,3 +56,26 @@ export const proximoVuelo = (ordenes, ahora = Date.now()) => {
     )
   return proximo
 }
+
+// En que momento esta una compra:
+// - 'cancelada': se cancelo
+// - 'realizada': confirmada y todos sus vuelos ya salieron
+// - 'proxima': confirmada y le queda al menos un vuelo por salir
+export const momentoDeCompra = (orden, ahora = Date.now()) => {
+  if (orden.estado === 'CANCELADA') return 'cancelada'
+  const quedaAlguno = orden.items.some((item) => new Date(item.fechaSalida).getTime() > ahora)
+  return quedaAlguno ? 'proxima' : 'realizada'
+}
+
+// Salida del primer vuelo de la compra (para ordenar los proximos viajes por fecha)
+const primeraSalida = (orden) => Math.min(...orden.items.map((item) => new Date(item.fechaSalida).getTime()))
+
+// Separa las compras en proximos viajes (el mas cercano primero), viajes realizados y
+// canceladas (las mas nuevas primero)
+export const comprasPorMomento = (ordenes, ahora = Date.now()) => {
+  const grupos = { proxima: [], realizada: [], cancelada: [] }
+  ;(ordenes ?? []).forEach((orden) => grupos[momentoDeCompra(orden, ahora)].push(orden))
+  grupos.proxima.sort((a, b) => primeraSalida(a) - primeraSalida(b))
+  grupos.realizada.sort((a, b) => primeraSalida(b) - primeraSalida(a))
+  return grupos
+}

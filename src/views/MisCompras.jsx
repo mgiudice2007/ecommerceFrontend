@@ -9,7 +9,7 @@ import Mensaje from '../components/comunes/Mensaje'
 import CuentaRegresiva from '../components/ordenes/CuentaRegresiva'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
 import { usePortadas } from '../hooks/usePortadas'
-import { proximoVuelo } from '../utils/ordenes'
+import { comprasPorMomento, proximoVuelo } from '../utils/ordenes'
 import { avisar } from '../redux/avisosSlice'
 import { cancelarOrden, fetchOrdenes, limpiarMensaje } from '../redux/ordenesSlice'
 import { fetchPerfil } from '../redux/usuarioSlice'
@@ -43,6 +43,12 @@ function MisCompras() {
   }
 
   const proximo = proximoVuelo(ordenes)
+  const grupos = comprasPorMomento(ordenes)
+  const secciones = [
+    { clave: 'proxima', titulo: 'Próximos viajes', compras: grupos.proxima },
+    { clave: 'realizada', titulo: 'Viajes realizados', compras: grupos.realizada },
+    { clave: 'cancelada', titulo: 'Canceladas', compras: grupos.cancelada },
+  ].filter((seccion) => seccion.compras.length > 0)
 
   return (
     <>
@@ -67,17 +73,24 @@ function MisCompras() {
           </EstadoVacio>
         )}
 
-        <div className="compras-lista">
-          {ordenes?.map((orden) => (
-            <TarjetaCompra
-              key={orden.id}
-              orden={orden}
-              imagen={portadas[orden.items[0].vueloId]}
-              cancelando={guardando && cancelandoId === orden.id}
-              onCancelar={setACancelar}
-            />
-          ))}
-        </div>
+        {secciones.map((seccion) => (
+          <section key={seccion.clave} className="compras-seccion">
+            <h2>
+              {seccion.titulo} <span>{seccion.compras.length}</span>
+            </h2>
+            <div className="compras-lista">
+              {seccion.compras.map((orden) => (
+                <TarjetaCompra
+                  key={orden.id}
+                  orden={orden}
+                  imagen={portadas[orden.items[0].vueloId]}
+                  cancelando={guardando && cancelandoId === orden.id}
+                  onCancelar={setACancelar}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
 
       {aCancelar && (

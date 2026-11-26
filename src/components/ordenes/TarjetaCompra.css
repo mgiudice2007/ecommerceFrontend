@@ -23,8 +23,45 @@
 }
 
 .compra-avion {
-  margin-right: 8px;
   color: var(--naranja);
+}
+
+.compra-vuelos li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.compra-tramo small {
+  display: block;
+  font-weight: 500;
+}
+
+/* Fecha de salida del vuelo, a la derecha de cada tramo */
+.compra-salida {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--azul-noche);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.compra-salida small {
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+/* Los viajes que ya se hicieron quedan mas apagados y con borde azul */
+.compra-realizada {
+  border-left-color: var(--azul);
+}
+
+.compra-realizada .compra-foto {
+  filter: saturate(0.4);
 }
 
 .compra-encabezado small,

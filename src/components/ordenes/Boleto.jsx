@@ -1,6 +1,6 @@
 import { fechaLarga, hora, precioOGratis } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
-import { numerosDeVuelo, rotuloVuelos } from '../../utils/ordenes'
+import { momentoDeCompra, numerosDeVuelo, rotuloVuelos } from '../../utils/ordenes'
 import { textoMedioPago } from '../../utils/pagos'
 import PasesEmbarque from './PasesEmbarque'
 import EtiquetaOrden from './EtiquetaOrden'
@@ -33,7 +33,7 @@ function Boleto({ orden, imprimir = false }) {
             <strong>{textoMedioPago(orden)}</strong>
           </div>
         )}
-        <EtiquetaOrden cancelada={cancelada} />
+        <EtiquetaOrden momento={momentoDeCompra(orden)} />
       </div>
 
       <ul className="orden-items">

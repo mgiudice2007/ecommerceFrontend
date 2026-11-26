@@ -5,6 +5,26 @@
   max-width: 860px;
 }
 
+.compras-seccion + .compras-seccion {
+  margin-top: 36px;
+}
+
+.compras-seccion h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 22px;
+}
+
+.compras-seccion h2 span {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--naranja-suave);
+  color: var(--naranja-oscuro);
+  font-size: 14px;
+}
+
 .compras-vacio {
   max-width: 860px;
 }
