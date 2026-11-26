@@ -1,7 +1,10 @@
-import Etiqueta from '../comunes/Etiqueta'
-
+// El estado de la compra es un sello: verde si esta confirmada, rojo si se cancelo
 function EtiquetaOrden({ cancelada }) {
-  return <Etiqueta tipo={cancelada ? 'cancelada' : 'exito'}>{cancelada ? 'Cancelada' : 'Confirmada'}</Etiqueta>
+  return (
+    <span className={`sello ${cancelada ? 'sello-cancelada' : 'sello-exito'}`}>
+      {cancelada ? 'Cancelada' : 'Confirmada'}
+    </span>
+  )
 }
 
 export default EtiquetaOrden

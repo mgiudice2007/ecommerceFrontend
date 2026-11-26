@@ -356,6 +356,14 @@ h3 {
   }
 }
 
+.sello-exito {
+  color: var(--verde);
+}
+
+.sello-cancelada {
+  color: var(--rojo);
+}
+
 .etiqueta-cancelada {
   background: var(--rojo-suave);
   color: var(--rojo);

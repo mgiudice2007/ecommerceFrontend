@@ -8,18 +8,23 @@
   font-size: 1.1rem;
 }
 
+/* Pase de embarque: franja naranja, fondo con brillo y el QR separado por
+   una linea de corte punteada */
 .pase-embarque {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   gap: 16px;
   margin-bottom: 12px;
   padding: 16px 18px;
   border: 1px solid var(--borde);
-  border-left: 6px solid var(--azul);
+  border-left: 6px solid var(--naranja);
   border-radius: var(--radio);
-  background: var(--superficie);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 154, 60, 0.12), transparent 45%),
+    var(--superficie);
+  box-shadow: var(--sombra);
 }
 
 .pase-anulado {
@@ -34,7 +39,8 @@
 }
 
 .pase-datos small {
-  color: var(--texto-suave);
+  color: var(--naranja-oscuro);
+  font-weight: 800;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -56,6 +62,9 @@
 .pase-qr {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   gap: 8px;
+  padding-left: 18px;
+  border-left: 2px dashed #c9d6e6;
 }

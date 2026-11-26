@@ -14,19 +14,34 @@
   font-size: 18px;
 }
 
+.compra-rotulo {
+  color: var(--naranja-oscuro);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.compra-avion {
+  margin-right: 8px;
+  color: var(--naranja);
+}
+
 .compra-encabezado small,
 .compra-vuelos small {
   color: var(--texto-suave);
 }
 
+/* Los tramos van en una franja punteada, como los cupones de un pasaje */
 .compra-vuelos {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin: 16px 0;
   padding: 14px 16px;
+  border: 1.5px dashed #c9d6e6;
   border-radius: var(--radio);
-  background: var(--superficie-2);
+  background: #fffaf5;
   list-style: none;
   font-weight: 600;
 }
@@ -40,7 +55,7 @@
 }
 
 .compra-pie > strong {
-  color: var(--azul);
+  color: var(--naranja-oscuro);
   font-size: 24px;
 }
 
@@ -62,10 +77,42 @@
 }
 
 .compra {
+  position: relative;
   display: grid;
   grid-template-columns: 150px 1fr;
   gap: 20px;
   padding: 16px 20px 16px 16px;
+  border-left: 5px solid var(--naranja);
+  animation: aparecer 0.5s ease-out backwards;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.compra:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.compra-cancelada {
+  border-left-color: #c9d6e6;
+}
+
+/* A las compras canceladas les cae un sello grande cruzado */
+.compra-cancelada::after {
+  content: 'Cancelada';
+  position: absolute;
+  top: 50%;
+  left: 52%;
+  padding: 6px 22px;
+  border: 4px double var(--rojo);
+  border-radius: 10px;
+  color: var(--rojo);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.22;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  pointer-events: none;
 }
 
 .compra-foto {

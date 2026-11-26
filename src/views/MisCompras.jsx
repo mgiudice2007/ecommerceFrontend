@@ -9,6 +9,7 @@ import Mensaje from '../components/comunes/Mensaje'
 import TarjetaCompra from '../components/ordenes/TarjetaCompra'
 import { useAuth } from '../context/AuthContext'
 import { useAvisos } from '../context/AvisosContext'
+import { usePortadas } from '../hooks/usePortadas'
 import { cancelarOrden } from '../utils/ordenes'
 import './MisCompras.css'
 
@@ -19,6 +20,7 @@ function MisCompras() {
   const { avisar } = useAvisos()
   const [cancelando, setCancelando] = useState(null)
   const [aCancelar, setACancelar] = useState(null)
+  const portadas = usePortadas((ordenes ?? []).map((o) => ({ id: o.items[0].vueloId })))
 
   useEffect(() => {
     api('/api/ordenes')
@@ -66,6 +68,7 @@ function MisCompras() {
             <TarjetaCompra
               key={orden.id}
               orden={orden}
+              imagen={portadas[orden.items[0].vueloId]}
               cancelando={cancelando === orden.id}
               onCancelar={setACancelar}
             />

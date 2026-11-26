@@ -1,10 +1,26 @@
+/* Cabecera del boleto en azul noche, como la de un pasaje impreso */
+.orden-boleto {
+  overflow: hidden;
+  padding-top: 0;
+}
+
 .orden-boleto-encabezado {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 16px 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed var(--borde);
+  margin: 0 -24px;
+  padding: 20px 24px;
+  border-bottom: 2px dashed #c9d6e6;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.35), transparent 50%),
+    var(--azul-noche);
+  color: #fff;
+}
+
+.orden-boleto-encabezado .sello {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .orden-boleto-encabezado div {
@@ -13,7 +29,7 @@
 }
 
 .orden-boleto-encabezado small {
-  color: var(--texto-suave);
+  color: #ffcf7a;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;

@@ -1,6 +1,5 @@
 import { precio } from '../../utils/formato'
 import { textoMedioPago } from '../../utils/pagos'
-import Etiqueta from '../comunes/Etiqueta'
 import './PagoAprobado.css'
 
 function PagoAprobado({ orden }) {
@@ -8,10 +7,10 @@ function PagoAprobado({ orden }) {
 
   return (
     <header className="pago-aprobado">
-      <span className="pago-aprobado-icono" aria-hidden="true">
-        ✓
-      </span>
-      <Etiqueta tipo="exito">Compra #{orden.id}</Etiqueta>
+      <div className="pago-aprobado-pista" aria-hidden="true">
+        <span className="pago-aprobado-avion">✈</span>
+      </div>
+      <span className="sello sello-exito">Compra #{orden.id} · Confirmada</span>
       <h1>¡Pago aprobado!</h1>
       <p className="texto-suave">
         {orden.total > 0 ? `Pagaste ${precio(orden.total)}` : 'Pagaste con tus millas'}

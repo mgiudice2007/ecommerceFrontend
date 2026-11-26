@@ -6,22 +6,21 @@ import FotoVuelo from '../FotoVuelo'
 import EtiquetaOrden from './EtiquetaOrden'
 import './TarjetaCompra.css'
 
-function TarjetaCompra({ orden, cancelando, onCancelar }) {
+function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
   const cancelada = orden.estado === 'CANCELADA'
   const pasajes = orden.items.reduce((total, item) => total + item.cantidad, 0)
 
   return (
     <article className={`tarjeta compra ${cancelada ? 'compra-cancelada' : ''}`}>
       <div className="compra-foto" aria-hidden="true">
-        <FotoVuelo destinoIata="" destinoCiudad={orden.items[0].destino} />
+        <FotoVuelo imagen={imagen} destinoIata="" destinoCiudad={orden.items[0].destino} />
       </div>
 
       <div className="compra-contenido">
         <div className="compra-encabezado">
           <div>
-            <strong>
-              Compra #{orden.id} · {textoNumerosDeVuelo(orden)}
-            </strong>
+            <span className="compra-rotulo">BCA Airlines · Compra #{orden.id}</span>
+            <strong>{textoNumerosDeVuelo(orden)}</strong>
             <small>
               {fechaLarga(orden.fecha)} · {hora(orden.fecha)} hs · {pasajes} {pasajes === 1 ? 'pasaje' : 'pasajes'}
             </small>
@@ -33,6 +32,9 @@ function TarjetaCompra({ orden, cancelando, onCancelar }) {
         <ul className="compra-vuelos">
           {orden.items.map((item) => (
             <li key={item.id}>
+              <span className="compra-avion" aria-hidden="true">
+                ✈
+              </span>
               {item.origen} → {item.destino}
               <small>
                 {' '}
