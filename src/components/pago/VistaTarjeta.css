@@ -1,24 +1,63 @@
+/* Tarjeta con frente y dorso: las dos caras estan una encima de la otra y la
+   tarjeta gira 180 grados en Y para mostrar el dorso */
 .vista-tarjeta {
+  max-width: 360px;
+  height: 200px;
+  margin-bottom: 20px;
+  perspective: 1000px;
+}
+
+.vista-tarjeta-giro {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.vista-tarjeta.girada .vista-tarjeta-giro {
+  transform: rotateY(180deg);
+}
+
+.vista-tarjeta-cara {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  max-width: 360px;
-  min-height: 190px;
-  margin-bottom: 20px;
-  padding: 22px;
   border-radius: var(--radio-grande);
-  background: var(--degradado-cielo);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 96, 12, 0.35), transparent 50%),
+    linear-gradient(150deg, #0a1f3d 0%, #041226 100%);
   box-shadow: var(--sombra);
   color: #fff;
+  backface-visibility: hidden;
+}
+
+/* Frente */
+.vista-tarjeta-frente {
+  justify-content: space-between;
+  padding: 22px;
+}
+
+.vista-tarjeta-arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vista-tarjeta-chip {
+  width: 40px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f3d98b 0%, #c9a24a 100%);
 }
 
 .vista-tarjeta-tipo {
+  color: #ffcf7a;
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.85;
 }
 
 .vista-tarjeta-numero {
@@ -45,4 +84,48 @@
   font-size: 11px;
   font-weight: 600;
   opacity: 0.75;
+}
+
+/* Dorso: banda magnetica, la franja de la firma con el codigo y el rotulo */
+.vista-tarjeta-dorso {
+  gap: 16px;
+  padding: 22px 0;
+  transform: rotateY(180deg);
+}
+
+.vista-tarjeta-banda {
+  height: 40px;
+  background: #02060d;
+}
+
+.vista-tarjeta-firma {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px;
+}
+
+.vista-tarjeta-firma span {
+  flex: 1;
+  height: 34px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(135deg, #e8edf4 0 6px, #dce4ee 6px 12px);
+}
+
+.vista-tarjeta-firma strong {
+  min-width: 60px;
+  padding: 6px 10px;
+  border: 2px solid var(--naranja);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--azul-noche);
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+.vista-tarjeta-dorso small {
+  padding: 0 22px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
 }

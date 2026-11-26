@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { precio } from '../../utils/formato'
 import Campo from '../comunes/Campo'
 import VistaTarjeta from './VistaTarjeta'
 
 function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar }) {
+  // Mientras se escribe el codigo de seguridad la tarjeta de muestra se da vuelta
+  const [mirandoDorso, setMirandoDorso] = useState(false)
+
   return (
     <div>
       <VistaTarjeta
@@ -10,6 +14,8 @@ function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar }) {
         titular={tarjeta.titular}
         vencimiento={tarjeta.vencimiento}
         tipo={credito ? 'Crédito' : 'Débito'}
+        codigo={tarjeta.codigo}
+        girada={mirandoDorso}
       />
 
       <Campo
@@ -63,6 +69,8 @@ function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar }) {
             placeholder="123"
             value={tarjeta.codigo}
             onChange={onCambiar}
+            onFocus={() => setMirandoDorso(true)}
+            onBlur={() => setMirandoDorso(false)}
           />
         </Campo>
       </div>
