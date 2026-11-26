@@ -17,6 +17,13 @@ function TarjetaDestino({ vuelo, pais, imagen }) {
 
       {descuento && <span className="tarjeta-destino-oferta">{descuento}</span>}
 
+      {/* Sello de pasaporte con el codigo del aeropuerto de destino */}
+      <span className="tarjeta-destino-sello" aria-hidden="true">
+        <strong>{vuelo.destinoIata}</strong>
+        <small>{vuelo.destinoCiudad}</small>
+        <small>✈ BCA</small>
+      </span>
+
       <div className="tarjeta-destino-texto">
         <span className="tarjeta-destino-pais">{pais ?? vuelo.categoriaNombre}</span>
         <h3>{vuelo.destinoCiudad}</h3>
