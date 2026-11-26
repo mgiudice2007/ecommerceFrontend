@@ -1,0 +1,111 @@
+.valija-vacia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.valija-vacia-icono {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--naranja-suave);
+  color: var(--naranja);
+  animation: balancear-valija 2.4s ease-in-out infinite;
+}
+
+/* La valija se balancea un poquito, como colgando de la mano */
+@keyframes balancear-valija {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.valija-vacia h2 {
+  font-size: 24px;
+}
+
+.valija-vacia p {
+  margin: 0 0 12px;
+}
+
+/* Tres postales chiquitas con foto, codigo, ciudad y precio */
+.valija-vacia-destinos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: min(640px, 100%);
+  margin-bottom: 18px;
+}
+
+.valija-vacia-destino {
+  position: relative;
+  overflow: hidden;
+  height: 150px;
+  border-radius: var(--radio);
+  color: #fff;
+  text-align: left;
+  isolation: isolate;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.valija-vacia-destino:hover {
+  text-decoration: none;
+  transform: translateY(-4px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.valija-vacia-destino .foto-vuelo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.valija-vacia-destino::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 30%, rgba(4, 30, 66, 0.9) 100%);
+}
+
+.valija-vacia-texto {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.valija-vacia-texto small {
+  color: #ffcf7a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.valija-vacia-texto strong {
+  font-size: 17px;
+}
+
+.valija-vacia-texto span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .valija-vacia-destinos {
+    grid-template-columns: 1fr;
+  }
+}

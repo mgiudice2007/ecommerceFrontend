@@ -4,24 +4,39 @@ import { Link, useNavigate } from 'react-router-dom'
 import ItemCarrito from '../components/ItemCarrito'
 import EncabezadoPagina from '../components/EncabezadoPagina'
 import ResumenCompra from '../components/carrito/ResumenCompra'
+import ValijaVacia from '../components/carrito/ValijaVacia'
 import Cargando from '../components/comunes/Cargando'
-import EstadoVacio from '../components/comunes/EstadoVacio'
 import Mensaje from '../components/comunes/Mensaje'
 import PasosCompra from '../components/pago/PasosCompra'
 import { usePortadas } from '../hooks/usePortadas'
 import { cambiarCantidad, eliminarItem, fetchCarrito, fetchVuelosDelCarrito } from '../redux/carritoSlice'
+import { fetchVuelosDestacados } from '../redux/vuelosSlice'
 import { calcularMillas, textoCantidadPasajes, vuelosSinAdulto } from '../utils/carrito'
+import { ofertasDe } from '../utils/destinos'
 import './Carrito.css'
 
 function Carrito() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { carrito, vuelosDelCarrito, guardando, error } = useSelector((state) => state.carrito)
-  const portadas = usePortadas((carrito?.items ?? []).map((item) => item.vueloId))
+  const { vuelosDestacados } = useSelector((state) => state.vuelos)
+  const carritoVacio = carrito?.items.length === 0
+  // Con el carrito vacio se sugieren tres destinos en oferta
+  const sugeridos = carritoVacio ? ofertasDe(vuelosDestacados).slice(0, 3) : []
+  const portadas = usePortadas([
+    ...(carrito?.items ?? []).map((item) => item.vueloId),
+    ...sugeridos.map((vuelo) => vuelo.id),
+  ])
 
   useEffect(() => {
     dispatch(fetchCarrito())
   }, [dispatch])
+
+  useEffect(() => {
+    if (carritoVacio && vuelosDestacados.length === 0) {
+      dispatch(fetchVuelosDestacados())
+    }
+  }, [carritoVacio, vuelosDestacados.length, dispatch])
 
   // Se piden solo los vuelos que todavía no están en el store
   const vueloIdsFaltantes = (carrito?.items ?? [])
@@ -55,11 +70,7 @@ function Carrito() {
         {error && <Mensaje>{error}</Mensaje>}
 
         {carrito.items.length === 0 ? (
-          <EstadoVacio titulo="Tu carrito está vacío" texto="Buscá un vuelo, elegí la clase y agregalo para comprarlo.">
-            <Link to="/" className="boton boton-primario">
-              Buscar vuelos
-            </Link>
-          </EstadoVacio>
+          <ValijaVacia sugeridos={sugeridos} portadas={portadas} />
         ) : (
           <>
             <PasosCompra actual={0} />
