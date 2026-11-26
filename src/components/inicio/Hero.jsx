@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import portada from '../../assets/portada.jpg'
-import { MOMENTOS, momentoDelDia } from '../../utils/cielo'
+import { MOMENTOS, momentoDelDia, SALUDO_FORZADO, saludoDe } from '../../utils/cielo'
 import './Hero.css'
 
 // Estrellas de la noche: posiciones fijas (salen del indice) para que no cambien en cada render
@@ -38,25 +38,30 @@ function CieloHero() {
 }
 
 function Hero() {
-  // Para mostrarlo en la defensa se puede forzar con ?cielo=manana|tarde|atardecer|noche
+  // Para mostrarlo en la defensa se puede forzar con ?cielo=amanecer|tarde|atardecer|noche
   const [searchParams] = useSearchParams()
   const forzado = searchParams.get('cielo')
   const [momentoReal, setMomentoReal] = useState(momentoDelDia)
+  const [saludoReal, setSaludoReal] = useState(saludoDe)
 
   // Cada minuto se revisa si cambio el momento del dia (por si la pagina queda abierta)
   useEffect(() => {
-    const id = setInterval(() => setMomentoReal(momentoDelDia()), 60000)
+    const id = setInterval(() => {
+      setMomentoReal(momentoDelDia())
+      setSaludoReal(saludoDe())
+    }, 60000)
     return () => clearInterval(id)
   }, [])
 
   const momento = MOMENTOS[forzado] ? forzado : momentoReal
+  const saludo = MOMENTOS[forzado] ? SALUDO_FORZADO[forzado] : saludoReal
 
   return (
     <section className={`inicio-hero cielo-${momento}`} style={{ backgroundImage: `url(${portada})` }}>
       <CieloHero />
       <div className="contenedor inicio-hero-contenido">
         <span className="inicio-hero-chip">
-          {MOMENTOS[momento].emoji} {MOMENTOS[momento].saludo} · Vuelos a Argentina, América y Europa
+          {MOMENTOS[momento].emoji} {saludo} · Vuelos a Argentina, América y Europa
         </span>
         <h1>
           Volá alto por toda la <span>Argentina</span> y el mundo
