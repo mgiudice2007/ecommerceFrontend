@@ -28,23 +28,25 @@ function Beneficios() {
     <section className="contenedor inicio-beneficios">
       {BENEFICIOS.map((b) => (
         <div key={b.titulo} className="inicio-beneficio">
-          <span className="inicio-beneficio-icono" aria-hidden="true">
-            <svg
-              viewBox="0 0 24 24"
-              width="22"
-              height="22"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d={b.icono} />
-            </svg>
-          </span>
-          <div>
-            <strong>{b.titulo}</strong>
-            <p>{b.texto}</p>
+          <div className="inicio-beneficio-etiqueta">
+            <span className="inicio-beneficio-icono" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d={b.icono} />
+              </svg>
+            </span>
+            <div>
+              <strong>{b.titulo}</strong>
+              <p>{b.texto}</p>
+            </div>
           </div>
         </div>
       ))}

@@ -9,10 +9,21 @@
   padding-top: 56px;
 }
 
+/* .inicio-beneficio es la caja fija de la grilla: recibe el hover y la
+   animación de entrada (index.css) y nunca se mueve. La etiqueta de adentro
+   es la que gira y se balancea. Si el balanceo estuviera en la misma caja,
+   pisaría la animación de entrada y al sacar el mouse la tarjeta volvía a
+   arrancar desde opacidad 0 (y al girar se salía del cursor, parpadeando). */
+.inicio-beneficio {
+  display: flex;
+}
+
 /* Cada beneficio es una etiqueta de equipaje: agujerito con hilo, borde
    naranja a la izquierda y un leve balanceo al pasar el mouse */
-.inicio-beneficio {
+.inicio-beneficio-etiqueta {
+  --giro: -1.2deg;
   position: relative;
+  flex: 1;
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -21,16 +32,16 @@
   border-left: 5px solid var(--naranja);
   background: var(--superficie);
   box-shadow: var(--sombra);
-  transform: rotate(-1.2deg);
+  transform: rotate(var(--giro));
   transform-origin: 18px 50%;
 }
 
-.inicio-beneficio:nth-child(even) {
-  transform: rotate(1.2deg);
+.inicio-beneficio:nth-child(even) .inicio-beneficio-etiqueta {
+  --giro: 1.2deg;
 }
 
 /* Agujerito de la etiqueta */
-.inicio-beneficio::before {
+.inicio-beneficio-etiqueta::before {
   content: '';
   position: absolute;
   left: 9px;
@@ -44,7 +55,7 @@
 }
 
 /* Hilo que sale del agujerito */
-.inicio-beneficio::after {
+.inicio-beneficio-etiqueta::after {
   content: '';
   position: absolute;
   left: -26px;
@@ -57,14 +68,14 @@
   transform-origin: right center;
 }
 
-.inicio-beneficio:hover {
+.inicio-beneficio:hover .inicio-beneficio-etiqueta {
   animation: balancear 0.9s ease-in-out;
 }
 
 @keyframes balancear {
   0%,
   100% {
-    transform: rotate(-1.2deg);
+    transform: rotate(var(--giro));
   }
   30% {
     transform: rotate(4deg);
