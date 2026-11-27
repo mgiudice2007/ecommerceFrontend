@@ -3,12 +3,18 @@ import { precio } from '../../utils/formato'
 import Campo from '../comunes/Campo'
 import VistaTarjeta from './VistaTarjeta'
 
-function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar }) {
+function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar, onRellenar }) {
   // Mientras se escribe el codigo de seguridad la tarjeta de muestra se da vuelta
   const [mirandoDorso, setMirandoDorso] = useState(false)
 
   return (
     <div>
+      <div className="form-tarjeta-demo">
+        <button type="button" className="boton boton-secundario" onClick={onRellenar}>
+          Rellenar con datos de prueba
+        </button>
+      </div>
+
       <VistaTarjeta
         numero={tarjeta.numero}
         titular={tarjeta.titular}

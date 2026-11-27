@@ -18,6 +18,7 @@ import { calcularMillas, vuelosSinAdulto } from '../utils/carrito'
 import { armarPersonas, pedidoDePasajeros, validarPersonas } from '../utils/datosPasajeros'
 import {
   MEDIOS_PAGO,
+  TARJETA_DEMO,
   TARJETA_INICIAL,
   esTarjeta,
   formatearCampoTarjeta,
@@ -108,6 +109,9 @@ function Checkout() {
     setTarjeta({ ...tarjeta, [name]: formatearCampoTarjeta(name, value) })
   }
 
+  // Para la demo: completa la tarjeta de una sin tipear campo por campo (las cuotas elegidas se mantienen)
+  const rellenarTarjeta = () => setTarjeta({ ...tarjeta, ...TARJETA_DEMO })
+
   const pagar = () => {
     setIntento(true)
     if (hayErrores) return
@@ -168,6 +172,7 @@ function Checkout() {
                       errores={intento ? errores : {}}
                       total={calculo.aPagar}
                       onCambiarTarjeta={cambiarTarjeta}
+                      onRellenarTarjeta={rellenarTarjeta}
                     />
                   </div>
                 </>

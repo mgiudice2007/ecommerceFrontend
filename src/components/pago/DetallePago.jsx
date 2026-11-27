@@ -3,7 +3,7 @@ import DatosTransferencia from './DatosTransferencia'
 import FormTarjeta from './FormTarjeta'
 import PagoBilletera from './PagoBilletera'
 
-function DetallePago({ medio, tarjeta, errores, total, onCambiarTarjeta }) {
+function DetallePago({ medio, tarjeta, errores, total, onCambiarTarjeta, onRellenarTarjeta }) {
   if (esTarjeta(medio)) {
     return (
       <FormTarjeta
@@ -13,6 +13,7 @@ function DetallePago({ medio, tarjeta, errores, total, onCambiarTarjeta }) {
         cuotas={CUOTAS}
         total={total}
         onCambiar={onCambiarTarjeta}
+        onRellenar={onRellenarTarjeta}
       />
     )
   }

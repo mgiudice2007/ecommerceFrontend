@@ -13,6 +13,12 @@
   border-top: 1px dashed var(--borde);
 }
 
+.form-tarjeta-demo {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
 .checkout-simulado {
   margin: 24px 0 0;
   font-size: 13px;

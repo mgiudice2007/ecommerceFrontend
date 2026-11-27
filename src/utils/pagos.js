@@ -16,6 +16,9 @@ export const DATOS_TRANSFERENCIA = {
 
 export const TARJETA_INICIAL = { numero: '', titular: '', vencimiento: '', codigo: '', cuotas: '1' }
 
+// Tarjeta de prueba para la demo: pasa todas las validaciones (Luhn incluido) y vence lejos.
+export const TARJETA_DEMO = { numero: '4242 4242 4242 4242', titular: 'Juan Perez', vencimiento: '12/30', codigo: '123' }
+
 export const esTarjeta = (medio) => medio === 'TARJETA_CREDITO' || medio === 'TARJETA_DEBITO'
 
 export const nombreMedioPago = (medio) => {
