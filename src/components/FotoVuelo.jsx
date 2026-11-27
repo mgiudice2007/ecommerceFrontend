@@ -1,8 +1,13 @@
+import { fotoDelDestino } from '../utils/fotosDestino'
 import './FotoVuelo.css'
 
+// Foto del vuelo: la propia si la tiene; si no, la foto del destino; y si el destino no
+// tiene foto de respaldo, el recuadro azul con el codigo del aeropuerto
 function FotoVuelo({ imagen, destinoIata, destinoCiudad }) {
-  if (imagen) {
-    return <img className="foto-vuelo" src={imagen} alt={`Foto de ${destinoCiudad}`} />
+  const foto = imagen || fotoDelDestino(destinoIata, destinoCiudad)
+
+  if (foto) {
+    return <img className="foto-vuelo" src={foto} alt={`Foto de ${destinoCiudad}`} loading="lazy" />
   }
 
   return (

@@ -2,10 +2,13 @@ import { Link } from 'react-router-dom'
 import { duracion, fechaLarga } from '../../utils/formato'
 import { textoDescuento, textoEstado } from '../../utils/vuelos'
 import './PortadaVuelo.css'
+import { fotoDelDestino } from '../../utils/fotosDestino'
 
 function PortadaVuelo({ vuelo, imagen }) {
   const descuento = textoDescuento(vuelo)
-  const fondo = imagen ? { backgroundImage: `url("${imagen}")` } : undefined
+  // Si el vuelo no tiene fotos propias, se usa la foto del destino
+  const foto = imagen || fotoDelDestino(vuelo.destinoIata, vuelo.destinoCiudad)
+  const fondo = foto ? { backgroundImage: `url("${foto}")` } : undefined
 
   return (
     <section className="detalle-portada" style={fondo}>
