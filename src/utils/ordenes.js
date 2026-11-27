@@ -1,9 +1,14 @@
 import { fechaLarga, hora } from './formato'
 
-export const textoCancelacion = (orden) =>
-  orden.sePuedeCancelar
+// Si la aerolínea canceló uno de los vuelos, la compra se puede cancelar sin el límite de 24 horas
+export const textoCancelacion = (orden) => {
+  if (orden.vueloCancelado) {
+    return 'La aerolínea canceló uno de los vuelos de esta compra: podés cancelarla cuando quieras.'
+  }
+  return orden.sePuedeCancelar
     ? `Podés cancelar sin cargo hasta el ${fechaLarga(orden.cancelableHasta)} a las ${hora(orden.cancelableHasta)} hs (24 horas antes del vuelo).`
     : 'Ya no se puede cancelar: faltan menos de 24 horas para el vuelo o el vuelo ya salió.'
+}
 
 export const numerosDeVuelo = (orden) => {
   const numeros = []
