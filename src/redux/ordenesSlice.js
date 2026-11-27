@@ -24,12 +24,21 @@ export const cancelarOrden = createAsyncThunk('ordenes/cancelarOrden', async (id
   return data
 })
 
+// El PDF llega como archivo (blob): el store guarda solo su dirección local (blob:...) para que la vista lo baje
+export const descargarPdf = createAsyncThunk('ordenes/descargarPdf', async (id) => {
+  const { data } = await clienteApi.get(`/api/ordenes/${id}/pdf`, { responseType: 'blob' })
+  return { id, url: URL.createObjectURL(data) }
+})
+
 const initialState = {
   ordenes: null,
   ordenActual: null,
   // Id de la orden que se acaba de pagar, hasta que la vista lo consume para ir a la pantalla de compra exitosa
   ordenConfirmada: null,
   mensaje: null,
+  // PDF de la orden de compra listo para bajar ({ id, url }); se limpia apenas la vista lo descarga
+  pdf: null,
+  descargandoPdf: false,
   loading: false,
   guardando: false,
   error: null,
@@ -41,6 +50,9 @@ const ordenesSlice = createSlice({
   reducers: {
     limpiarMensaje: (state) => {
       state.mensaje = null
+    },
+    pdfDescargado: (state) => {
+      state.pdf = null
     },
     reiniciarConfirmada: (state) => {
       state.ordenConfirmada = null
@@ -113,8 +125,20 @@ const ordenesSlice = createSlice({
         state.guardando = false
         state.error = action.error.message
       })
+      .addCase(descargarPdf.pending, (state) => {
+        state.descargandoPdf = true
+        state.error = null
+      })
+      .addCase(descargarPdf.fulfilled, (state, action) => {
+        state.descargandoPdf = false
+        state.pdf = action.payload
+      })
+      .addCase(descargarPdf.rejected, (state, action) => {
+        state.descargandoPdf = false
+        state.error = action.error.message
+      })
   },
 })
 
-export const { limpiarMensaje, reiniciarConfirmada } = ordenesSlice.actions
+export const { limpiarMensaje, pdfDescargado, reiniciarConfirmada } = ordenesSlice.actions
 export default ordenesSlice.reducer
