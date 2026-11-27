@@ -12,6 +12,7 @@ import ListaClases from '../components/detalle/ListaClases'
 import PanelCompra from '../components/detalle/PanelCompra'
 import PortadaVuelo from '../components/detalle/PortadaVuelo'
 import ResumenSeleccion from '../components/detalle/ResumenSeleccion'
+import { avisar } from '../redux/avisosSlice'
 import { agregarPasajes, reiniciarAgregado } from '../redux/carritoSlice'
 import { fetchFotosVuelo, fetchMapaAsientos, fetchVuelo } from '../redux/vuelosSlice'
 import { leerPasajeros, textoPasajeros } from '../utils/pasajeros'
@@ -51,13 +52,28 @@ function DetalleVuelo() {
     dispatch(fetchFotosVuelo(Number(id)))
   }, [id, dispatch])
 
-  // Cuando el backend confirma los pasajes y hay que elegir la vuelta, se sigue a la búsqueda de la vuelta
+  // Cuando el backend confirma los pasajes y hay que elegir la vuelta, sale el aviso flotante y se sigue a
+  // la búsqueda de la vuelta
   useEffect(() => {
     if (pasajesAgregados && seguirConVuelta) {
       dispatch(reiniciarAgregado())
+      dispatch(
+        avisar({
+          texto: 'Tu vuelo de ida ya está en el carrito. Ahora elegí el vuelo de vuelta.',
+          enlace: { a: '/carrito', texto: 'Ir al carrito' },
+        }),
+      )
       navigate(urlParaElegirVuelta(searchParams, pasajeros))
     }
   }, [pasajesAgregados, seguirConVuelta, dispatch, navigate, searchParams, pasajeros])
+
+  // Cuando el backend confirma los pasajes y se queda en esta página, lo que se agregó sale en el aviso
+  // flotante (textoAgregado vacío = no se pidió agregar nada desde que se abrió la página)
+  useEffect(() => {
+    if (pasajesAgregados && !seguirConVuelta && textoAgregado) {
+      dispatch(avisar({ texto: textoAgregado, enlace: { a: '/carrito', texto: 'Ir al carrito' } }))
+    }
+  }, [pasajesAgregados, seguirConVuelta, textoAgregado, dispatch])
 
   // La clase elegida es la que tocó el usuario; si no tocó ninguna, la de la URL o la primera con lugar
   const disponibilidades = vuelo?.disponibilidades ?? []
@@ -169,7 +185,7 @@ function DetalleVuelo() {
           <PanelCompra motivoSinVenta={sinVenta} hayClase={elegida !== null}>
             <ResumenSeleccion clase={elegida} pasajeros={pasajeros} onCambiarPasajeros={cambiarPasajeros} />
 
-            {agregado && <Mensaje tipo="exito">{textoAgregado}</Mensaje>}
+            {/* El aviso de que se agregó sale flotante; el error queda acá, a la vista hasta que se corrija */}
             {errorAlAgregar && <Mensaje>{errorAlAgregar}</Mensaje>}
 
             <AccionesCompra

@@ -1,16 +1,12 @@
-import { Link } from 'react-router-dom'
-import Mensaje from '../comunes/Mensaje'
 import ListaVuelos from './ListaVuelos'
 import TramoVuelos from './TramoVuelos'
 
+// Con la ida ya en el carrito (soloVuelta) solo se muestran las vueltas: el aviso de que la ida quedó en el
+// carrito sale flotante desde el detalle del vuelo, en el momento en que se agrega
 function ResultadosIdaYVuelta({ resultado, soloVuelta, consultaIda, consultaPasajeros }) {
   return (
     <>
-      {soloVuelta ? (
-        <Mensaje tipo="exito">
-          ✓ Tu vuelo de ida ya está en el carrito. Ahora elegí el vuelo de vuelta. <Link to="/carrito">Ir al carrito</Link>
-        </Mensaje>
-      ) : (
+      {!soloVuelta && (
         <>
           <TramoVuelos
             numero={1}

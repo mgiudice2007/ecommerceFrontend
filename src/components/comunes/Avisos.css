@@ -64,6 +64,19 @@
   line-height: 1.4;
 }
 
+/* Enlace dentro del aviso ("Ir al carrito"), en el dorado del altavoz */
+.aviso-enlace {
+  display: inline-block;
+  margin-top: 6px;
+  color: #ffcf7a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.aviso-enlace:hover {
+  color: #ffffff;
+}
+
 .aviso-cerrar {
   flex-shrink: 0;
   padding: 0 4px;

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './Avisos.css'
 
 const SEGUNDOS_VISIBLE = 6
@@ -21,6 +22,12 @@ function Aviso({ aviso, onCerrar }) {
       <div className="aviso-texto">
         <small>Anuncio BCA</small>
         <p>{aviso.texto}</p>
+        {/* Si el aviso lleva un enlace, al tocarlo se va y el aviso se cierra */}
+        {aviso.enlace && (
+          <Link to={aviso.enlace.a} className="aviso-enlace" onClick={() => onCerrar(aviso.id)}>
+            {aviso.enlace.texto} →
+          </Link>
+        )}
       </div>
       <button type="button" className="aviso-cerrar" onClick={() => onCerrar(aviso.id)} aria-label="Cerrar aviso">
         ×
