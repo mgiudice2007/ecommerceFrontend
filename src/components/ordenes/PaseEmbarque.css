@@ -354,3 +354,59 @@
     transform: translateY(0);
   }
 }
+
+/* ---------- Impresion: solo los pases, a tamano real ----------
+   Con Ctrl + P en el detalle de la compra se imprimen solo las tarjetas de embarque,
+   cada una a 203,2 x 82,55 mm (formato ATB2), en A4 apaisada (entran dos por hoja). */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  /* Se ocultan el menu, el footer, los avisos y todo lo de la pagina que no lleva a los pases */
+  #root > :not(main),
+  main :not(:has(.pases-embarque)):not(.pases-embarque):not(.pases-embarque *),
+  .pases-embarque > h2,
+  .impresora {
+    display: none !important;
+  }
+
+  /* Los contenedores que envuelven a los pases quedan sin fondo, borde, sombra ni margen */
+  body {
+    background: #fff !important;
+  }
+
+  main,
+  main :has(.pases-embarque),
+  .pases-embarque {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: none !important;
+    max-width: none !important;
+    animation: none !important;
+  }
+
+  .pase-salida {
+    animation: none !important;
+  }
+
+  /* Cada pase a tamano real, con un borde finito para recortarlo y sin cortarse entre hojas */
+  .pase-sombra {
+    width: 203.2mm;
+    margin: 0 auto 8mm;
+    filter: none;
+    break-inside: avoid;
+  }
+
+  .pase {
+    width: 203.2mm;
+    height: 82.55mm;
+    aspect-ratio: auto;
+    border: 0.3mm solid #c9d6e6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
