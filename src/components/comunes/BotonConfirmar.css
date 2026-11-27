@@ -1,17 +1,53 @@
+/* Burbuja "¿Seguro? No / Sí" que flota sobre el botón. Al ser un popover se dibuja encima de todo
+   (no la recorta ni la corre la tabla o la tarjeta de la foto). */
 .boton-confirmar {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  display: none;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--superficie);
+  box-shadow: var(--sombra-fuerte);
+  color: var(--texto);
   font-size: 13px;
   font-weight: 600;
+  /* En el DOM queda dentro de la celda o la tarjeta: que no herede su alineación */
+  text-align: left;
+}
+
+.boton-confirmar:popover-open {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: confirmar-aparecer 0.15s ease-out;
+}
+
+/* Si el navegador sabe anclar (Chrome, Edge), la burbuja queda justo arriba del botón y, si no entra
+   arriba, se da vuelta y va abajo. Si no sabe, queda centrada en la pantalla: igual se ve. */
+@supports (position-area: top) {
+  .boton-confirmar {
+    position-area: top span-left;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+}
+
+.boton-confirmar-pregunta {
+  color: var(--rojo);
+}
+
+.boton-confirmar-botones {
+  display: flex;
+  gap: 8px;
 }
 
 .boton-confirmar button {
-  padding: 6px 12px;
+  padding: 7px 12px;
   border-radius: var(--radio);
   font: inherit;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -25,4 +61,16 @@
   border: 1px solid var(--borde);
   background: var(--superficie);
   color: var(--texto);
+}
+
+.boton-confirmar button:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 2px;
+}
+
+@keyframes confirmar-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
