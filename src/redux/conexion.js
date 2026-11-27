@@ -35,9 +35,14 @@ clienteApi.interceptors.request.use((config) => {
 // Si un pedido falla, el error trae el mensaje del backend: así el slice lo guarda con action.error.message
 clienteApi.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    let datos = error.response?.data
+    // Los pedidos de archivos (el PDF) reciben el error como Blob: adentro viene el JSON del backend
+    if (datos instanceof Blob) {
+      datos = await datos.text().then(JSON.parse).catch(() => null)
+    }
     const mensaje = error.response
-      ? mensajeDeError(error.response.data, error.response.status)
+      ? mensajeDeError(datos, error.response.status)
       : 'No se pudo conectar con el servidor. ¿Está levantado el backend?'
     return Promise.reject(new Error(mensaje))
   },

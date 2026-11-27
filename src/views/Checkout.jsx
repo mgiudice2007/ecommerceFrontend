@@ -87,7 +87,11 @@ function Checkout() {
   const personas = armarPersonas(carrito.items).map((persona) => ({ ...persona, ...cambios[persona.clave] }))
   const erroresPasajeros = validarPersonas(personas, carrito.items)
 
-  const cambiarPersona = (clave, campo, valor) => setCambios({ ...cambios, [clave]: { ...cambios[clave], [campo]: valor } })
+  // Al corregir un dato se saca el aviso de arriba; los errores de cada campo se siguen viendo abajo
+  const cambiarPersona = (clave, campo, valor) => {
+    setCambios({ ...cambios, [clave]: { ...cambios[clave], [campo]: valor } })
+    setError('')
+  }
 
   const continuar = () => {
     setIntentoPasajeros(true)
