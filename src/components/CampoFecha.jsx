@@ -10,6 +10,28 @@ for (let m = 0; m < 60; m += 5) MINUTOS.push(dosDigitos(m))
 
 const aTexto = (fecha) => (fecha ? `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}/${fecha.slice(0, 4)}` : '')
 
+// Arma dd/mm/aaaa mientras se escribe: el usuario pone solo los números y el campo agrega las barras.
+// Si alguien igual escribe la barra después de un solo número (1/5/...), se completa con un 0 (01/05/...).
+// Al borrar no se agregan barras (así la barra no "vuelve" cuando se borra hacia atrás), pero la que
+// ya estaba al final se respeta: cada tecla borra un solo carácter.
+const conBarras = (texto, escribiendo) => {
+  const agregando = escribiendo || texto.endsWith('/')
+  const partes = texto.split('/')
+  const digitos = partes
+    .map((parte, i) => {
+      const numeros = parte.replace(/\D/g, '')
+      const cerrada = i < partes.length - 1 && i < 2
+      return cerrada && numeros.length === 1 ? `0${numeros}` : numeros
+    })
+    .join('')
+    .slice(0, 8)
+
+  let salida = digitos.slice(0, 2)
+  if (digitos.length > 2 || (agregando && digitos.length === 2)) salida += `/${digitos.slice(2, 4)}`
+  if (digitos.length > 4 || (agregando && digitos.length === 4)) salida += `/${digitos.slice(4)}`
+  return salida
+}
+
 const aFecha = (texto) => {
   const partes = texto.split('/')
   if (partes.length !== 3 || partes[2].length !== 4) return null
@@ -35,8 +57,10 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
     else onChange(conHora ? `${nuevaFecha}T${nuevaHora}:${nuevosMinutos}` : nuevaFecha)
   }
 
+  const textoVisible = escrito ?? aTexto(fecha)
+
   const escribir = (e) => {
-    const texto = e.target.value
+    const texto = conBarras(e.target.value, e.target.value.length > textoVisible.length)
     setEscrito(texto)
     const nueva = aFecha(texto)
 
@@ -71,7 +95,8 @@ function CampoFecha({ id, value, onChange, min, max, conHora = false, required =
           inputMode="numeric"
           placeholder="dd/mm/aaaa"
           autoComplete="off"
-          value={escrito ?? aTexto(fecha)}
+          maxLength={10}
+          value={textoVisible}
           onChange={escribir}
           onBlur={salir}
           required={required}
