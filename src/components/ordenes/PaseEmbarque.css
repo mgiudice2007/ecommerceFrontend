@@ -180,7 +180,7 @@
   text-transform: uppercase;
 }
 
-/* Talon: clase arriba, QR, asiento grande y codigo de barras */
+/* Talon: clase arriba, QR real del codigo de embarque y asiento grande */
 .pase-talon {
   display: flex;
   flex-direction: column;
