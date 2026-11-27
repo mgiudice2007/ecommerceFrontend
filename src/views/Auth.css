@@ -9,17 +9,7 @@
 .auth-formulario {
   position: relative;
   overflow: hidden;
-  padding: 48px 40px 40px;
-}
-
-.auth-formulario::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: repeating-linear-gradient(135deg, var(--naranja) 0 14px, var(--azul-noche) 14px 28px);
+  padding: 40px;
 }
 
 .auth-formulario h1 {
