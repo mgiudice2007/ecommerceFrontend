@@ -21,11 +21,17 @@ export const textoEstado = (estado) => ESTADOS_VUELO.find((e) => e.valor === est
 
 export const estaOperativo = (vuelo) => vuelo.estado === 'ACTIVO' || vuelo.estado === 'DEMORADO'
 
-export const textoDescuento = (descuento, formatearPrecio) => {
+// El cartel del descuento siempre dice cuánto se ahorra en porcentaje ("15% OFF"). Si el descuento es un
+// monto fijo, el porcentaje se calcula sobre la clase más barata, que es el precio "desde" de la tarjeta.
+export const textoDescuento = (vuelo) => {
+  const descuento = vuelo.descuentoVigente
   if (!descuento) return null
-  return descuento.tipoDescuento === 'PORCENTAJE'
-    ? `${Number(descuento.valor)}% OFF`
-    : `${formatearPrecio(descuento.valor)} OFF`
+  if (descuento.tipoDescuento === 'PORCENTAJE') return `${Math.round(Number(descuento.valor))}% OFF`
+
+  const desde = precioDesde(vuelo)
+  if (!desde.precio || desde.precioConDescuento >= desde.precio) return null
+  const porcentaje = Math.max(1, Math.round((1 - desde.precioConDescuento / desde.precio) * 100))
+  return `${porcentaje}% OFF`
 }
 
 export const problemaEnVuelo = (datos) => {

@@ -6,6 +6,18 @@
   filter: drop-shadow(0 10px 22px rgba(4, 30, 66, 0.12));
 }
 
+/* Con descuento, el pase lleva un marco naranja. Va con drop-shadow (una "sombra" sin difuminar para cada
+   lado) y no con border, porque la mascara de la tarjeta recortaria el borde en las muescas. */
+.pase-vuelo.pase-vuelo-con-oferta {
+  filter: drop-shadow(2px 0 0 var(--naranja)) drop-shadow(-2px 0 0 var(--naranja)) drop-shadow(0 2px 0 var(--naranja))
+    drop-shadow(0 -2px 0 var(--naranja)) drop-shadow(0 10px 22px rgba(242, 96, 12, 0.22));
+}
+
+.pase-vuelo.pase-vuelo-con-oferta:hover {
+  filter: drop-shadow(2px 0 0 var(--naranja)) drop-shadow(-2px 0 0 var(--naranja)) drop-shadow(0 2px 0 var(--naranja))
+    drop-shadow(0 -2px 0 var(--naranja)) drop-shadow(0 18px 30px rgba(242, 96, 12, 0.32));
+}
+
 .tarjeta-vuelo {
   display: grid;
   grid-template-columns: 180px 1fr var(--talon);

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { fechaCorta, hora, precio } from '../../utils/formato'
+import { fechaCorta, hora } from '../../utils/formato'
 import { asientosDe, ESTADOS_VUELO, textoDescuento } from '../../utils/vuelos'
 import Etiqueta from '../comunes/Etiqueta'
 import EtiquetaEstado from '../comunes/EtiquetaEstado'
@@ -8,7 +8,7 @@ import './FilaVueloPanel.css'
 
 function FilaVueloPanel({ vuelo, onCambiarEstado, onEliminar }) {
   const asientos = asientosDe(vuelo)
-  const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+  const descuento = textoDescuento(vuelo)
   const sinClases = vuelo.disponibilidades.length === 0
 
   return (

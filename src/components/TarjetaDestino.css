@@ -34,23 +34,20 @@
   background: linear-gradient(180deg, rgba(4, 30, 66, 0) 35%, rgba(4, 30, 66, 0.55) 60%, rgba(4, 30, 66, 0.92) 100%);
 }
 
+/* El cartel "15% OFF" (estilo en .cartel-descuento de index.css) va arriba a la izquierda */
 .tarjeta-destino-oferta {
   position: absolute;
   top: 14px;
   left: 14px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(255, 250, 245, 0.95);
-  color: var(--naranja-oscuro);
-  font-size: 13px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border: 2px solid currentColor;
-  box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px currentColor, 0 4px 12px rgba(0, 0, 0, 0.25);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
-  animation: sellar 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) 0.5s backwards;
+}
+
+/* Las tarjetas con descuento llevan un marco naranja para que se destaquen en la grilla */
+.tarjeta-destino.tarjeta-destino-con-oferta {
+  box-shadow: 0 0 0 3px var(--naranja), 0 10px 28px rgba(242, 96, 12, 0.25);
+}
+
+.tarjeta-destino.tarjeta-destino-con-oferta:hover {
+  box-shadow: 0 0 0 3px var(--naranja), 0 18px 40px rgba(242, 96, 12, 0.35);
 }
 
 /* Sello de pasaporte redondo arriba a la derecha con el codigo del destino:

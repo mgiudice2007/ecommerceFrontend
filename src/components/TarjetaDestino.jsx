@@ -6,17 +6,17 @@ import FotoVuelo from './FotoVuelo'
 import './TarjetaDestino.css'
 
 function TarjetaDestino({ vuelo, pais, imagen }) {
-  const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+  const descuento = textoDescuento(vuelo)
   const desde = precioDesde(vuelo)
   const conRebaja = desde.precioConDescuento < desde.precio
 
   return (
-    <Link to={`/vuelos/${vuelo.id}`} className="tarjeta-destino">
+    <Link to={`/vuelos/${vuelo.id}`} className={`tarjeta-destino ${descuento ? 'tarjeta-destino-con-oferta' : ''}`.trim()}>
       <div className="tarjeta-destino-foto">
         <FotoVuelo imagen={imagen} destinoIata={vuelo.destinoIata} destinoCiudad={vuelo.destinoCiudad} />
       </div>
 
-      {descuento && <span className="tarjeta-destino-oferta">{descuento}</span>}
+      {descuento && <span className="tarjeta-destino-oferta cartel-descuento">{descuento}</span>}
 
       {/* Sello de pasaporte con el codigo del aeropuerto de destino */}
       <span className="tarjeta-destino-sello" aria-hidden="true">

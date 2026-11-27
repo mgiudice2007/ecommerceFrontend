@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { duracion, fechaLarga, precio } from '../../utils/formato'
+import { duracion, fechaLarga } from '../../utils/formato'
 import { textoDescuento, textoEstado } from '../../utils/vuelos'
 import './PortadaVuelo.css'
 
 function PortadaVuelo({ vuelo, imagen }) {
-  const descuento = textoDescuento(vuelo.descuentoVigente, precio)
+  const descuento = textoDescuento(vuelo)
   const fondo = imagen ? { backgroundImage: `url("${imagen}")` } : undefined
 
   return (
@@ -16,7 +16,7 @@ function PortadaVuelo({ vuelo, imagen }) {
         </nav>
         <div className="detalle-portada-etiquetas">
           <span>{vuelo.categoriaNombre}</span>
-          {descuento && <span className="oferta">{descuento}</span>}
+          {descuento && <span className="oferta cartel-descuento">{descuento}</span>}
           {vuelo.estado !== 'ACTIVO' && (
             <span className={`estado-${vuelo.estado.toLowerCase()}`}>{textoEstado(vuelo.estado)}</span>
           )}

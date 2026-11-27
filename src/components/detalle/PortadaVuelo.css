@@ -40,15 +40,11 @@
   font-weight: 700;
 }
 
+/* El cartel "15% OFF" usa .cartel-descuento (index.css); aca solo se pisa lo de las otras etiquetas */
 .detalle-portada-etiquetas .oferta {
-  background: rgba(255, 250, 245, 0.95);
-  color: var(--naranja-oscuro);
-  border: 2px solid currentColor;
-  box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px currentColor, 0 4px 12px rgba(0, 0, 0, 0.25);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
-  animation: sellar 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) 0.5s backwards;
+  border-radius: 8px;
+  background: var(--degradado-atardecer);
+  backdrop-filter: none;
 }
 
 .detalle-portada h1 {
