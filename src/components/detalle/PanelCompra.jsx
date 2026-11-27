@@ -17,8 +17,6 @@ function PanelCompra({ motivoSinVenta, hayClase, children }) {
         ) : (
           children
         )}
-
-        <span className="detalle-compra-barras" aria-hidden="true" />
       </aside>
     </div>
   )

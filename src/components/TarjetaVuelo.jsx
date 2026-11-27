@@ -88,7 +88,6 @@ function TarjetaVuelo({ vuelo, pasajeros = '', imagen }) {
           <Link to={`/vuelos/${vuelo.id}${pasajeros}`} className="boton boton-accion">
             Ver vuelo
           </Link>
-          <span className="tarjeta-vuelo-barras" aria-hidden="true" />
         </div>
       </article>
     </div>

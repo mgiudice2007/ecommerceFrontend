@@ -79,7 +79,6 @@
   font-size: 18px;
 }
 
-
 .tarjeta-vuelo-fecha {
   margin: 14px 0 0;
   font-size: 14px;
@@ -236,25 +235,6 @@
   text-align: left;
 }
 
-/* Codigo de barras del talon */
-.tarjeta-vuelo-barras {
-  align-self: stretch;
-  height: 26px;
-  margin-top: 12px;
-  opacity: 0.75;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--azul-noche) 0 2px,
-    transparent 2px 4px,
-    var(--azul-noche) 4px 5px,
-    transparent 5px 8px,
-    var(--azul-noche) 8px 11px,
-    transparent 11px 13px,
-    var(--azul-noche) 13px 14px,
-    transparent 14px 17px
-  );
-}
-
 .tarjeta-vuelo-precio small {
   color: var(--texto-suave);
 }
@@ -287,8 +267,7 @@
     mask: none;
   }
 
-  .tarjeta-vuelo-talon,
-  .tarjeta-vuelo-barras {
+  .tarjeta-vuelo-talon {
     display: none;
   }
 

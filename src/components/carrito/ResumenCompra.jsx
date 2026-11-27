@@ -56,7 +56,6 @@ function ResumenCompra({
       <Link to={enlace.to} className="carrito-seguir">
         {enlace.texto}
       </Link>
-      <span className="carrito-resumen-barras" aria-hidden="true" />
     </aside>
   )
 }

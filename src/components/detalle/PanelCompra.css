@@ -43,24 +43,6 @@
   font-size: 22px;
 }
 
-.detalle-compra-barras {
-  display: block;
-  height: 34px;
-  margin-top: 18px;
-  opacity: 0.7;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--azul-noche) 0 2px,
-    transparent 2px 4px,
-    var(--azul-noche) 4px 5px,
-    transparent 5px 8px,
-    var(--azul-noche) 8px 11px,
-    transparent 11px 13px,
-    var(--azul-noche) 13px 14px,
-    transparent 14px 17px
-  );
-}
-
 .detalle-resumen {
   display: flex;
   justify-content: space-between;
