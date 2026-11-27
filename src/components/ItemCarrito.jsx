@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { fechaLarga, hora, precioOGratis } from '../utils/formato'
+import { duracion, fechaLarga, hora, horaLlegada, precioOGratis } from '../utils/formato'
 import { nombreTipo } from '../utils/pasajeros'
 import FotoVuelo from './FotoVuelo'
 import './ItemCarrito.css'
@@ -22,12 +22,11 @@ function ItemCarrito({ item, vuelo, imagen, onCambiarCantidad, onEliminar, ocupa
               {item.origen} → {item.destino}
             </Link>
           </h3>
-          {vuelo && (
-            <p className="texto-suave">
-              {fechaLarga(vuelo.fechaSalida)} · sale {hora(vuelo.fechaSalida)} hs ({vuelo.origenIata} →{' '}
-              {vuelo.destinoIata})
-            </p>
-          )}
+          <p className="texto-suave">
+            {fechaLarga(item.fechaSalida)} · sale {hora(item.fechaSalida)} hs · llega{' '}
+            {horaLlegada(item.fechaSalida, item.fechaLlegada)} hs · {duracion(item.duracionMinutos)}
+            {vuelo && ` (${vuelo.origenIata} → ${vuelo.destinoIata})`}
+          </p>
           <p className="item-carrito-clase">
             Clase <strong>{item.claseNombre}</strong> · <strong>{nombreTipo(item.tipoPasajero)}</strong> ·{' '}
             {precioOGratis(item.precioUnitario)} por pasajero
@@ -71,7 +70,6 @@ function ItemCarrito({ item, vuelo, imagen, onCambiarCantidad, onEliminar, ocupa
           <button className="item-carrito-eliminar" onClick={() => onEliminar(item)} disabled={ocupado}>
             Eliminar
           </button>
-          <span className="item-carrito-barras" aria-hidden="true" />
         </div>
       </article>
     </div>

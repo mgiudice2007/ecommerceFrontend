@@ -1,4 +1,4 @@
-import { fechaLarga, hora, precioOGratis } from '../../utils/formato'
+import { duracion, fechaLarga, hora, horaLlegada, precioOGratis } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
 import { momentoDeCompra, numerosDeVuelo, rotuloVuelos } from '../../utils/ordenes'
 import { textoMedioPago } from '../../utils/pagos'
@@ -46,6 +46,10 @@ function Boleto({ orden, imprimir = false }) {
               <small>
                 Vuelo {item.numeroVuelo} · {item.claseNombre} · {item.cantidad} ×{' '}
                 {nombreTipo(item.tipoPasajero).toLowerCase()} × {precioOGratis(item.precioUnitario)}
+              </small>
+              <small>
+                {fechaLarga(item.fechaSalida)} · sale {hora(item.fechaSalida)} hs · llega{' '}
+                {horaLlegada(item.fechaSalida, item.fechaLlegada)} hs · {duracion(item.duracionMinutos)}
               </small>
               {item.asientos?.length > 0 && (
                 <small>

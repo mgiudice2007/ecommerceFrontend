@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { fechaCorta, fechaLarga, hora, precio } from '../../utils/formato'
+import { duracion, fechaCorta, fechaLarga, hora, horaLlegada, precio } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
 import { momentoDeCompra, textoNumerosDeVuelo, tramoYaSalio as yaSalio } from '../../utils/ordenes'
 import { textoMedioPago } from '../../utils/pagos'
@@ -48,7 +48,11 @@ function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
               </span>
               <span className="compra-salida">
                 {fechaCorta(item.fechaSalida)}
-                <small>{!cancelada && yaSalio(item) ? 'Ya voló' : `${hora(item.fechaSalida)} hs`}</small>
+                <small>
+                  {!cancelada && yaSalio(item)
+                    ? 'Ya voló'
+                    : `${hora(item.fechaSalida)} → ${horaLlegada(item.fechaSalida, item.fechaLlegada)} hs · ${duracion(item.duracionMinutos)}`}
+                </small>
               </span>
             </li>
           ))}

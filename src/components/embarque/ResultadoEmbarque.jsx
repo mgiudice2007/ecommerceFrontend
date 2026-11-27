@@ -1,4 +1,4 @@
-import { fechaLarga, hora } from '../../utils/formato'
+import { duracion, fechaLarga, hora } from '../../utils/formato'
 import './ResultadoEmbarque.css'
 
 // Lo que muestra el semaforo segun el estado del pase
@@ -48,6 +48,12 @@ function ResultadoEmbarque({ pase, embarcando, recienEmbarcado, onEmbarcar }) {
           <dt>Salida</dt>
           <dd>
             {fechaLarga(pase.fechaSalida)} · {hora(pase.fechaSalida)} hs
+          </dd>
+        </div>
+        <div>
+          <dt>Llegada</dt>
+          <dd>
+            {fechaLarga(pase.fechaLlegada)} · {hora(pase.fechaLlegada)} hs ({duracion(pase.duracionMinutos)} de vuelo)
           </dd>
         </div>
         <div>

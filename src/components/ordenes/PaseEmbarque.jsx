@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { hora } from '../../utils/formato'
+import { diasHastaLlegada, duracion, hora } from '../../utils/formato'
 import { nombreTipo } from '../../utils/pasajeros'
 import CodigoQr from './CodigoQr'
 import './PaseEmbarque.css'
@@ -40,6 +40,8 @@ function PaseEmbarque({ pasaje, item, anulado }) {
   const destinoIata = iataDe(item.destino)
   const asiento = pasaje.asiento ?? '—'
   const documento = `${pasaje.tipoDocumento === 'PASAPORTE' ? 'Pasaporte' : 'DNI'} ${pasaje.documento}`
+  // Si se llega otro dia, la hora de llegada lleva un "+1" chiquito como en los pases reales
+  const diasDespues = diasHastaLlegada(item.fechaSalida, item.fechaLlegada)
 
   return (
     <div className="pase-sombra">
@@ -62,20 +64,23 @@ function PaseEmbarque({ pasaje, item, anulado }) {
           </header>
 
           <div className="pase-datos">
-            <Dato rotulo="Pasajero" clase="pase-dato-pasajero">
+            {/* Grilla de 6 columnas en 3 filas, para que el pase mantenga la proporcion de una tarjeta real */}
+            <Dato rotulo="Pasajero" clase="pase-dato-ancho pase-dato-pasajero">
               {pasaje.nombre} {pasaje.apellido}
             </Dato>
             <Dato rotulo="Vuelo">{item.numeroVuelo}</Dato>
-            <Dato rotulo="Fecha">{fechaPase(item.fechaSalida)}</Dato>
+            <Dato rotulo="Fecha" clase="pase-dato-ancho">
+              {fechaPase(item.fechaSalida)}
+            </Dato>
             <Dato rotulo="Asiento" clase="pase-dato-destacado">
               {asiento}
             </Dato>
 
-            <Dato rotulo="Desde" clase="pase-dato-ancho">
+            <Dato rotulo="Desde" clase="pase-dato-mitad">
               {item.origen}
               {origenIata && ` (${origenIata})`}
             </Dato>
-            <Dato rotulo="Hacia" clase="pase-dato-ancho">
+            <Dato rotulo="Hacia" clase="pase-dato-mitad">
               {item.destino}
               {destinoIata && ` (${destinoIata})`}
             </Dato>
@@ -87,6 +92,11 @@ function PaseEmbarque({ pasaje, item, anulado }) {
             <Dato rotulo="Salida" clase="pase-dato-grande">
               {hora(item.fechaSalida)}
             </Dato>
+            <Dato rotulo="Llegada" clase="pase-dato-grande">
+              {hora(item.fechaLlegada)}
+              {diasDespues > 0 && <sup className="pase-dato-dias">+{diasDespues}</sup>}
+            </Dato>
+            <Dato rotulo="Duración">{duracion(item.duracionMinutos)}</Dato>
             <Dato rotulo="Zona">{zonaDe(item.claseNombre)}</Dato>
           </div>
 
@@ -109,7 +119,6 @@ function PaseEmbarque({ pasaje, item, anulado }) {
             <strong>{asiento}</strong>
             <small>{pasaje.asiento ? 'Asiento' : 'Viaja en brazos'}</small>
           </div>
-          <span className="pase-barras" aria-hidden="true" />
         </aside>
 
         {anulado && <span className="pase-sello sello sello-cancelada">Anulado</span>}

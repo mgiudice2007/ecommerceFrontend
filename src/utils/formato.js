@@ -26,6 +26,12 @@ export const diasHastaLlegada = (salida, llegada) => {
   return Math.round((dia(llegada) - dia(salida)) / 86_400_000)
 }
 
+// Hora de llegada con "(+1)" si se llega otro dia, como en los pasajes: "09:35" o "06:10 (+1)"
+export const horaLlegada = (salida, llegada) => {
+  const dias = diasHastaLlegada(salida, llegada)
+  return dias > 0 ? `${hora(llegada)} (+${dias})` : hora(llegada)
+}
+
 export const fechaLarga = (fecha) =>
   new Date(fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
 
