@@ -64,7 +64,17 @@
   cursor: default;
 }
 
-/* El mapa es el fuselaje del avion: nariz redondeada arriba y ventanillas a los costados */
+/* Minimapa a la izquierda y zoom a la derecha, centrados juntos */
+.selector-asientos-mapas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* El zoom es el fuselaje del avion con ventanillas a los costados. Muestra 9 filas por vez, asi entra
+   entero y no hace falta scroll; cuales se ven lo elige el minimapa. */
 .selector-asientos-avion {
   display: flex;
   flex-direction: column;
@@ -72,18 +82,74 @@
   gap: 6px;
   width: fit-content;
   max-width: 100%;
-  max-height: 420px;
-  margin: 0 auto;
-  overflow-y: auto;
-  padding: 70px 40px 24px;
+  padding: 24px 40px;
   border: 3px solid #c9d6e6;
-  border-radius: 220px 220px 28px 28px;
+  border-radius: 28px;
   background:
     radial-gradient(ellipse 5px 8px at 14px 50%, #8fb3dc 70%, transparent 75%) 0 0 / 100% 38px repeat-y,
     radial-gradient(ellipse 5px 8px at calc(100% - 14px) 50%, #8fb3dc 70%, transparent 75%) 0 0 / 100% 38px repeat-y,
     linear-gradient(180deg, #f7faff 0%, #ffffff 100%);
   box-shadow: inset 0 0 0 6px #eef3fa, var(--sombra);
-  background-attachment: local;
+  animation: aparecer 0.25s ease-out;
+}
+
+/* La parte de adelante del avion lleva la nariz redondeada arriba */
+.selector-asientos-avion.con-nariz {
+  --nariz: 60px;
+  padding-top: var(--nariz);
+  border-radius: 220px 220px 28px 28px;
+}
+
+/* Con muchas filas se ven unas 9 y se scrollea la caja de afuera, no el avion: asi la barra de scroll
+   queda a un costado, separada del fuselaje, y el avion se ve entero (nariz arriba, cola abajo).
+   overscroll-behavior: contain evita que al llegar al final el scroll siga con la pagina. */
+.selector-asientos-scroll {
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.selector-asientos-scroll.con-scroll {
+  max-height: 400px;
+  padding-right: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #c9d6e6 transparent;
+}
+
+/* Las letras de las columnas quedan fijas arriba del avion mientras se scrollea. Ocupan todo el ancho de
+   adentro del fuselaje (de ventanilla a ventanilla: el margen negativo compensa el padding del avion) y son
+   transparentes mientras estan en su lugar, asi no se dibuja un rectangulo sobre la nariz. */
+.selector-asientos-scroll.con-scroll .fila-asientos.letras {
+  /* Igual al padding de los costados del avion */
+  --lado: 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  align-self: stretch;
+  justify-content: center;
+  margin: 0 calc(-1 * var(--lado));
+  padding: 10px var(--lado) 8px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+/* Recien cuando quedan fijas arriba llevan fondo, para tapar las filas que pasan por debajo */
+.selector-asientos-scroll.con-scroll .fila-asientos.letras.fijas {
+  background: #fafcff;
+  box-shadow: 0 6px 8px -6px rgba(4, 30, 66, 0.2);
+}
+
+/* El asiento elegido de cada pasajero es un boton que lleva el avion hasta el */
+.selector-asientos-ir {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--naranja-oscuro);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline dotted;
+  cursor: pointer;
 }
 
 .fila-asientos {
@@ -162,5 +228,56 @@
 
   .despues-del-pasillo {
     margin-left: 14px;
+  }
+}
+
+/* En el celular el zoom pierde margen a los costados para entrar al lado del minimapa */
+@media (max-width: 480px) {
+  .selector-asientos-mapas {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .selector-asientos-avion {
+    gap: 5px;
+    padding: 16px 10px;
+    background: linear-gradient(180deg, #f7faff 0%, #ffffff 100%);
+  }
+
+  .selector-asientos-avion.con-nariz {
+    --nariz: 40px;
+  }
+
+  .selector-asientos-scroll.con-scroll {
+    max-height: 340px;
+    padding-right: 8px;
+  }
+
+  .selector-asientos-scroll.con-scroll .fila-asientos.letras {
+    --lado: 10px;
+  }
+
+  .fila-asientos {
+    gap: 4px;
+  }
+
+  .fila-asientos.letras span {
+    width: 26px;
+  }
+
+  /* La columna del numero de fila (y su hueco en la fila de letras) es mas angosta que un asiento */
+  .fila-asientos.letras span:first-child,
+  .numero-fila {
+    width: 18px;
+  }
+
+  .asiento {
+    width: 26px;
+    height: 26px;
+  }
+
+  .despues-del-pasillo,
+  .fila-asientos.letras span.despues-del-pasillo {
+    margin-left: 10px;
   }
 }

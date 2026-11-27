@@ -1,0 +1,99 @@
+/* La cabina entera vista de arriba en miniatura: punta cuadrada, salvo la de adelante, que lleva la nariz */
+.minimapa-avion {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 10px 6px;
+  border: 2px solid #c9d6e6;
+  border-radius: 12px;
+  background: #f7faff;
+}
+
+.minimapa-avion.con-nariz {
+  padding-top: 26px;
+  border-radius: 60px 60px 12px 12px;
+}
+
+/* La zona que se toca o se arrastra. touch-action: none para que en el celular arrastrar el dedo mueva
+   la franja y no la pagina. */
+.minimapa-filas {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.minimapa-filas:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 3px;
+}
+
+.minimapa-fila {
+  display: flex;
+  gap: 2px;
+  padding: 1px 4px;
+}
+
+.minimapa-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: #8fb3dc;
+}
+
+.minimapa-punto.despues-del-pasillo {
+  margin-left: 5px;
+}
+
+.minimapa-punto.ocupado {
+  background: #d5dde8;
+}
+
+.minimapa-punto.elegido {
+  background: var(--naranja);
+}
+
+/* La franja: la parte del avion que se ve grande al lado */
+.minimapa-franja {
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  border: 2px solid var(--azul);
+  border-radius: 5px;
+  background: rgba(0, 87, 184, 0.12);
+  cursor: grab;
+  pointer-events: none;
+}
+
+.minimapa-filas:active .minimapa-franja {
+  cursor: grabbing;
+  background: rgba(0, 87, 184, 0.2);
+}
+
+/* En el celular el minimapa se achica para quedar al lado del avion grande y no arriba */
+@media (max-width: 480px) {
+  .minimapa-avion {
+    padding: 8px 3px;
+  }
+
+  .minimapa-avion.con-nariz {
+    padding-top: 18px;
+  }
+
+  .minimapa-fila {
+    gap: 1px;
+    padding: 1px 2px;
+  }
+
+  .minimapa-punto {
+    width: 5px;
+    height: 5px;
+  }
+
+  .minimapa-punto.despues-del-pasillo {
+    margin-left: 3px;
+  }
+}
