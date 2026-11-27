@@ -84,7 +84,8 @@ function FormTarjeta({ tarjeta, errores, credito, cuotas, total, onCambiar, onRe
       {credito && (
         <Campo id="cuotas" etiqueta="Cuotas">
           <select id="cuotas" name="cuotas" value={tarjeta.cuotas} onChange={onCambiar}>
-            {cuotas.map((cantidad) => (
+            {/* Con montos chicos no se ofrecen cuotas de menos de $ 1 */}
+            {cuotas.filter((cantidad) => cantidad === 1 || total / cantidad >= 1).map((cantidad) => (
               <option key={cantidad} value={cantidad}>
                 {cantidad === 1
                   ? `1 pago de ${precio(total)}`

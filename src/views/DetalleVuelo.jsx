@@ -32,7 +32,7 @@ function DetalleVuelo() {
   const dispatch = useDispatch()
   const { clases } = useSelector((state) => state.catalogo)
   const { vueloActual, fotosVuelo, mapaAsientos, errorMapa, error } = useSelector((state) => state.vuelos)
-  const { pasajesAgregados, guardando: agregando, error: errorAlAgregar } = useSelector((state) => state.carrito)
+  const { carrito, pasajesAgregados, guardando: agregando, error: errorAlAgregar } = useSelector((state) => state.carrito)
 
   // El store guarda el último vuelo que se pidió: solo sirve si es el de esta página
   const vuelo = vueloActual?.id === Number(id) ? vueloActual : null
@@ -104,6 +104,9 @@ function DetalleVuelo() {
 
   const sinVenta = motivoSinVenta(vuelo)
   const mapaDeLaClase = elegida && mapaAsientos.disponibilidadId === elegida.id
+  // Los asientos que ya están en el carrito para esta clase se ven ocupados: no se pueden elegir dos veces
+  const enElCarrito = (carrito?.items ?? []).filter((item) => item.disponibilidadId === elegida?.id).flatMap((item) => item.asientos)
+  const mapa = mapaDeLaClase ? { ...mapaAsientos.datos, ocupados: [...mapaAsientos.datos.ocupados, ...enElCarrito] } : null
   const faltanAsientos = pasajeros.adultos + pasajeros.ninos - asientos.length
   const agregado = pasajesAgregados && !seguirConVuelta
   const eligiendoIda = searchParams.get('viaje') === 'idavuelta' && searchParams.get('tramo') === 'ida'
@@ -167,7 +170,7 @@ function DetalleVuelo() {
                 clase={elegida}
                 pasajeros={pasajeros}
                 asientos={asientos}
-                mapa={mapaDeLaClase ? mapaAsientos.datos : null}
+                mapa={mapa}
                 error={mapaDeLaClase ? '' : (errorMapa ?? '')}
                 ocupado={agregando}
                 onCambio={cambiarAsientos}
