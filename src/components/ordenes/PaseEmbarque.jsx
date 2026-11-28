@@ -35,9 +35,11 @@ function Dato({ rotulo, children, clase = '' }) {
 // anulado: no muestra el QR y le cae un sello.
 function PaseEmbarque({ pasaje, item, anulado }) {
   const { aeropuertos } = useSelector((state) => state.catalogo)
+  // El back manda el codigo del aeropuerto de cada tramo (Buenos Aires puede ser EZE o AEP).
+  // Si una compra vieja no lo trae, se busca por la ciudad en el catalogo
   const iataDe = (ciudad) => aeropuertos.find((a) => a.ciudad === ciudad)?.codigoIata
-  const origenIata = iataDe(item.origen)
-  const destinoIata = iataDe(item.destino)
+  const origenIata = item.origenIata ?? iataDe(item.origen)
+  const destinoIata = item.destinoIata ?? iataDe(item.destino)
   const asiento = pasaje.asiento ?? '—'
   const documento = `${pasaje.tipoDocumento === 'PASAPORTE' ? 'Pasaporte' : 'DNI'} ${pasaje.documento}`
   // Si se llega otro dia, la hora de llegada lleva un "+1" chiquito como en los pases reales

@@ -37,7 +37,7 @@ export const sellosDeViaje = (ordenes, aeropuertos) => {
         const aeropuerto = aeropuertos.find((a) => a.ciudad === item.destino)
         porDestino[item.destino] = {
           clave: item.destino,
-          iata: aeropuerto?.codigoIata ?? item.destino.slice(0, 3).toUpperCase(),
+          iata: item.destinoIata ?? aeropuerto?.codigoIata ?? item.destino.slice(0, 3).toUpperCase(),
           ciudad: item.destino,
           fecha: item.fechaSalida,
         }

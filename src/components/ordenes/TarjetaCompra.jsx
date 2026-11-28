@@ -17,7 +17,7 @@ function TarjetaCompra({ orden, imagen, cancelando, onCancelar }) {
   return (
     <article className={`tarjeta compra compra-${momento}`}>
       <div className="compra-foto" aria-hidden="true">
-        <FotoVuelo imagen={imagen} destinoIata="" destinoCiudad={orden.items[0].destino} />
+        <FotoVuelo imagen={imagen} destinoIata={orden.items[0].destinoIata} destinoCiudad={orden.items[0].destino} />
       </div>
 
       <div className="compra-contenido">
